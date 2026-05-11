@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import {
   Eye, EyeOff, Loader2, LogIn,
   TrendingUp, Bot, Target, Shield,
-  ChevronLeft,
+  ChevronLeft, Mail, Lock
 } from 'lucide-react'
 import ParticleField from '../components/Particlefield'
 
@@ -79,7 +79,7 @@ export default function LoginPage() {
                 background: 'rgba(0,245,255,0.05)'
               }}
             >
-              <div className="w-7 h-7 rounded-full" style={{ background: 'linear-gradient(135deg, #00f5ff, #0096c7)' }} />
+              <span className="text-3xl">⏱</span>
             </motion.div>
             <div className="flex flex-col items-center">
               <span
@@ -159,6 +159,28 @@ export default function LoginPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
+            <div className="flex items-center gap-2 mb-4">
+              <motion.div
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+                className="w-8 h-8 rounded-full border border-cyan-DEFAULT/40 flex items-center justify-center text-sm"
+                style={{ borderColor: 'rgba(0,245,255,0.4)' }}
+              >
+                ⏱
+              </motion.div>
+              <span
+                className="text-xl font-bold tracking-tight"
+                style={{
+                  background: 'linear-gradient(135deg, #00f5ff, #0096c7)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  fontFamily: 'Sora, sans-serif',
+                  letterSpacing: '-0.03em',
+                }}
+              >
+                FinTime
+              </span>
+            </div>
             <div className="section-label">Welcome Back</div>
             <h2 className="text-4xl font-extrabold tracking-tight mb-2" style={{ fontFamily: 'Sora, sans-serif' }}>
               Masuk ke <span className="grad-text">FinTime</span>
@@ -175,14 +197,17 @@ export default function LoginPage() {
                 <label className="text-xs font-bold tracking-widest uppercase" style={{ color: 'var(--text-dim)' }}>
                   Email <span style={{ color: '#00f5ff' }}>*</span>
                 </label>
-                <input
-                  type="email"
-                  placeholder="nama@email.com"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  className="finput"
-                  required
-                />
+                <div className="relative">
+                  <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-dim)' }} />
+                  <input
+                    type="email"
+                    placeholder="nama@email.com"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    className="finput"
+                    required
+                  />
+                </div>
               </div>
 
               <div className="flex flex-col gap-2">
@@ -190,6 +215,7 @@ export default function LoginPage() {
                   Password <span style={{ color: '#00f5ff' }}>*</span>
                 </label>
                 <div className="relative">
+                  <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-dim)' }} />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     placeholder="Masukkan password"
