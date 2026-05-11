@@ -5,6 +5,7 @@ import {
   AnimatePresence,
 } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import ParticleField from "./Particlefield";
 import { TIMELINE_DATA } from "../data/timeline";
 import { formatRupiah } from "../utils/format";
@@ -153,6 +154,7 @@ function FloatingTimeline({ activeIdx, onSelect }) {
 }
 
 export default function HeroSection() {
+  const navigate = useNavigate()
   const [activeIdx, setActiveIdx] = useState(0);
   const [displayBalance, setDisplayBalance] = useState(
     TIMELINE_DATA[0].netWorth,
@@ -327,7 +329,7 @@ export default function HeroSection() {
             whileHover={{ scale: 1.04, y: -2 }}
             whileTap={{ scale: 0.97 }}
             className="btn-primary flex items-center gap-2.5 px-8 py-4 text-base font-extrabold rounded-full"
-            onClick={scrollToNext}
+            onClick={() => navigate('/register')}
           >
             <span>🚀</span>
             <span>Start Your Time Machine</span>

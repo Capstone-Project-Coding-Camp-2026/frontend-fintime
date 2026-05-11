@@ -112,7 +112,7 @@ export default function Navbar() {
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             className="btn-primary text-sm font-bold px-5 py-2.5"
-            onClick={() => scrollTo('#hero')}
+            onClick={() => navigate('/login')}
           >
             Launch App
           </motion.button>
