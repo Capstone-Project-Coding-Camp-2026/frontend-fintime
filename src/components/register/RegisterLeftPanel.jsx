@@ -64,7 +64,7 @@ export function RegisterLeftPanel() {
               background: 'rgba(0,245,255,0.05)',
             }}
           >
-            <div className="w-7 h-7 rounded-full" style={{ background: 'linear-gradient(135deg, #00f5ff, #0096c7)' }} />
+            <span className="text-3xl">⏱</span>
           </motion.div>
           <div className="flex flex-col items-center">
             <span

@@ -133,6 +133,29 @@ export default function RegisterPage() {
         </Link>
 
         <div className="w-full max-w-md mx-auto">
+          <div className="flex items-center gap-2 mb-6">
+            <motion.div
+              animate={{ rotate: [0, 360] }}
+              transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+              className="w-8 h-8 rounded-full border border-cyan-DEFAULT/40 flex items-center justify-center text-sm"
+              style={{ borderColor: 'rgba(0,245,255,0.4)' }}
+            >
+              ⏱
+            </motion.div>
+            <span
+              className="text-xl font-bold tracking-tight"
+              style={{
+                background: 'linear-gradient(135deg, #00f5ff, #0096c7)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                fontFamily: 'Sora, sans-serif',
+                letterSpacing: '-0.03em',
+              }}
+            >
+              FinTime
+            </span>
+          </div>
+          
           {!isSuccess && (
             <div className="mb-8">
               <div className="flex items-center justify-between mb-3">
