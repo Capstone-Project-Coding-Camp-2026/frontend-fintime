@@ -169,7 +169,7 @@ export default function Navbar() {
           </button>
         ))}
         <button
-          onClick={() => { navigate('/profile'); setMobileOpen(false) }}
+          onClick={() => { navigate('/login'); setMobileOpen(false) }}
           className="btn-ghost text-sm font-bold py-2.5 mt-2"
         >
           Login

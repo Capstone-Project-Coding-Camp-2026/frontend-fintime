@@ -334,15 +334,6 @@ export default function HeroSection() {
             <span>🚀</span>
             <span>Start Your Time Machine</span>
           </motion.button>
-          {/* <motion.button
-            whileHover={{ scale: 1.03, y: -2 }}
-            whileTap={{ scale: 0.97 }}
-            className="btn-ghost flex items-center gap-2 px-6 py-4 text-sm font-bold rounded-full"
-            onClick={() => navigate('/profile')}
-          >
-            <span>Edit My Profile</span>
-            <span>→</span>
-          </motion.button> */}
         </motion.div>
 
         {/* Avatar + Timeline */}

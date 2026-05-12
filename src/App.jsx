@@ -1,27 +1,24 @@
-import { Routes, Route } from 'react-router-dom'
-import Navbar from './components/Navbar'
-import ParticleField from './components/Particlefield'
-import HeroSection from './components/HeroSection'
-import TimelineSection from './components/TimelineSection'
-import RegisterPage from './pages/RegisterPage'
-import LoginPage from './pages/LoginPage'
+import { Routes, Route } from "react-router-dom";
+import LandingPage from "./pages/LandingPage";
+import RegisterPage from "./pages/RegisterPage";
+import LoginPage from "./pages/LoginPage";
+import DashboardPage from "./pages/DashboardPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
   return (
     <Routes>
-      <Route
-        path="/"
-        element={
-          <main className="relative min-h-screen overflow-hidden bg-[#020b18]">
-            <ParticleField />
-            <Navbar />
-            <HeroSection />
-            <TimelineSection />
-          </main>
-        }
-      />
+      <Route path="/" element={<LandingPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <DashboardPage />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
-  )
+  );
 }

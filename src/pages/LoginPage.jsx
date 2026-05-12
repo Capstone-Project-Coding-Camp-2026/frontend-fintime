@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import api from '../lib/api'
 import {
   Eye, EyeOff, Loader2, LogIn,
   TrendingUp, Bot, Target, Shield,
@@ -13,12 +15,47 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const navigate = useNavigate();
+  const handleLogin = async (e) => {
+  e.preventDefault()
 
-  const handleLogin = (e) => {
-    e.preventDefault()
+  try {
     setLoading(true)
-    setTimeout(() => setLoading(false), 1500)
+
+    const response = await api.post('/auth/login', {
+      email,
+      password,
+    })
+
+    console.log(response.data)
+
+    // simpan token
+    localStorage.setItem(
+      'token',
+      response.data.token
+    )
+
+    // optional save user
+    localStorage.setItem(
+      'user',
+      JSON.stringify(response.data.user)
+    )
+     setTimeout(() => {
+    navigate('/dashboard');
+  }, 1500); // delay 1 detik untuk melihat pesan sukses
+
+  } catch (error) {
+    console.error(error)
+
+    alert(
+      error.response?.data?.message ||
+      'Login failed'
+    )
+
+  } finally {
+    setLoading(false)
   }
+}
 
   return (
     <div className="relative min-h-screen flex overflow-hidden" style={{ background: 'var(--dark)' }}>
