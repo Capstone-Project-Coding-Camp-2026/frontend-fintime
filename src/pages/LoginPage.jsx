@@ -1,61 +1,45 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
-import { useNavigate } from 'react-router-dom'
-import api from '../lib/api'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   Eye, EyeOff, Loader2, LogIn,
   TrendingUp, Bot, Target, Shield,
-  ChevronLeft, Mail, Lock
+  ChevronLeft, Mail, Lock, AlertCircle
 } from 'lucide-react'
 import ParticleField from '../components/Particlefield'
+import api from '../lib/api'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-  const navigate = useNavigate();
-  const handleLogin = async (e) => {
-  e.preventDefault()
+  const [error, setError] = useState('')
+  const navigate = useNavigate()
 
-  try {
+  const handleLogin = async (e) => {
+    e.preventDefault()
+    setError('')
     setLoading(true)
 
-    const response = await api.post('/auth/login', {
-      email,
-      password,
-    })
-
-    console.log(response.data)
-
-    // simpan token
-    localStorage.setItem(
-      'token',
-      response.data.token
-    )
-
-    // optional save user
-    localStorage.setItem(
-      'user',
-      JSON.stringify(response.data.user)
-    )
-     setTimeout(() => {
-    navigate('/dashboard');
-  }, 1500); // delay 1 detik untuk melihat pesan sukses
-
-  } catch (error) {
-    console.error(error)
-
-    alert(
-      error.response?.data?.message ||
-      'Login failed'
-    )
-
-  } finally {
-    setLoading(false)
+    try {
+      const response = await api.post('/auth/login', { email, password })
+      
+      if (response.data.token) {
+        localStorage.setItem('fintime_token', response.data.token)
+        localStorage.setItem('fintime_user', JSON.stringify(response.data.user))
+        
+        setTimeout(() => {
+          navigate('/dashboard')
+        }, 1000)
+      }
+    } catch (err) {
+      console.error('Login error:', err)
+      setError(err.response?.data?.message || 'Email atau password salah.')
+    } finally {
+      setLoading(false)
+    }
   }
-}
 
   return (
     <div className="relative min-h-screen flex overflow-hidden" style={{ background: 'var(--dark)' }}>
@@ -66,7 +50,7 @@ export default function LoginPage() {
       <div
         className="hidden lg:flex flex-col items-center justify-center relative"
         style={{
-          background: 'linear-gradient(135deg, #061528 0%, #020b18 50%, #0a1f35 100%)',
+          background: 'linear-gradient(135deg, #061528 0%, #020b18 50%, #0a1f35 100%)',   
           flex: '0 0 45%',
           padding: 'clamp(2rem, 5vw, 4rem)',
           overflow: 'hidden',
@@ -149,7 +133,7 @@ export default function LoginPage() {
               <br />
               <span className="shimmer-text">Kembali</span>
             </h2>
-            <p className="text-sm mt-4 max-w-xs" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-sm mt-4 max-w-xs" style={{ color: 'var(--text-muted)' }}>  
               Lanjutkan perjalanan finansialmu dan lihat bagaimana AI kami memproyeksikan masa depanmu.
             </p>
           </div>
@@ -285,6 +269,23 @@ export default function LoginPage() {
                   Lupa password?
                 </button>
               </div>
+
+              {/* Error Message */}
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-2 p-3 rounded-xl text-sm"
+                  style={{
+                    backgroundColor: 'rgba(248, 113, 113, 0.1)',
+                    border: '1px solid rgba(248, 113, 113, 0.3)',
+                    color: '#f87171'
+                  }}
+                >
+                  <AlertCircle size={16} />
+                  <span>{error}</span>
+                </motion.div>
+              )}
 
               <motion.button
                 type="submit"
