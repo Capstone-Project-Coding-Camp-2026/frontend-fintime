@@ -2,10 +2,6 @@ import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
 import { STEP_LABELS } from './registerConstants'
 
-// ============================================================
-// STEP CHECKPOINT
-// Komponen indikator step di atas form
-// ============================================================
 export function StepCheckpoint({ step, current }) {
   const done = step < current
   const active = step === current

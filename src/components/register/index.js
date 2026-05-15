@@ -7,7 +7,6 @@ export { StepPensiun } from './StepPensiun'
 export { RegisterSuccess } from './RegisterSuccess'
 export { RegisterLeftPanel } from './RegisterLeftPanel'
 
-// Constants
 export {
   BANK_EWALLET_OPTIONS,
   INCOME_OPTIONS,

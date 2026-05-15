@@ -135,7 +135,7 @@ export const TIMELINE_DATA = [
 export const FEATURES_DATA = [
   {
     id: "ledger",
-    icon: "📒",
+    iconName: "BookOpen",
     title: "Smart Ledger",
     subtitle: "AI Pencatat Transaksi",
     description:
@@ -147,11 +147,11 @@ export const FEATURES_DATA = [
   },
   {
     id: "categorize",
-    icon: "🏷️",
+    iconName: "Tag",
     title: "Behavior Analysis",
     subtitle: "AI Pembaca Pola Spending",
     description:
-      "Bukan cuma kategori “makan” atau “transport”. FinTime bisa detect emotional spending, belanja karena FOMO, lifestyle inflation, sampai kebocoran budget kecil yang sering ga kerasa.",
+      "Bukan cuma kategori \"makan\" atau \"transport\". FinTime bisa detect emotional spending, belanja karena FOMO, lifestyle inflation, sampai kebocoran budget kecil yang sering ga kerasa.",
     tag: "Behavioral AI",
     tagColor: "#00d4a8",
     detail: "Menganalisis puluhan tipe pola perilaku pengeluaran pengguna.",
@@ -159,7 +159,7 @@ export const FEATURES_DATA = [
   },
   {
     id: "forecast",
-    icon: "📈",
+    iconName: "TrendingUp",
     title: "Future Forecast",
     subtitle: "Prediksi Finansial Masa Depan",
     description:
@@ -172,11 +172,11 @@ export const FEATURES_DATA = [
   },
   {
     id: "whatif",
-    icon: "🧪",
+    iconName: "FlaskConical",
     title: "What-If Lab",
     subtitle: "Simulator Keputusan Finansial",
     description:
-      "“Kalau aku beli mobil tahun 2027 gimana ya?” Semua keputusan bisa langsung disimulasikan. Kamu bisa lihat efek domino finansialnya sampai bertahun-tahun ke depan secara real-time.",
+      "\"Kalau aku beli mobil tahun 2027 gimana ya?\" Semua keputusan bisa langsung disimulasikan. Kamu bisa lihat efek domino finansialnya sampai bertahun-tahun ke depan secara real-time.",
     tag: "Simulation Engine",
     tagColor: "#ff6b6b",
     detail:
@@ -189,31 +189,31 @@ export const WHATIF_SCENARIOS = [
   {
     label: "Beli mobil baru (Rp 450 Juta)",
     impact: -380_000_000,
-    emoji: "🚗",
+    iconName: "Car",
     verdict: "Pensiun mundur sekitar 3 tahun",
   },
   {
     label: "Mulai investasi saham",
     impact: +920_000_000,
-    emoji: "📈",
+    iconName: "TrendingUp",
     verdict: "Nambah kebebasan finansial sampai 8 tahun",
   },
   {
     label: "Beli rumah di Jakarta",
     impact: -1_200_000_000,
-    emoji: "🏠",
+    iconName: "Home",
     verdict: "Aset bertambah, tapi cash flow jadi lebih ketat",
   },
   {
     label: "Ngurangin makan di luar 30%",
     impact: +540_000_000,
-    emoji: "🍽️",
+    iconName: "UtensilsCrossed",
     verdict: "Bisa berkembang jadi Rp 540 juta di 2055",
   },
   {
     label: "Bangun side business",
     impact: +1_800_000_000,
-    emoji: "💼",
+    iconName: "Briefcase",
     verdict: "Salah satu keputusan dengan ROI paling tinggi",
   },
 ];

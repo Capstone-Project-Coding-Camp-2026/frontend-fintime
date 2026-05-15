@@ -1,8 +1,4 @@
-﻿// ============================================================
-// REGISTER PAGE
-// Halaman pendaftaran akun FinTime
-// ============================================================
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import { ChevronLeft, ArrowRight, Loader2, AlertCircle } from 'lucide-react'
@@ -22,9 +18,6 @@ import {
   INITIAL_FORM_DATA,
 } from '../components/register'
 
-// ============================================================
-// MAIN COMPONENT
-// ============================================================
 export default function RegisterPage() {
   // ─── State ───────────────────────────────────────────────
   const [currentStep, setCurrentStep] = useState(0)
@@ -32,6 +25,7 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [formData, setFormData] = useState(INITIAL_FORM_DATA)
+  const [step2CanNext, setStep2CanNext] = useState(false) // Untuk StepContact
   const navigate = useNavigate()
 
   // ─── Validasi step ────────────────────────────────────────
@@ -40,13 +34,7 @@ export default function RegisterPage() {
       return formData.fullName && formData.gender && formData.birthDate && formData.occupation
     }
     if (currentStep === 1) {
-      return (
-        formData.email &&
-        formData.phone &&
-        formData.password &&
-        formData.confirmPassword &&
-        formData.password === formData.confirmPassword
-      )
+      return step2CanNext
     }
     if (currentStep === 2) {
       return formData.monthlyIncome
@@ -54,7 +42,6 @@ export default function RegisterPage() {
     return true
   }
 
-  // ─── Navigasi step ────────────────────────────────────────
   const handleNext = async () => {
     if (!canNext()) return
     setError('')
@@ -65,7 +52,7 @@ export default function RegisterPage() {
       setIsLoading(true)
       try {
         const response = await api.post('/auth/register', formData)
-        
+
         if (response.data.token) {
           localStorage.setItem('fintime_token', response.data.token)
           localStorage.setItem('fintime_user', JSON.stringify(response.data.user))
@@ -85,12 +72,22 @@ export default function RegisterPage() {
     if (currentStep > 0) setCurrentStep(s => s - 1)
   }
 
+  // Reset step2CanNext saat kembali ke step lain
+  const handleBackReset = () => {
+    if (currentStep > 0) {
+      setCurrentStep(s => s - 1)
+      if (currentStep === 1) {
+        setStep2CanNext(false)
+      }
+    }
+  }
+
   // ─── Progress calculation ─────────────────────────────────
   const progressPct = (currentStep / (STEPS.length - 1)) * 100
 
   // ─── Render ───────────────────────────────────────────────
   return (
-    <div className="relative min-h-screen flex overflow-hidden" style={{ background: 'var(--dark)' }}>
+    <div className="relative min-h-screen min-h-[100dvh] flex overflow-hidden" style={{ background: 'var(--dark)' }}>
 
       <div className="absolute inset-0 pointer-events-none">
         <ParticleField count={40} />
@@ -143,7 +140,7 @@ export default function RegisterPage() {
                 <span className="text-xs font-mono font-bold tracking-widest" style={{ color: 'var(--text-dim)' }}>
                   {Math.round(progressPct)}% COMPLETE
                 </span>
-                <span className="text-xs font-mono" style={{ color: 'var(--text-dim)' }}> 
+                <span className="text-xs font-mono" style={{ color: 'var(--text-dim)' }}>
                   {currentStep + 1} / {STEPS.length}
                 </span>
               </div>
@@ -173,7 +170,7 @@ export default function RegisterPage() {
             ) : (
               <>
                 {currentStep === 0 && <StepPersonal data={formData} setData={setFormData} />}
-                {currentStep === 1 && <StepContact data={formData} setData={setFormData} />}
+                {currentStep === 1 && <StepContact data={formData} setData={setFormData} canNext={step2CanNext} setCanNext={setStep2CanNext} />}
                 {currentStep === 2 && <StepFinancial data={formData} setData={setFormData} />}
                 {currentStep === 3 && <StepBankEWallet data={formData} setData={setFormData} />}
                 {currentStep === 4 && <StepPensiun data={formData} setData={setFormData} />}
@@ -203,7 +200,7 @@ export default function RegisterPage() {
             <div className="flex items-center justify-between mt-8">
 
               <button
-                onClick={handleBack}
+                onClick={handleBackReset}
                 className="btn-ghost text-sm font-bold px-6 py-3"
                 style={{ visibility: currentStep > 0 ? 'visible' : 'hidden' }}
               >
@@ -239,7 +236,7 @@ export default function RegisterPage() {
 
 
           {!isSuccess && (
-            <p className="text-center text-xs mt-6" style={{ color: 'var(--text-dim)' }}> 
+            <p className="text-center text-xs mt-6" style={{ color: 'var(--text-dim)' }}>
               Sudah punya akun?{' '}
               <Link to="/login" className="font-bold no-underline" style={{ color: '#00f5ff' }}>
                 Masuk di sini

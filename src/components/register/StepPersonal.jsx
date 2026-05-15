@@ -1,10 +1,6 @@
 import { motion } from 'framer-motion'
 import { User, Calendar, Briefcase, ChevronDown, Mars, Venus } from 'lucide-react'
 
-// ============================================================
-// STEP 1: DATA DIRI
-// Form input data pribadi user
-// ============================================================
 export function StepPersonal({ data, setData }) {
   return (
     <motion.div

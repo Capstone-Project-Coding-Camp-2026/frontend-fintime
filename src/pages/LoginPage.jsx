@@ -42,7 +42,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative min-h-screen flex overflow-hidden" style={{ background: 'var(--dark)' }}>
+    <div className="relative min-h-screen min-h-[100dvh] flex overflow-hidden" style={{ background: 'var(--dark)' }}>
       <div className="absolute inset-0 pointer-events-none">
         <ParticleField count={40} />
       </div>
@@ -50,10 +50,9 @@ export default function LoginPage() {
       <div
         className="hidden lg:flex flex-col items-center justify-center relative"
         style={{
-          background: 'linear-gradient(135deg, #061528 0%, #020b18 50%, #0a1f35 100%)',   
+          background: 'linear-gradient(135deg, #061528 0%, #020b18 50%, #0a1f35 100%)',
           flex: '0 0 45%',
           padding: 'clamp(2rem, 5vw, 4rem)',
-          overflow: 'hidden',
         }}
       >
         <div
@@ -261,13 +260,13 @@ export default function LoginPage() {
                   <input type="checkbox" className="accent-[#00f5ff]" />
                   <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Ingat saya</span>
                 </label>
-                <button
-                  type="button"
+                <Link
+                  to="/forgot-password"
                   className="text-xs font-bold no-underline"
                   style={{ color: '#00f5ff' }}
                 >
                   Lupa password?
-                </button>
+                </Link>
               </div>
 
               {/* Error Message */}

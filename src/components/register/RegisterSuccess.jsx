@@ -2,10 +2,6 @@ import { motion } from 'framer-motion'
 import { CheckCircle2 } from 'lucide-react'
 import { INCOME_OPTIONS } from './registerConstants'
 
-// ============================================================
-// REGISTER SUCCESS
-// Tampilan setelah registrasi berhasil
-// ============================================================
 export function RegisterSuccess({ data }) {
   return (
     <motion.div
@@ -35,7 +31,6 @@ export function RegisterSuccess({ data }) {
           Selamat, {data.fullName}. Siap memulai perjalanan finansialmu?
         </p>
       </div>
-
       
       <div
         className="w-full rounded-xl text-left"

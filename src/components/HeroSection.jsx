@@ -58,8 +58,7 @@ function AvatarOrbit({ avatar, color }) {
           }}
         />
       </motion.div>
-
-      {/* Avatar core */}
+      
       <motion.div
         animate={{ scale: [1, 1.05, 1] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
@@ -206,7 +205,7 @@ export default function HeroSection() {
     <section
       ref={heroRef}
       id="hero"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      className="relative min-h-screen min-h-[100dvh] flex items-center justify-center overflow-hidden"
       style={{ paddingTop: "80px" }}
     >
       {/* Layered Backgrounds */}

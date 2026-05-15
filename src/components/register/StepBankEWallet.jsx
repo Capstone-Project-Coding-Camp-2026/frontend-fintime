@@ -1,36 +1,34 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Search, Check, Info } from 'lucide-react'
-import { BANK_EWALLET_OPTIONS } from './registerConstants'
+import { Search, Check, Info, Building2, Wallet } from 'lucide-react'
+import { ALL_PROVIDERS, getProviderType } from '../../constants/providers'
 
-// ============================================================
-// STEP 4: AKUN BANK & E-WALLET
-// Form pemilihan bank dan e-wallet
-// ============================================================
 export function StepBankEWallet({ data, setData }) {
   const [search, setSearch] = useState('')
   const [filterType, setFilterType] = useState('all')
 
-  // Filter data berdasarkan search dan type
-  const filtered = BANK_EWALLET_OPTIONS.filter(item => {
+  const filtered = ALL_PROVIDERS.filter(item => {
     const matchSearch = item.name.toLowerCase().includes(search.toLowerCase())
     const matchType = filterType === 'all' || item.type === filterType
     return matchSearch && matchType
   })
 
-  // Toggle pilih bank/e-wallet
-  const toggleItem = (id) => {
+
+  const toggleItem = (item) => {
     setData(d => {
       const current = d.linkedAccounts || []
-      const exists = current.includes(id)
+      const exists = current.some(x => x.provider === item.id)
+      const newItem = { provider: item.id, type: item.type, name: item.name }
       return {
         ...d,
-        linkedAccounts: exists ? current.filter(x => x !== id) : [...current, id],
+        linkedAccounts: exists
+          ? current.filter(x => x.provider !== item.id)
+          : [...current, newItem],
       }
     })
   }
 
-  const isSelected = (id) => (data.linkedAccounts || []).includes(id)
+  const isSelected = (item) => (data.linkedAccounts || []).some(x => x.provider === item.id)
 
   return (
     <motion.div
@@ -100,18 +98,27 @@ export function StepBankEWallet({ data, setData }) {
             <button
               key={item.id}
               type="button"
-              onClick={() => toggleItem(item.id)}
+              onClick={() => toggleItem(item)}
               className="flex items-center gap-3 rounded-xl py-2.5 px-3 transition-all duration-300 text-left"
               style={{
-                background: isSelected(item.id) ? 'rgba(0,245,255,0.07)' : 'rgba(0,245,255,0.02)',
-                border: `1px solid ${isSelected(item.id) ? 'rgba(0,245,255,0.4)' : 'rgba(0,245,255,0.07)'}`,
+                background: isSelected(item) ? 'rgba(0,245,255,0.07)' : 'rgba(0,245,255,0.02)',
+                border: `1px solid ${isSelected(item) ? 'rgba(0,245,255,0.4)' : 'rgba(0,245,255,0.07)'}`,
                 fontFamily: 'Sora, sans-serif',
               }}
             >
               <div
-                className="w-3 h-3 rounded-full flex-shrink-0"
-                style={{ background: item.color }}
-              />
+                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                style={{
+                  background: item.type === 'ewallet' ? 'rgba(0,245,255,0.1)' : 'rgba(0,150,199,0.1)',
+                  border: `1px solid ${item.type === 'ewallet' ? 'rgba(0,245,255,0.3)' : 'rgba(0,150,199,0.3)'}`,
+                }}
+              >
+                {item.type === 'ewallet' ? (
+                  <Wallet size={14} style={{ color: '#00f5ff' }} />
+                ) : (
+                  <Building2 size={14} style={{ color: '#0096c7' }} />
+                )}
+              </div>
               <div className="flex-1 min-w-0">
                 <div
                   className="text-sm font-semibold truncate"
@@ -124,11 +131,11 @@ export function StepBankEWallet({ data, setData }) {
               <div
                 className="w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-all duration-300"
                 style={{
-                  borderColor: isSelected(item.id) ? '#00f5ff' : 'rgba(0,245,255,0.25)',
-                  background: isSelected(item.id) ? '#00f5ff' : 'transparent',
+                  borderColor: isSelected(item) ? '#00f5ff' : 'rgba(0,245,255,0.25)',
+                  background: isSelected(item) ? '#00f5ff' : 'transparent',
                 }}
               >
-                {isSelected(item.id) && <Check size={9} strokeWidth={3} color="#020b18" />}
+                {isSelected(item) && <Check size={9} strokeWidth={3} color="#020b18" />}
               </div>
             </button>
           ))
@@ -145,17 +152,17 @@ export function StepBankEWallet({ data, setData }) {
             Terpilih ({data.linkedAccounts.length})
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {data.linkedAccounts.map(id => {
-              const item = BANK_EWALLET_OPTIONS.find(x => x.id === id)
+            {data.linkedAccounts.map(acc => {
+              const item = ALL_PROVIDERS.find(x => x.id === acc.provider)
               if (!item) return null
               return (
                 <div
-                  key={id}
+                  key={acc.provider}
                   className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
                   style={{
-                    background: `${item.color}15`,
-                    border: `1px solid ${item.color}35`,
-                    color: item.color,
+                    background: item.type === 'ewallet' ? 'rgba(0,245,255,0.1)' : 'rgba(0,150,199,0.1)',
+                    border: `1px solid ${item.type === 'ewallet' ? 'rgba(0,245,255,0.3)' : 'rgba(0,150,199,0.3)'}`,
+                    color: item.type === 'ewallet' ? '#00f5ff' : '#0096c7',
                   }}
                 >
                   {item.name}

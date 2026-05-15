@@ -1,10 +1,6 @@
 import { motion } from 'framer-motion'
 import { Zap, Brain } from 'lucide-react'
 
-// ============================================================
-// STEP 5: PENSIUN
-// Form input target usia pensiun
-// ============================================================
 export function StepPensiun({ data, setData }) {
   const today = new Date()
   const yearsLeft = () => today.getFullYear() + (data.retirementAge || 55) - today.getFullYear()
