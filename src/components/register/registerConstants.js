@@ -19,7 +19,7 @@ export const INITIAL_FORM_DATA = {
   fullName: '',
   gender: '',
   birthDate: '',
-  occupation: '',
+  jobType: '',
   email: '',
   phone: '',
   password: '',

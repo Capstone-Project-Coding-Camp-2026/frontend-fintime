@@ -31,7 +31,7 @@ export default function RegisterPage() {
   // ─── Validasi step ────────────────────────────────────────
   const canNext = () => {
     if (currentStep === 0) {
-      return formData.fullName && formData.gender && formData.birthDate && formData.occupation
+      return formData.fullName && formData.gender && formData.birthDate && formData.jobType
     }
     if (currentStep === 1) {
       return step2CanNext

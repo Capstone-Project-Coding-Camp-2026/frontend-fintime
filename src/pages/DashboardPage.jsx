@@ -179,7 +179,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="text-left hidden lg:block">
                     <p className="text-sm font-semibold">{user.fullName}</p>
-                    <p className="text-[10px] text-gray-500">{user.occupation || 'Investor'}</p>
+                    <p className="text-[10px] text-gray-500">{user.jobType ? user.jobType.charAt(0).toUpperCase() + user.jobType.slice(1).replace(/_/g, ' ') : 'Investor'}</p>
                   </div>
                   <ChevronDown size={16} style={{ color: 'var(--text-dim)' }} className={`transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} />
                 </motion.button>

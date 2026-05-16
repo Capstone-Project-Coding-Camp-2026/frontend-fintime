@@ -22,7 +22,7 @@ export default function ProfilePage() {
     fullName: '',
     email: '',
     phone: '',
-    occupation: '',
+    jobType: '',
     monthlyIncome: ''
   })
 
@@ -42,7 +42,7 @@ export default function ProfilePage() {
         fullName: userData.fullName || '',
         email: userData.email || '',
         phone: userData.phone || '',
-        occupation: userData.occupation || '',
+        jobType: userData.jobType || '',
         monthlyIncome: userData.monthlyIncome || ''
       })
     } else {
@@ -75,7 +75,7 @@ export default function ProfilePage() {
       fullName: user.fullName || '',
       email: user.email || '',
       phone: user.phone || '',
-      occupation: user.occupation || '',
+      jobType: user.jobType || '',
       monthlyIncome: user.monthlyIncome || ''
     })
     setIsEditing(false)
@@ -87,7 +87,7 @@ export default function ProfilePage() {
     { icon: UserCircle, label: 'Nama Lengkap', name: 'fullName', type: 'text', value: formData.fullName, placeholder: 'Masukkan nama lengkap' },
     { icon: Mail, label: 'Alamat Email', name: 'email', type: 'email', value: formData.email, placeholder: 'nama@email.com' },
     { icon: Phone, label: 'Nomor Telepon', name: 'phone', type: 'tel', value: formData.phone, placeholder: '+62 xxx xxxx xxxx' },
-    { icon: Briefcase, label: 'Pekerjaan', name: 'occupation', type: 'text', value: formData.occupation, placeholder: 'Contoh: Software Engineer' },
+    { icon: Briefcase, label: 'Pekerjaan', name: 'jobType', type: 'text', value: formData.jobType, placeholder: 'Contoh: Karyawan Swasta' },
     { icon: DollarSign, label: 'Pendapatan Bulanan', name: 'monthlyIncome', type: 'text', value: formData.monthlyIncome, placeholder: 'Rp. x.xxx.xxx' },
   ]
 
@@ -161,7 +161,7 @@ export default function ProfilePage() {
                   </div>
                   <div className="text-left hidden lg:block">
                     <p className="text-sm font-semibold">{user.fullName}</p>
-                    <p className="text-[10px] text-gray-500">{user.occupation || 'Investor'}</p>
+                    <p className="text-[10px] text-gray-500">{user.jobType ? user.jobType.charAt(0).toUpperCase() + user.jobType.slice(1).replace(/_/g, ' ') : 'Investor'}</p>
                   </div>
                   <ChevronDown size={16} style={{ color: 'var(--text-dim)' }} className={`transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} />
                 </motion.button>
@@ -397,7 +397,7 @@ export default function ProfilePage() {
                       border: '1px solid rgba(0,245,255,0.2)',
                       color: '#00f5ff',
                     }}>
-                      {user.occupation || 'Investor'}
+                      {user.jobType ? user.jobType.charAt(0).toUpperCase() + user.jobType.slice(1).replace(/_/g, ' ') : 'Investor'}
                     </span>
                     {user.gender && (
                       <span className="px-4 py-2 rounded-xl text-sm font-semibold" style={{

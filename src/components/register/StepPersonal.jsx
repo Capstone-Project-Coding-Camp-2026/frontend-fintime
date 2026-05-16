@@ -96,8 +96,8 @@ export function StepPersonal({ data, setData }) {
           <div className="relative">
             <Briefcase size={16} className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-dim)' }} />
             <select
-              value={data.occupation}
-              onChange={e => setData(d => ({ ...d, occupation: e.target.value }))}
+              value={data.jobType}
+              onChange={e => setData(d => ({ ...d, jobType: e.target.value }))}
               className="finput pr-10 cursor-pointer"
             >
               <option value="">Pilih pekerjaan</option>
