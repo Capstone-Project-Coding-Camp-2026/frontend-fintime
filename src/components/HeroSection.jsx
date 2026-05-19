@@ -159,7 +159,7 @@ export default function HeroSection() {
     TIMELINE_DATA[0].netWorth,
   );
   const heroRef = useRef(null);
-  // const navigate = useNavigate()
+
 
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -422,17 +422,7 @@ export default function HeroSection() {
           >
             SCROLL TO EXPLORE
           </span>
-          {/* <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="w-5 h-8 rounded-full flex items-start justify-center pt-1.5"
-            style={{ border: '1.5px solid rgba(0,245,255,0.2)' }}
-          >
-            <div
-              className="w-1 h-2 rounded-full"
-              style={{ background: 'rgba(0,245,255,0.6)' }}
-            />
-          </motion.div> */}
+
         </motion.button>
       </motion.div>
     </section>

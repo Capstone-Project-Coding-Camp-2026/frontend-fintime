@@ -74,11 +74,11 @@ export default function Navbar() {
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
-            onClick={() => navigate("/profile")}
+            onClick={() => navigate("/login")}
             className="hidden md:flex items-center gap-2 btn-ghost text-sm font-bold px-4 py-2"
             style={{ fontFamily: "Sora, sans-serif" }}
           >
-            <span>My Profile</span>
+            <span>Login</span>
             <span style={{ color: "var(--cyan)" }}>→</span>
           </motion.button>
           <motion.button
