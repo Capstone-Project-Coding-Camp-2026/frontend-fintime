@@ -54,9 +54,13 @@ export function getProviderType(id) {
   return provider ? provider.type : 'bank'
 }
 
-export function getProviderStyle(id) {
-  return null
-}
+// export function getProviderStyle(id) {
+//   return null
+// }
+
+// export function getProviderStyle(id) {
+//   return null
+// }
 
 export function isEWallet(id) {
   return getProviderType(id) === 'ewallet'

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
   ArrowUpCircle,
@@ -7,6 +7,7 @@ import {
   CreditCard,
 } from 'lucide-react'
 
+import api from '../lib/api'
 import DashboardLayout from '../components/layout/DashboardLayout'
 import AvatarConditionBanner from '../components/dashboard/AvatarConditionBanner'
 import ScenarioForm from '../components/dashboard/ScenarioForm'
@@ -24,10 +25,19 @@ export default function DashboardPage() {
     useState('expense')
   const [refreshKey, setRefreshKey] = useState(0)
 
+  // Real-time backend states
+  const [totalBalance, setTotalBalance] = useState(0)
+  const [projectedWealth, setProjectedWealth] = useState(0)
+  const [pensionSurvivalYears, setPensionSurvivalYears] = useState(0)
+  const [avatarCondition, setAvatarCondition] = useState('normal')
+  const [monthlyIncome, setMonthlyIncome] = useState(5000000)
+  const [monthlyExpense, setMonthlyExpense] = useState(3500000)
+
+  // What-If Form States
   const [price, setPrice] = useState('')
   const [selectedOption, setSelectedOption] = useState('cash')
   const [installmentMonths, setInstallmentMonths] = useState('12')
-  const [interestRate, setInterestRate] = useState('15')
+  const [interestRate, setInterestRate] = useState('2')
   const [monthlyBudget, setMonthlyBudget] = useState('')
 
   const [isAnalyzing, setIsAnalyzing] = useState(false)
@@ -42,55 +52,115 @@ export default function DashboardPage() {
     totalPayment: 0,
   })
 
-  const handleAnalyze = () => {
+  // 1. Fetch real-time data on mount and refresh
+  useEffect(() => {
+    const storedUser = localStorage.getItem('fintime_user')
+    if (!storedUser) return
+    const u = JSON.parse(storedUser)
+
+    setMonthlyIncome(u.monthlyIncome || 5000000)
+
+    // Fetch Linked Account Summary
+    api.get(`/linked-accounts/${u.id}/summary`)
+      .then(res => {
+        if (res.data?.success) {
+          setTotalBalance(res.data.data.totalBalance || 0)
+        }
+      })
+      .catch(err => console.error('Failed to get account summary:', err))
+
+    // Run dynamic Forecast to get latest avatar health condition and pension wealth metrics
+    api.post('/ai/forecast', { userId: u.id })
+      .then(res => {
+        if (res.data) {
+          setProjectedWealth(res.data.projectedWealth || 0)
+          setPensionSurvivalYears(res.data.pensionSurvivalYears || 0)
+          setAvatarCondition(res.data.condition || 'normal')
+
+          if (res.data.predictedExpenses && res.data.predictedExpenses.length > 0) {
+            // Estimate average future monthly expenses from the prediction trend
+            const avgExpense = res.data.predictedExpenses.reduce((sum, val) => sum + val, 0) / res.data.predictedExpenses.length
+            setMonthlyExpense(Math.round(avgExpense))
+          }
+        }
+      })
+      .catch(err => console.error('Failed to run forecast:', err))
+  }, [refreshKey])
+
+  // 2. Perform real-time What-If prediction using the backend ML model
+  const handleAnalyze = async () => {
     setIsAnalyzing(true)
     setHasResult(false)
 
-    setTimeout(() => {
-      const p = parseFloat(price) || 0
-      const b = parseFloat(monthlyBudget) || 0
-      let total = p
-      let monthly = p
+    try {
+      const storedUser = localStorage.getItem('fintime_user')
+      const u = storedUser ? JSON.parse(storedUser) : null
 
-      if (selectedOption === 'paylater') {
-        const months = parseInt(installmentMonths) || 12
-        const rate = (parseFloat(interestRate) || 15) / 100
-        total = p + p * rate * (months / 12)
-        monthly = total / months
+      const itemPriceVal = parseFloat(price) || 0
+      const monthlyBudgetVal = parseFloat(monthlyBudget) || 0
+
+      const payload = {
+        userId: u?.id,
+        item_price: itemPriceVal,
+        paylater_tenor_months: selectedOption === 'paylater' ? parseInt(installmentMonths) : 1,
+        paylater_interest_rate: selectedOption === 'paylater' ? (parseFloat(interestRate) / 100) : 0.0,
+        monthly_cashflow: monthlyBudgetVal, // budget input acts as user cash flow
+        current_etr: 0.5 // baseline ETR
       }
 
-      const remaining = b - monthly
+      const response = await api.post('/ai/whatif', payload)
 
-      let verdict = 'neutral'
-      let good = 40,
-        neutral = 40,
-        bad = 20
+      if (response.data) {
+        const data = response.data
+        const conf = data.confidence || 0.8
 
-      if (remaining > b * 0.5) {
-        verdict = 'good'
-        good = 85
-        neutral = 10
-        bad = 5
-      } else if (remaining < 0) {
-        verdict = 'bad'
-        good = 5
-        neutral = 15
-        bad = 80
+        // Map backend decision results back to graphical percentages
+        let good = 40, neutral = 40, bad = 20
+        let verdict = 'neutral' // default
+
+        if (data.recommendation === 'just_buy') {
+          verdict = 'good'
+          good = Math.round(conf * 100)
+          neutral = Math.round((1 - conf) * 60)
+          bad = Math.round((1 - conf) * 40)
+        } else if (data.recommendation === 'dont_buy') {
+          verdict = 'bad'
+          bad = Math.round(conf * 100)
+          neutral = Math.round((1 - conf) * 60)
+          good = Math.round((1 - conf) * 40)
+        } else {
+          verdict = 'neutral'
+          neutral = Math.round(conf * 100)
+          good = Math.round((1 - conf) * 50)
+          bad = Math.round((1 - conf) * 50)
+        }
+
+        // Calculate payment metrics
+        const monthlyPay = selectedOption === 'paylater'
+          ? (itemPriceVal / parseInt(installmentMonths)) * (1 + (parseFloat(interestRate) / 100))
+          : itemPriceVal
+
+        const totalPay = selectedOption === 'paylater'
+          ? monthlyPay * parseInt(installmentMonths)
+          : itemPriceVal
+
+        setAnalysisData({
+          goodPercent: good,
+          neutralPercent: neutral,
+          badPercent: bad,
+          verdict: verdict,
+          monthlyPayment: Math.round(monthlyPay),
+          remainingBudget: Math.round(data.cashflow_after_purchase),
+          totalPayment: Math.round(totalPay),
+        })
+
+        setHasResult(true)
       }
-
-      setAnalysisData({
-        goodPercent: good,
-        neutralPercent: neutral,
-        badPercent: bad,
-        verdict: verdict,
-        monthlyPayment: Math.round(monthly),
-        remainingBudget: Math.round(remaining),
-        totalPayment: Math.round(total),
-      })
-
+    } catch (err) {
+      console.error('Failed to run what-if simulation:', err)
+    } finally {
       setIsAnalyzing(false)
-      setHasResult(true)
-    }, 2000)
+    }
   }
 
   const handleRefresh = () => {
@@ -134,8 +204,13 @@ export default function DashboardPage() {
               <AvatarConditionBanner
                 userName={user.fullName}
                 gender={user.gender || 'male'}
-                balance={15400000}
-                targetPension={500000000}
+                balance={totalBalance}
+                projectedWealth={projectedWealth}
+                pensionSurvivalYears={pensionSurvivalYears}
+                condition={avatarCondition}
+                monthlyIncome={monthlyIncome}
+                monthlyExpense={monthlyExpense}
+                targetPension={user.monthlyIncome ? user.monthlyIncome * 12 * 25 : 1500000000}
               />
             </section>
 
@@ -305,7 +380,7 @@ export default function DashboardPage() {
 
             <section className="mb-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <SmartLedger />
+                <SmartLedger key={`ledger-${refreshKey}`} onRelabel={handleRefresh} />
               </div>
             </section>
           </main>

@@ -62,7 +62,7 @@ export default function ScenarioForm({
             <input
               type="text"
               value={formatInputCurrency(price)}
-              onChange={(e) => setPrice(e.target.value.replace(/,/g, ''))}
+              onChange={(e) => setPrice(e.target.value.replace(/\D/g, ''))}
               placeholder="15.000.000"
               style={{ ...inputBaseStyle, paddingLeft: '2.5rem', paddingRight: '1rem', paddingTop: '0.75rem', paddingBottom: '0.75rem' }}
               onFocus={(e) => {
@@ -145,18 +145,18 @@ export default function ScenarioForm({
             </div>
             <div>
               <label className="text-xs mb-2 block" style={{ color: 'var(--text-muted)' }}>
-                Bunga (% / tahun)
+                Bunga (% / bulan)
               </label>
               <input
                 type="number"
                 value={interestRate}
                 onChange={(e) => setInterestRate(e.target.value)}
-                placeholder="15"
+                placeholder="2"
                 min="0"
                 max="36"
                 style={{ ...inputBaseStyle, padding: '0.75rem 1rem' }}
                 onFocus={(e) => {
-                  e.target.style.borderColor = 'var(--cyan'
+                  e.target.style.borderColor = 'var(--cyan)'
                   e.target.style.background = 'rgba(0, 245, 255, 0.08)'
                 }}
                 onBlur={(e) => {
@@ -183,7 +183,7 @@ export default function ScenarioForm({
             <input
               type="text"
               value={formatInputCurrency(monthlyBudget)}
-              onChange={(e) => setMonthlyBudget(e.target.value.replace(/,/g, ''))}
+              onChange={(e) => setMonthlyBudget(e.target.value.replace(/\D/g, ''))}
               placeholder="8.000.000"
               style={{ ...inputBaseStyle, paddingLeft: '2.5rem', paddingRight: '1rem', paddingTop: '0.75rem', paddingBottom: '0.75rem' }}
               onFocus={(e) => {

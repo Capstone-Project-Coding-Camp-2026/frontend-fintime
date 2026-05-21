@@ -10,6 +10,7 @@ import Logo from '../common/logo'
 import ParticleField from '../Particlefield'
 import UserDropdown from './UserDropdown'
 import BottomNav from './BottomNav'
+import api from '../../lib/api'
 
 export default function DashboardLayout({ children, activePage = 'dashboard', particleCount = 30 }) {
   const navigate = useNavigate()
@@ -28,6 +29,16 @@ export default function DashboardLayout({ children, activePage = 'dashboard', pa
     const storedUser = localStorage.getItem('fintime_user')
     if (storedUser) {
       setUser(JSON.parse(storedUser))
+      
+      // Fetch latest profile from backend to sync real-time database changes
+      api.get('/auth/profile')
+        .then(res => {
+          if (res.data?.user) {
+            setUser(res.data.user)
+            localStorage.setItem('fintime_user', JSON.stringify(res.data.user))
+          }
+        })
+        .catch(err => console.error('Failed to sync profile in layout:', err))
     } else {
       navigate('/login')
     }

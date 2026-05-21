@@ -8,7 +8,7 @@ import {
 
 const CATEGORIES = TRANSACTION_CATEGORIES
 
-export default function SmartLedger() {
+export default function SmartLedger({ onRelabel }) {
   const [transactions, setTransactions] = useState([])
   const [loading, setLoading] = useState(true)
   const [savingId, setSavingId] = useState(null)
@@ -17,7 +17,9 @@ export default function SmartLedger() {
     try {
       setLoading(true)
 
-      const user = JSON.parse(localStorage.getItem('user'))
+      const storedUser = localStorage.getItem('fintime_user')
+      if (!storedUser) return
+      const user = JSON.parse(storedUser)
 
       const response = await getUnlabelledTransactions(user.id)
 
@@ -40,6 +42,9 @@ export default function SmartLedger() {
       await relabelTransaction(transactionId, categoryLabel)
 
       setTransactions((prev) => prev.filter((t) => t.id !== transactionId))
+      if (onRelabel) {
+        onRelabel()
+      }
     } catch (error) {
       console.error('Failed to relabel:', error)
     } finally {

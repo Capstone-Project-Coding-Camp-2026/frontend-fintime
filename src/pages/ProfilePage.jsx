@@ -6,6 +6,7 @@ import {
   TrendingUp, Clock, LogOut,
 } from 'lucide-react'
 
+import api from '../lib/api'
 import DashboardLayout from '../components/layout/DashboardLayout'
 
 export default function ProfilePage() {
@@ -28,7 +29,7 @@ export default function ProfilePage() {
         fullName: userData.fullName || '',
         email: userData.email || '',
         phone: userData.phone || '',
-        occupation: userData.occupation || '',
+        occupation: userData.occupation || userData.jobType || '',
         monthlyIncome: userData.monthlyIncome || '',
       })
     }
@@ -39,11 +40,26 @@ export default function ProfilePage() {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSave = () => {
-    const updatedUser = { ...user, ...formData }
-    localStorage.setItem('fintime_user', JSON.stringify(updatedUser))
-    setUser(updatedUser)
-    setIsEditing(false)
+  const handleSave = async () => {
+    try {
+      const response = await api.put('/auth/profile', formData)
+      if (response.data?.user) {
+        const updatedUser = response.data.user
+        localStorage.setItem('fintime_user', JSON.stringify(updatedUser))
+        setUser(updatedUser)
+        setFormData({
+          fullName: updatedUser.fullName || '',
+          email: updatedUser.email || '',
+          phone: updatedUser.phone || '',
+          occupation: updatedUser.occupation || '',
+          monthlyIncome: updatedUser.monthlyIncome || '',
+        })
+      }
+      setIsEditing(false)
+    } catch (err) {
+      console.error('Failed to save profile:', err)
+      alert(err.response?.data?.message || 'Gagal menyimpan profil.')
+    }
   }
 
   const handleCancel = () => {
