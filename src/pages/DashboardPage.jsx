@@ -42,6 +42,7 @@ export default function DashboardPage() {
 
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [hasResult, setHasResult] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
   const [analysisData, setAnalysisData] = useState({
     goodPercent: 0,
     neutralPercent: 0,
@@ -72,14 +73,15 @@ export default function DashboardPage() {
     // Run dynamic Forecast to get latest avatar health condition and pension wealth metrics
     api.post('/ai/forecast', { userId: u.id })
       .then(res => {
-        if (res.data) {
-          setProjectedWealth(res.data.projectedWealth || 0)
-          setPensionSurvivalYears(res.data.pensionSurvivalYears || 0)
-          setAvatarCondition(res.data.condition || 'normal')
+        if (res.data && res.data.success) {
+          const aiData = res.data.data || {};
+          setProjectedWealth(aiData.projectedWealth || 0)
+          setPensionSurvivalYears(aiData.pensionSurvivalYears || 0)
+          setAvatarCondition(aiData.condition || 'normal')
 
-          if (res.data.predictedExpenses && res.data.predictedExpenses.length > 0) {
+          if (aiData.predictedExpenses && aiData.predictedExpenses.length > 0) {
             // Estimate average future monthly expenses from the prediction trend
-            const avgExpense = res.data.predictedExpenses.reduce((sum, val) => sum + val, 0) / res.data.predictedExpenses.length
+            const avgExpense = aiData.predictedExpenses.reduce((sum, val) => sum + val, 0) / aiData.predictedExpenses.length
             setMonthlyExpense(Math.round(avgExpense))
           }
         }
@@ -87,7 +89,6 @@ export default function DashboardPage() {
       .catch(err => console.error('Failed to run forecast:', err))
   }, [refreshKey])
 
-  // 2. Perform real-time What-If prediction using the backend ML model
   const handleAnalyze = async () => {
     setIsAnalyzing(true)
     setHasResult(false)
@@ -97,21 +98,72 @@ export default function DashboardPage() {
       const u = storedUser ? JSON.parse(storedUser) : null
 
       const itemPriceVal = parseFloat(price) || 0
-      const monthlyBudgetVal = parseFloat(monthlyBudget) || 0
 
       const payload = {
-        userId: u?.id,
-        item_price: itemPriceVal,
-        paylater_tenor_months: selectedOption === 'paylater' ? parseInt(installmentMonths) : 1,
-        paylater_interest_rate: selectedOption === 'paylater' ? (parseFloat(interestRate) / 100) : 0.0,
-        monthly_cashflow: monthlyBudgetVal, // budget input acts as user cash flow
-        current_etr: 0.5 // baseline ETR
-      }
+        user_profile: {
+          age: u?.age || 22,
+          total_income: monthlyIncome,
+          monthly_expenses: monthlyExpense,
+          current_savings: totalBalance,
 
+          has_emergency_fund: totalBalance >= monthlyExpense * 3 ? 1 : 0,
+
+          emergency_fund_months:
+            monthlyExpense > 0
+              ? Number((totalBalance / monthlyExpense).toFixed(1))
+              : 0,
+
+          has_kpr: 0,
+          has_vehicle_credit: 0,
+          pinjol_active: 0,
+          total_debt: 0,
+
+          credit_card_utilization: 0.2,
+
+          financial_literacy_score: 70,
+
+          employment_type: "full_time",
+
+          city_tier: "tier_2",
+
+          paylater_usage_history:
+            selectedOption === "paylater"
+              ? "medium"
+              : "low",
+
+          impulse_spending_tendency: "medium",
+
+          savings_rate:
+            monthlyIncome > 0
+              ? Number(
+                (
+                  (monthlyIncome - monthlyExpense) /
+                  monthlyIncome
+                ).toFixed(2)
+              )
+              : 0
+        },
+
+        simulation: {
+          item_price: itemPriceVal,
+
+          available_cash: totalBalance,
+
+          paylater_interest_rate:
+            selectedOption === "paylater"
+              ? parseFloat(interestRate) / 100
+              : 0,
+
+          paylater_tenor_months:
+            selectedOption === "paylater"
+              ? parseInt(installmentMonths)
+              : 1
+        }
+      }
       const response = await api.post('/ai/whatif', payload)
 
-      if (response.data) {
-        const data = response.data
+      if (response.data && response.data.success) {
+        const data = response.data.data || {}
         const conf = data.confidence || 0.8
 
         // Map backend decision results back to graphical percentages
@@ -155,9 +207,12 @@ export default function DashboardPage() {
         })
 
         setHasResult(true)
+        setErrorMsg('')
       }
     } catch (err) {
       console.error('Failed to run what-if simulation:', err)
+      const msg = err?.response?.data?.detail?.map(d => d.msg).join('; ') || err.message || 'Unexpected error'
+      setErrorMsg(msg)
     } finally {
       setIsAnalyzing(false)
     }
@@ -369,6 +424,11 @@ export default function DashboardPage() {
                   onAnalyze={handleAnalyze}
                   isAnalyzing={isAnalyzing}
                 />
+                {errorMsg && (
+                  <p className="text-sm text-red-500 mt-2" style={{ color: 'var(--error-red)' }}>
+                    {errorMsg}
+                  </p>
+                )}
                 <AnalysisResult
                   {...analysisData}
                   price={parseFloat(price) || 0}

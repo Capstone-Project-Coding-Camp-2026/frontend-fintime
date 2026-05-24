@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import { ChevronLeft, ArrowRight, Loader2, AlertCircle } from 'lucide-react'
@@ -53,9 +53,11 @@ export default function RegisterPage() {
       try {
         const response = await api.post('/auth/register', formData)
 
-        if (response.data.token) {
-          localStorage.setItem('fintime_token', response.data.token)
-          localStorage.setItem('fintime_user', JSON.stringify(response.data.user))
+        const data = response.data.data || response.data;
+
+        if (data.token) {
+          localStorage.setItem('fintime_token', data.token)
+          localStorage.setItem('fintime_user', JSON.stringify(data.user))
         }
 
         setIsSuccess(true)
