@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import {
@@ -25,9 +25,12 @@ export default function LoginPage() {
     try {
       const response = await api.post('/auth/login', { email, password })
       
-      if (response.data.token) {
-        localStorage.setItem('fintime_token', response.data.token)
-        localStorage.setItem('fintime_user', JSON.stringify(response.data.user))
+      // Support both { data: { token, user } } and { token, user } formats
+      const data = response.data.data || response.data;
+      
+      if (data.token) {
+        localStorage.setItem('fintime_token', data.token)
+        localStorage.setItem('fintime_user', JSON.stringify(data.user))
         
         setTimeout(() => {
           navigate('/dashboard')

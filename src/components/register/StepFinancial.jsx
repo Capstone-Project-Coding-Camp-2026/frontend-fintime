@@ -52,7 +52,7 @@ export function StepFinancial({ data, setData }) {
               value={formatDisplay(data.monthlyIncome)}
               onChange={(e) => handleIncomeChange(e.target.value)}
               placeholder="0"
-              className="w-full h-14 rounded-xl pl-10 pr-4 text-lg font-semibold"
+              className="w-full h-14 rounded-xl pl-14 pr-4 text-lg font-semibold"
               style={{
                 background: 'rgba(0, 245, 255, 0.04)',
                 border: '1px solid rgba(0, 245, 255, 0.12)',

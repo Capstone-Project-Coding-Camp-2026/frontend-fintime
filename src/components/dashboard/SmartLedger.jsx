@@ -8,7 +8,7 @@ import {
 
 const CATEGORIES = TRANSACTION_CATEGORIES
 
-export default function SmartLedger() {
+export default function SmartLedger({ onRelabel }) {
   const [transactions, setTransactions] = useState([])
   const [loading, setLoading] = useState(true)
   const [savingId, setSavingId] = useState(null)
@@ -17,7 +17,9 @@ export default function SmartLedger() {
     try {
       setLoading(true)
 
-      const user = JSON.parse(localStorage.getItem('user'))
+      const storedUser = localStorage.getItem('fintime_user')
+      if (!storedUser) return
+      const user = JSON.parse(storedUser)
 
       const response = await getUnlabelledTransactions(user.id)
 
@@ -40,6 +42,9 @@ export default function SmartLedger() {
       await relabelTransaction(transactionId, categoryLabel)
 
       setTransactions((prev) => prev.filter((t) => t.id !== transactionId))
+      if (onRelabel) {
+        onRelabel()
+      }
     } catch (error) {
       console.error('Failed to relabel:', error)
     } finally {
@@ -99,9 +104,9 @@ export default function SmartLedger() {
       </div>
 
       {/* Content */}
-      <div className="p-4 flex flex-col gap-4">
+      <div className={transactions.length === 0 ? "p-0" : "p-4 flex flex-col gap-4"}>
         {transactions.length === 0 ? (
-          <div className="text-center py-10">
+          <div className="text-center py-4">
             <p className="font-bold" style={{ color: 'white' }}>
               All transactions labelled 🎉
             </p>
