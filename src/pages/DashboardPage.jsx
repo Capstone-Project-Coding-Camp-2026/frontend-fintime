@@ -17,10 +17,15 @@ import AddAccountModal from '../components/dashboard/AddAccountModal'
 import AccountCard from '../components/dashboard/AccountCard'
 import TransactionCard from '../components/dashboard/TransactionCard'
 import SmartLedger from '../components/dashboard/SmartLedger'
+import BudgetCard from '../components/budget/BudgetCard'
+import DebtCard from '../components/debt/DebtCard'
+import GoalCard from '../components/goal/GoalCard'
+import OnboardingWizard from '../components/onboarding/OnboardingWizard'
 
 export default function DashboardPage() {
   const [showAddTransaction, setShowAddTransaction] = useState(false)
   const [showAddAccount, setShowAddAccount] = useState(false)
+  const [showOnboardingManual, setShowOnboardingManual] = useState(false)
   const [defaultTransactionType, setDefaultTransactionType] =
     useState('expense')
   const [refreshKey, setRefreshKey] = useState(0)
@@ -56,8 +61,15 @@ export default function DashboardPage() {
   // 1. Fetch real-time data on mount and refresh
   useEffect(() => {
     const storedUser = localStorage.getItem('fintime_user')
-    if (!storedUser) return
-    const u = JSON.parse(storedUser)
+    if (!storedUser || storedUser === 'undefined') return
+    
+    let u
+    try {
+      u = JSON.parse(storedUser)
+    } catch (e) {
+      console.error('Failed to parse user data in dashboard:', e)
+      return
+    }
 
     setMonthlyIncome(u.monthlyIncome || 5000000)
 
@@ -223,7 +235,11 @@ export default function DashboardPage() {
   }
 
   return (
-    <DashboardLayout activePage="dashboard" particleCount={30}>
+    <DashboardLayout 
+      activePage="dashboard" 
+      particleCount={30}
+      onShowHelp={() => setShowOnboardingManual(true)}
+    >
       {({ user }) => (
         <>
           {/* Main Content */}
@@ -441,6 +457,27 @@ export default function DashboardPage() {
             <section>
               <SmartLedger key={`ledger-${refreshKey}`} onRelabel={handleRefresh} />
             </section>
+
+            {/* Budget Section */}
+            <section className="mt-8">
+              <BudgetCard onRefresh={handleRefresh} />
+            </section>
+
+            {/* Debt Section */}
+            <section className="mt-8">
+              <DebtCard onRefresh={handleRefresh} />
+            </section>
+
+            {/* Goal Section */}
+            <section className="mt-8">
+              <GoalCard onRefresh={handleRefresh} />
+            </section>
+
+            {/* Onboarding Wizard */}
+            <OnboardingWizard 
+              showOnboarding={showOnboardingManual} 
+              onComplete={() => setShowOnboardingManual(false)} 
+            />
           </main>
 
           {/* Modals */}

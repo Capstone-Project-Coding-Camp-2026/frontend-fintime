@@ -6,13 +6,20 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import DashboardPage from './pages/DashboardPage'
 import ProfilePage from './pages/ProfilePage'
+import ReportsPage from './pages/ReportsPage'
+import SettingsPage from './pages/SettingsPage'
+import InvestmentPage from './pages/InvestmentPage'
+import RecurringPage from './pages/RecurringPage'
+import GamificationPage from './components/gamification/GamificationPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import CustomCursor from './components/CustomCursor'
+import ToastContainer from './components/notification/ToastContainer'
 
 function App() {
   return (
     <>
       <CustomCursor />
+      <ToastContainer />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
@@ -34,6 +41,46 @@ function App() {
           element={
             <ProtectedRoute>
               <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute>
+              <ReportsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <SettingsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/investment"
+          element={
+            <ProtectedRoute>
+              <InvestmentPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/recurring"
+          element={
+            <ProtectedRoute>
+              <RecurringPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/achievements"
+          element={
+            <ProtectedRoute>
+              <GamificationPage />
             </ProtectedRoute>
           }
         />

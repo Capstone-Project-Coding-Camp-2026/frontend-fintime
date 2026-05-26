@@ -18,8 +18,15 @@ export default function SmartLedger({ onRelabel }) {
       setLoading(true)
 
       const storedUser = localStorage.getItem('fintime_user')
-      if (!storedUser) return
-      const user = JSON.parse(storedUser)
+      if (!storedUser || storedUser === 'undefined') return
+      
+      let user
+      try {
+        user = JSON.parse(storedUser)
+      } catch (e) {
+        console.error('Failed to parse user in ledger:', e)
+        return
+      }
 
       const response = await getUnlabelledTransactions(user.id)
 

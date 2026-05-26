@@ -3,20 +3,25 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import {
   Bell, Menu, X, LayoutDashboard,
-  User as UserIcon, LogOut,
+  User as UserIcon, LogOut, FileText, Settings,
+  HelpCircle,
 } from 'lucide-react'
 
 import Logo from '../common/logo'
 import ParticleField from '../Particlefield'
 import UserDropdown from './UserDropdown'
 import BottomNav from './BottomNav'
+import NotificationCenter from '../notification/NotificationCenter'
+import { useToast } from '../../context/ToastContext'
 import api from '../../lib/api'
 
-export default function DashboardLayout({ children, activePage = 'dashboard', particleCount = 30 }) {
+export default function DashboardLayout({ children, activePage = 'dashboard', particleCount = 30, onShowHelp }) {
   const navigate = useNavigate()
   const [user, setUser] = useState(null)
   const [isMobile, setIsMobile] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [showNotifications, setShowNotifications] = useState(false)
+  const { unreadCount } = useToast()
 
   useEffect(() => {
     const checkMobile = () => {
@@ -27,18 +32,38 @@ export default function DashboardLayout({ children, activePage = 'dashboard', pa
     window.addEventListener('resize', checkMobile)
 
     const storedUser = localStorage.getItem('fintime_user')
-    if (storedUser) {
-      setUser(JSON.parse(storedUser))
-      
-      // Fetch latest profile from backend to sync real-time database changes
-      api.get('/auth/profile')
-        .then(res => {
-          if (res.data?.user) {
-            setUser(res.data.user)
-            localStorage.setItem('fintime_user', JSON.stringify(res.data.user))
-          }
-        })
-        .catch(err => console.error('Failed to sync profile in layout:', err))
+    if (storedUser && storedUser !== 'undefined') {
+      try {
+        const parsed = JSON.parse(storedUser)
+        if (parsed) {
+          setUser(parsed)
+          
+          // Fetch latest profile from backend to sync real-time database changes
+          api.get('/auth/profile')
+            .then(res => {
+              if (res.data?.success && res.data?.data) {
+                setUser(res.data.data)
+                localStorage.setItem('fintime_user', JSON.stringify(res.data.data))
+              } else if (res.data?.user) {
+                // Fallback for old API format
+                setUser(res.data.user)
+                localStorage.setItem('fintime_user', JSON.stringify(res.data.user))
+              }
+            })
+            .catch(err => {
+              console.error('Failed to sync profile in layout:', err)
+              if (err.response?.status === 401) {
+                handleLogout()
+              }
+            })
+        } else {
+          navigate('/login')
+        }
+      } catch (e) {
+        console.error('Failed to parse user data:', e)
+        localStorage.removeItem('fintime_user')
+        navigate('/login')
+      }
     } else {
       navigate('/login')
     }
@@ -73,20 +98,63 @@ export default function DashboardLayout({ children, activePage = 'dashboard', pa
 
           {/* Desktop Navigation */}
           {!isMobile && (
-            <div className="flex items-center gap-4">
-              {activePage !== 'dashboard' && (
-                <button
-                  onClick={() => navigate('/dashboard')}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-gray-400 hover:text-cyan-400 transition-all"
-                >
-                  <LayoutDashboard size={18} />
-                  <span className="font-medium">Dashboard</span>
-                </button>
-              )}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => navigate('/dashboard')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${
+                  activePage === 'dashboard'
+                    ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
+                    : 'text-gray-400 hover:text-cyan-400'
+                }`}
+              >
+                <LayoutDashboard size={18} />
+                <span className="font-medium">Dashboard</span>
+              </button>
 
-              <button className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center relative hover:bg-white/10 transition-all">
+              <button
+                onClick={() => navigate('/reports')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${
+                  activePage === 'reports'
+                    ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
+                    : 'text-gray-400 hover:text-cyan-400'
+                }`}
+              >
+                <FileText size={18} />
+                <span className="font-medium">Laporan</span>
+              </button>
+
+              <button
+                onClick={() => navigate('/settings')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${
+                  activePage === 'settings'
+                    ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
+                    : 'text-gray-400 hover:text-cyan-400'
+                }`}
+              >
+                <Settings size={18} />
+                <span className="font-medium">Settings</span>
+              </button>
+
+              <div className="w-px h-6 mx-2" style={{ background: 'rgba(255,255,255,0.1)' }} />
+
+              <button
+                onClick={onShowHelp}
+                className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all text-gray-300 hover:text-cyan-400"
+                title="Bantuan & Panduan"
+              >
+                <HelpCircle size={18} />
+              </button>
+
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center relative hover:bg-white/10 transition-all"
+              >
                 <Bell size={18} className="text-gray-300" />
-                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-[#020b18]"></span>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center border-2 border-[#020b18]">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
               </button>
 
               <UserDropdown user={user} onLogout={handleLogout} />
@@ -163,6 +231,12 @@ export default function DashboardLayout({ children, activePage = 'dashboard', pa
 
       {/* Page Content */}
       {typeof children === 'function' ? children({ user, handleLogout }) : children}
+
+      {/* Notification Center */}
+      <NotificationCenter
+        isOpen={showNotifications}
+        onClose={() => setShowNotifications(false)}
+      />
 
       {/* Mobile Bottom Nav */}
       <BottomNav activePage={activePage} onLogout={handleLogout} />

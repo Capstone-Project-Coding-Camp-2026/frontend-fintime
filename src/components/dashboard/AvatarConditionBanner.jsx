@@ -63,8 +63,11 @@ export default function AvatarConditionBanner({
 
   // Format currency helpers
   const formatIDR = (val) => {
+    if (val >= 1000000000) {
+      return `Rp ${(val / 1000000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })} Miliar`
+    }
     if (val >= 1000000) {
-      return `Rp ${(val / 1000000).toFixed(1)}Jt`
+      return `Rp ${(val / 1000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })} Juta`
     }
     return `Rp ${val.toLocaleString('id-ID')}`
   }

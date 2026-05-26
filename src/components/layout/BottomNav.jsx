@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { LayoutDashboard, User as UserIcon, Settings, LogOut } from 'lucide-react'
+import { LayoutDashboard, User as UserIcon, FileText, LogOut } from 'lucide-react'
 
 export default function BottomNav({ activePage = 'dashboard', onLogout }) {
   const navigate = useNavigate()
@@ -12,16 +12,16 @@ export default function BottomNav({ activePage = 'dashboard', onLogout }) {
       onClick: () => navigate('/dashboard'),
     },
     {
+      id: 'reports',
+      icon: FileText,
+      label: 'Laporan',
+      onClick: () => navigate('/reports'),
+    },
+    {
       id: 'profile',
       icon: UserIcon,
       label: 'Profil',
       onClick: () => navigate('/profile'),
-    },
-    {
-      id: 'settings',
-      icon: Settings,
-      label: 'Set',
-      onClick: () => {},
     },
     {
       id: 'logout',

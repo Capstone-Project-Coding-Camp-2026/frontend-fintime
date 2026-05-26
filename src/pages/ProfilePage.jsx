@@ -22,16 +22,20 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem('fintime_user')
-    if (storedUser) {
-      const userData = JSON.parse(storedUser)
-      setUser(userData)
-      setFormData({
-        fullName: userData.fullName || '',
-        email: userData.email || '',
-        phone: userData.phone || '',
-        jobType: userData.jobType || userData.occupation || '',
-        monthlyIncome: userData.monthlyIncome || ''
-      })
+    if (storedUser && storedUser !== 'undefined') {
+      try {
+        const userData = JSON.parse(storedUser)
+        setUser(userData)
+        setFormData({
+          fullName: userData.fullName || '',
+          email: userData.email || '',
+          phone: userData.phone || '',
+          jobType: userData.jobType || userData.occupation || '',
+          monthlyIncome: userData.monthlyIncome || ''
+        })
+      } catch (e) {
+        console.error('Failed to parse user in profile:', e)
+      }
     }
   }, [])
 
