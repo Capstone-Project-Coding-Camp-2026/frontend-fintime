@@ -73,7 +73,24 @@ export default function DashboardPage() {
 
     setMonthlyIncome(u.monthlyIncome || 5000000)
 
-    // Fetch Linked Account Summary
+    // 1. Fetch Instant Avatar State from DB (Cached)
+    api.get('/ai/avatar-state')
+      .then(res => {
+        if (res.data?.success && res.data.data) {
+          const aiData = res.data.data;
+          setProjectedWealth(aiData.projectedWealth || 0)
+          setPensionSurvivalYears(aiData.pensionSurvivalYears || 0)
+          setAvatarCondition(aiData.condition || 'normal')
+          
+          if (aiData.predictedExpenseTrend && Array.isArray(aiData.predictedExpenseTrend)) {
+            const avgExpense = aiData.predictedExpenseTrend.reduce((sum, val) => sum + val, 0) / aiData.predictedExpenseTrend.length
+            setMonthlyExpense(Math.round(avgExpense))
+          }
+        }
+      })
+      .catch(err => console.error('Failed to get cached avatar state:', err))
+
+    // 2. Fetch Linked Account Summary
     api.get(`/linked-accounts/${u.id}/summary`)
       .then(res => {
         if (res.data?.success) {
@@ -82,7 +99,7 @@ export default function DashboardPage() {
       })
       .catch(err => console.error('Failed to get account summary:', err))
 
-    // Run dynamic Forecast to get latest avatar health condition and pension wealth metrics
+    // 3. Run Background dynamic Forecast to update analytics
     api.post('/ai/forecast', { userId: u.id })
       .then(res => {
         if (res.data && res.data.success) {
@@ -92,7 +109,6 @@ export default function DashboardPage() {
           setAvatarCondition(aiData.condition || 'normal')
 
           if (aiData.predictedExpenses && aiData.predictedExpenses.length > 0) {
-            // Estimate average future monthly expenses from the prediction trend
             const avgExpense = aiData.predictedExpenses.reduce((sum, val) => sum + val, 0) / aiData.predictedExpenses.length
             setMonthlyExpense(Math.round(avgExpense))
           }
@@ -214,7 +230,7 @@ export default function DashboardPage() {
           badPercent: bad,
           verdict: verdict,
           monthlyPayment: Math.round(monthlyPay),
-          remainingBudget: Math.round(data.cashflow_after_purchase),
+          remainingBudget: Math.round(data.cashflow_after || data.cashflow_after_purchase || 0),
           totalPayment: Math.round(totalPay),
         })
 

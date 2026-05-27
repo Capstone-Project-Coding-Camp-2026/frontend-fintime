@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
-import { AlertTriangle, Plus, Pencil, Trash2, Calendar, CreditCard, TrendingDown, CheckCircle } from 'lucide-react'
+import { AlertTriangle, Plus, Pencil, Trash2, Calendar, CreditCard, TrendingDown, CheckCircle, ChevronDown } from 'lucide-react'
 import { useToast } from '../../context/ToastContext'
 import api from '../../lib/api'
 
@@ -38,6 +38,7 @@ export default function DebtCard({ onRefresh }) {
   const [showPayment, setShowPayment] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [selectedDebt, setSelectedDebt] = useState(null)
+  const [showTypeDropdown, setShowTypeDropdown] = useState(false)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -269,18 +270,18 @@ export default function DebtCard({ onRefresh }) {
 
       {/* Summary Stats */}
       <div
-        className="px-6 py-4 flex items-center gap-6"
+        className="px-6 py-4 grid grid-cols-2 md:grid-cols-3 gap-4"
         style={{ borderBottom: '1px solid rgba(0,245,255,0.08)' }}
       >
         <div>
           <span className="text-xs" style={{ color: '#7aa6c2' }}>Total Hutang</span>
-          <p className="text-lg font-bold" style={{ color: '#f87171' }}>
+          <p className="text-lg font-bold truncate" style={{ color: '#f87171' }}>
             {formatCurrency(totalDebt)}
           </p>
         </div>
         <div>
           <span className="text-xs" style={{ color: '#7aa6c2' }}>Cicilan/Bulan</span>
-          <p className="text-lg font-bold" style={{ color: '#fbbf24' }}>
+          <p className="text-lg font-bold truncate" style={{ color: '#fbbf24' }}>
             {formatCurrency(totalMonthly)}
           </p>
         </div>
@@ -472,24 +473,70 @@ export default function DebtCard({ onRefresh }) {
                   />
                 </div>
 
-                <div>
+                <div className="relative">
                   <label className="block text-sm font-medium mb-2" style={{ color: '#7aa6c2' }}>
                     Jenis
                   </label>
-                  <select
-                    value={formData.type}
-                    onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl outline-none"
+                  <button
+                    type="button"
+                    onClick={() => setShowTypeDropdown(!showTypeDropdown)}
+                    className="w-full px-4 py-3 rounded-xl outline-none flex items-center justify-between transition-all"
                     style={{
                       background: '#02111f',
                       border: '1px solid rgba(0,245,255,0.15)',
                       color: 'white',
                     }}
                   >
-                    {DEBT_TYPES.map((type) => (
-                      <option key={type.id} value={type.id}>{type.label}</option>
-                    ))}
-                  </select>
+                    <div className="flex items-center gap-2">
+                      <span>{DEBT_TYPES.find(t => t.id === formData.type)?.icon}</span>
+                      <span>{DEBT_TYPES.find(t => t.id === formData.type)?.label}</span>
+                    </div>
+                    <ChevronDown 
+                      size={18} 
+                      className={`transition-transform duration-300 ${showTypeDropdown ? 'rotate-180' : ''}`} 
+                      style={{ color: '#00f5ff' }}
+                    />
+                  </button>
+
+                  {showTypeDropdown && (
+                    <>
+                      <div 
+                        className="fixed inset-0 z-[60]" 
+                        onClick={() => setShowTypeDropdown(false)} 
+                      />
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="absolute left-0 right-0 mt-2 z-[70] rounded-xl overflow-hidden border shadow-2xl"
+                        style={{
+                          background: 'rgba(6,21,40,0.98)',
+                          backdropFilter: 'blur(10px)',
+                          borderColor: 'rgba(0,245,255,0.2)',
+                        }}
+                      >
+                        <div className="max-h-60 overflow-y-auto custom-scrollbar">
+                          {DEBT_TYPES.map((type) => (
+                            <button
+                              key={type.id}
+                              type="button"
+                              onClick={() => {
+                                setFormData({ ...formData, type: type.id })
+                                setShowTypeDropdown(false)
+                              }}
+                              className="w-full px-4 py-3 flex items-center gap-3 hover:bg-white/5 transition-all text-left"
+                              style={{
+                                color: formData.type === type.id ? '#00f5ff' : 'white',
+                                background: formData.type === type.id ? 'rgba(0,245,255,0.05)' : 'transparent',
+                              }}
+                            >
+                              <span className="text-xl">{type.icon}</span>
+                              <span className="font-medium">{type.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </motion.div>
+                    </>
+                  )}
                 </div>
 
                 <div>

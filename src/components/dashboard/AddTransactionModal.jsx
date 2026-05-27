@@ -98,7 +98,7 @@ export default function AddTransactionModal({ isOpen, onClose, onSuccess, defaul
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-8 overflow-y-auto"
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
         style={{ background: 'rgba(2, 11, 24, 0.9)', backdropFilter: 'blur(8px)' }}
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >
@@ -107,7 +107,7 @@ export default function AddTransactionModal({ isOpen, onClose, onSuccess, defaul
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.95 }}
           transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full max-w-md rounded-2xl my-4"
+          className="w-full max-w-md rounded-2xl"
           style={{
             background: 'linear-gradient(135deg, #061528 0%, #020b18 100%)',
             border: '1px solid rgba(0, 245, 255, 0.15)',

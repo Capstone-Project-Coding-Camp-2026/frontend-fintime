@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
-import { TrendingUp, TrendingDown, Plus, Pencil, Trash2, AlertTriangle, Check } from 'lucide-react'
+import { TrendingUp, TrendingDown, Plus, Pencil, Trash2, AlertTriangle, Check, ChevronDown } from 'lucide-react'
 import { useToast } from '../../context/ToastContext'
 import api from '../../lib/api'
 
@@ -26,6 +26,7 @@ export default function BudgetCard({ onRefresh }) {
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -314,28 +315,72 @@ export default function BudgetCard({ onRefresh }) {
             </h3>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
+              <div className="relative">
                 <label className="block text-sm font-medium mb-2" style={{ color: '#7aa6c2' }}>
                   Kategori
                 </label>
-                <select
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  required
-                  className="w-full px-4 py-3 rounded-xl outline-none"
+                <button
+                  type="button"
+                  onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                  className="w-full px-4 py-3 rounded-xl outline-none flex items-center justify-between transition-all"
                   style={{
                     background: '#02111f',
                     border: '1px solid rgba(0,245,255,0.15)',
                     color: 'white',
                   }}
                 >
-                  <option value="">Pilih Kategori</option>
-                  {categories.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                    </option>
-                  ))}
-                </select>
+                  <span className={!formData.category ? 'text-gray-500' : ''}>
+                    {formData.category 
+                      ? formData.category.charAt(0).toUpperCase() + formData.category.slice(1)
+                      : 'Pilih Kategori'}
+                  </span>
+                  <ChevronDown 
+                    size={18} 
+                    className={`transition-transform duration-300 ${showCategoryDropdown ? 'rotate-180' : ''}`} 
+                    style={{ color: '#00f5ff' }}
+                  />
+                </button>
+
+                {showCategoryDropdown && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-[60]" 
+                      onClick={() => setShowCategoryDropdown(false)} 
+                    />
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="absolute left-0 right-0 mt-2 z-[70] rounded-xl overflow-hidden border shadow-2xl"
+                      style={{
+                        background: 'rgba(6,21,40,0.98)',
+                        backdropFilter: 'blur(10px)',
+                        borderColor: 'rgba(0,245,255,0.2)',
+                      }}
+                    >
+                      <div className="max-h-60 overflow-y-auto custom-scrollbar">
+                        {categories.map((cat) => (
+                          <button
+                            key={cat}
+                            type="button"
+                            onClick={() => {
+                              setFormData({ ...formData, category: cat })
+                              setShowCategoryDropdown(false)
+                            }}
+                            className="w-full px-4 py-3 hover:bg-white/5 transition-all text-left"
+                            style={{
+                              color: formData.category === cat ? '#00f5ff' : 'white',
+                              background: formData.category === cat ? 'rgba(0,245,255,0.05)' : 'transparent',
+                            }}
+                          >
+                            <span className="font-medium">
+                              {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  </>
+                )}
               </div>
 
               <div>

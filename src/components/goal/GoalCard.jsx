@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
-import { Target, Plus, Pencil, Trash2, Calendar, TrendingUp, Award, CheckCircle, Clock } from 'lucide-react'
+import { Target, Plus, Pencil, Trash2, Calendar, TrendingUp, Award, CheckCircle, Clock, ChevronDown } from 'lucide-react'
 import { useToast } from '../../context/ToastContext'
 import api from '../../lib/api'
 
@@ -48,6 +48,7 @@ export default function GoalCard({ onRefresh }) {
   const [showAddSavings, setShowAddSavings] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [selectedGoal, setSelectedGoal] = useState(null)
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -242,18 +243,18 @@ export default function GoalCard({ onRefresh }) {
 
       {/* Summary Stats */}
       <div
-        className="px-6 py-4 flex items-center gap-6"
+        className="px-6 py-4 grid grid-cols-2 md:grid-cols-4 gap-4"
         style={{ borderBottom: '1px solid rgba(0,245,255,0.08)' }}
       >
         <div>
           <span className="text-xs" style={{ color: '#7aa6c2' }}>Total Ditabung</span>
-          <p className="text-lg font-bold" style={{ color: '#a855f7' }}>
+          <p className="text-lg font-bold truncate" style={{ color: '#a855f7' }}>
             {formatCurrency(totalSaved)}
           </p>
         </div>
         <div>
           <span className="text-xs" style={{ color: '#7aa6c2' }}>Target Keseluruhan</span>
-          <p className="text-lg font-bold" style={{ color: '#00f5ff' }}>
+          <p className="text-lg font-bold truncate" style={{ color: '#00f5ff' }}>
             {formatCurrency(totalTarget)}
           </p>
         </div>
@@ -285,7 +286,7 @@ export default function GoalCard({ onRefresh }) {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4">
             {goals.map((goal) => {
               const current = goal.currentAmount || 0
               const target = goal.targetAmount || 0
@@ -480,26 +481,71 @@ export default function GoalCard({ onRefresh }) {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#7aa6c2' }}>
-                  Kategori
-                </label>
-                <select
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl outline-none"
-                  style={{
-                    background: '#02111f',
-                    border: '1px solid rgba(0,245,255,0.15)',
-                    color: 'white',
-                  }}
-                >
-                  {GOAL_CATEGORIES.map((cat) => (
-                    <option key={cat.id} value={cat.id}>{cat.icon} {cat.label}</option>
-                  ))}
-                </select>
-              </div>
+              <div className="relative">
+               <label className="block text-sm font-medium mb-2" style={{ color: '#7aa6c2' }}>
+                 Kategori
+               </label>
+               <button
+                 type="button"
+                 onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                 className="w-full px-4 py-3 rounded-xl outline-none flex items-center justify-between transition-all"
+                 style={{
+                   background: '#02111f',
+                   border: '1px solid rgba(0,245,255,0.15)',
+                   color: 'white',
+                 }}
+               >
+                 <div className="flex items-center gap-2">
+                   <span>{GOAL_CATEGORIES.find(c => c.id === formData.category)?.icon}</span>
+                   <span>{GOAL_CATEGORIES.find(c => c.id === formData.category)?.label}</span>
+                 </div>
+                 <ChevronDown 
+                   size={18} 
+                   className={`transition-transform duration-300 ${showCategoryDropdown ? 'rotate-180' : ''}`} 
+                   style={{ color: '#00f5ff' }}
+                 />
+               </button>
 
+               {showCategoryDropdown && (
+                 <>
+                   <div 
+                     className="fixed inset-0 z-[60]" 
+                     onClick={() => setShowCategoryDropdown(false)} 
+                   />
+                   <motion.div
+                     initial={{ opacity: 0, y: -10 }}
+                     animate={{ opacity: 1, y: 0 }}
+                     className="absolute left-0 right-0 mt-2 z-[70] rounded-xl overflow-hidden border shadow-2xl"
+                     style={{
+                       background: 'rgba(6,21,40,0.98)',
+                       backdropFilter: 'blur(10px)',
+                       borderColor: 'rgba(0,245,255,0.2)',
+                     }}
+                   >
+                     <div className="max-h-60 overflow-y-auto custom-scrollbar">
+                       {GOAL_CATEGORIES.map((cat) => (
+                         <button
+                           key={cat.id}
+                           type="button"
+                           onClick={() => {
+                             setFormData({ ...formData, category: cat.id })
+                             setShowCategoryDropdown(false)
+                           }}
+                           className="w-full px-4 py-3 flex items-center gap-3 hover:bg-white/5 transition-all text-left"
+                           style={{
+                             color: formData.category === cat.id ? '#00f5ff' : 'white',
+                             background: formData.category === cat.id ? 'rgba(0,245,255,0.05)' : 'transparent',
+                           }}
+                         >
+                           <span className="text-xl">{cat.icon}</span>
+                           <span className="font-medium">{cat.label}</span>
+                         </button>
+                       ))}
+                     </div>
+                   </motion.div>
+                 </>
+               )}
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-2" style={{ color: '#7aa6c2' }}>
