@@ -3,7 +3,9 @@ import api from './api'
 // Get all transactions
 export const getTransactions = async (userId, params = {}) => {
   const queryParams = new URLSearchParams(params).toString()
-  const response = await api.get(`/transactions/${userId}${queryParams ? `?${queryParams}` : ''}`)
+  const response = await api.get(
+    `/transactions/${userId}${queryParams ? `?${queryParams}` : ''}`,
+  )
   return response.data
 }
 
@@ -15,7 +17,9 @@ export const getUnlabelledTransactions = async (userId) => {
 
 // Get monthly aggregation
 export const getMonthlyAggregation = async (userId, year, month) => {
-  const response = await api.get(`/transactions/${userId}/monthly?year=${year}&month=${month}`)
+  const response = await api.get(
+    `/transactions/${userId}/monthly?year=${year}&month=${month}`,
+  )
   return response.data
 }
 
@@ -27,13 +31,18 @@ export const createTransaction = async (data) => {
 
 // Relabel single transaction
 export const relabelTransaction = async (transactionId, categoryLabel) => {
-  const response = await api.put(`/transactions/${transactionId}/relabel`, { categoryLabel })
+  const response = await api.put(`/transactions/${transactionId}/relabel`, {
+    categoryLabel,
+  })
   return response.data
 }
 
 // Batch relabel transactions
 export const relabelBatch = async (transactionIds, categoryLabel) => {
-  const response = await api.put('/transactions/relabel-batch', { transactionIds, categoryLabel })
+  const response = await api.put('/transactions/relabel-batch', {
+    transactionIds,
+    categoryLabel,
+  })
   return response.data
 }
 
@@ -61,7 +70,9 @@ export const linkAccount = async (data) => {
 
 // Update account balance
 export const updateAccountBalance = async (accountId, balance) => {
-  const response = await api.put(`/linked-accounts/${accountId}/balance`, { balance })
+  const response = await api.put(`/linked-accounts/${accountId}/balance`, {
+    balance,
+  })
   return response.data
 }
 
@@ -98,3 +109,20 @@ export const INCOME_CATEGORIES = [
   { id: 'hadiah', label: 'Hadiah', iconName: 'Gift' },
   { id: 'lainnya', label: 'Lainnya', iconName: 'Sparkles' },
 ]
+
+// ============================================================
+// LABEL RULES API
+// ============================================================
+// Save a label rule to user's labelRules
+export const saveLabelRule = async (userId, description, categoryLabel) => {
+  const response = await api.put(`/users/${userId}/label-rules`, {
+    description,
+    categoryLabel,
+  })
+  return response.data
+}
+// Get user's label rules
+export const getLabelRules = async (userId) => {
+  const response = await api.get(`/users/${userId}/label-rules`)
+  return response.data
+}

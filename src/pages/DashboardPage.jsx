@@ -16,7 +16,6 @@ import AddTransactionModal from '../components/dashboard/AddTransactionModal'
 import AddAccountModal from '../components/dashboard/AddAccountModal'
 import AccountCard from '../components/dashboard/AccountCard'
 import TransactionCard from '../components/dashboard/TransactionCard'
-import SmartLedger from '../components/dashboard/SmartLedger'
 import BudgetCard from '../components/budget/BudgetCard'
 import DebtCard from '../components/debt/DebtCard'
 import GoalCard from '../components/goal/GoalCard'
@@ -62,7 +61,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const storedUser = localStorage.getItem('fintime_user')
     if (!storedUser || storedUser === 'undefined') return
-    
+
     let u
     try {
       u = JSON.parse(storedUser)
@@ -74,47 +73,57 @@ export default function DashboardPage() {
     setMonthlyIncome(u.monthlyIncome || 5000000)
 
     // 1. Fetch Instant Avatar State from DB (Cached)
-    api.get('/ai/avatar-state')
-      .then(res => {
+    api
+      .get('/ai/avatar-state')
+      .then((res) => {
         if (res.data?.success && res.data.data) {
-          const aiData = res.data.data;
+          const aiData = res.data.data
           setProjectedWealth(aiData.projectedWealth || 0)
           setPensionSurvivalYears(aiData.pensionSurvivalYears || 0)
           setAvatarCondition(aiData.condition || 'normal')
-          
-          if (aiData.predictedExpenseTrend && Array.isArray(aiData.predictedExpenseTrend)) {
-            const avgExpense = aiData.predictedExpenseTrend.reduce((sum, val) => sum + val, 0) / aiData.predictedExpenseTrend.length
+
+          if (
+            aiData.predictedExpenseTrend &&
+            Array.isArray(aiData.predictedExpenseTrend)
+          ) {
+            const avgExpense =
+              aiData.predictedExpenseTrend.reduce((sum, val) => sum + val, 0) /
+              aiData.predictedExpenseTrend.length
             setMonthlyExpense(Math.round(avgExpense))
           }
         }
       })
-      .catch(err => console.error('Failed to get cached avatar state:', err))
+      .catch((err) => console.error('Failed to get cached avatar state:', err))
 
     // 2. Fetch Linked Account Summary
-    api.get(`/linked-accounts/${u.id}/summary`)
-      .then(res => {
+    api
+      .get(`/linked-accounts/${u.id}/summary`)
+      .then((res) => {
         if (res.data?.success) {
           setTotalBalance(res.data.data.totalBalance || 0)
         }
       })
-      .catch(err => console.error('Failed to get account summary:', err))
+      .catch((err) => console.error('Failed to get account summary:', err))
 
     // 3. Run Background dynamic Forecast to update analytics
-    api.post('/ai/forecast', { userId: u.id })
-      .then(res => {
+    api
+      .post('/ai/forecast', { userId: u.id })
+      .then((res) => {
         if (res.data && res.data.success) {
-          const aiData = res.data.data || {};
+          const aiData = res.data.data || {}
           setProjectedWealth(aiData.projectedWealth || 0)
           setPensionSurvivalYears(aiData.pensionSurvivalYears || 0)
           setAvatarCondition(aiData.condition || 'normal')
 
           if (aiData.predictedExpenses && aiData.predictedExpenses.length > 0) {
-            const avgExpense = aiData.predictedExpenses.reduce((sum, val) => sum + val, 0) / aiData.predictedExpenses.length
+            const avgExpense =
+              aiData.predictedExpenses.reduce((sum, val) => sum + val, 0) /
+              aiData.predictedExpenses.length
             setMonthlyExpense(Math.round(avgExpense))
           }
         }
       })
-      .catch(err => console.error('Failed to run forecast:', err))
+      .catch((err) => console.error('Failed to run forecast:', err))
   }, [refreshKey])
 
   const handleAnalyze = async () => {
@@ -150,26 +159,21 @@ export default function DashboardPage() {
 
           financial_literacy_score: 70,
 
-          employment_type: "full_time",
+          employment_type: 'full_time',
 
-          city_tier: "tier_2",
+          city_tier: 'tier_2',
 
           paylater_usage_history:
-            selectedOption === "paylater"
-              ? "medium"
-              : "low",
+            selectedOption === 'paylater' ? 'medium' : 'low',
 
-          impulse_spending_tendency: "medium",
+          impulse_spending_tendency: 'medium',
 
           savings_rate:
             monthlyIncome > 0
               ? Number(
-                (
-                  (monthlyIncome - monthlyExpense) /
-                  monthlyIncome
-                ).toFixed(2)
-              )
-              : 0
+                  ((monthlyIncome - monthlyExpense) / monthlyIncome).toFixed(2),
+                )
+              : 0,
         },
 
         simulation: {
@@ -178,15 +182,11 @@ export default function DashboardPage() {
           available_cash: totalBalance,
 
           paylater_interest_rate:
-            selectedOption === "paylater"
-              ? parseFloat(interestRate) / 100
-              : 0,
+            selectedOption === 'paylater' ? parseFloat(interestRate) / 100 : 0,
 
           paylater_tenor_months:
-            selectedOption === "paylater"
-              ? parseInt(installmentMonths)
-              : 1
-        }
+            selectedOption === 'paylater' ? parseInt(installmentMonths) : 1,
+        },
       }
       const response = await api.post('/ai/whatif', payload)
 
@@ -195,7 +195,9 @@ export default function DashboardPage() {
         const conf = data.confidence || 0.8
 
         // Map backend decision results back to graphical percentages
-        let good = 40, neutral = 40, bad = 20
+        let good = 40,
+          neutral = 40,
+          bad = 20
         let verdict = 'neutral' // default
 
         if (data.recommendation === 'just_buy') {
@@ -216,13 +218,16 @@ export default function DashboardPage() {
         }
 
         // Calculate payment metrics
-        const monthlyPay = selectedOption === 'paylater'
-          ? (itemPriceVal / parseInt(installmentMonths)) * (1 + (parseFloat(interestRate) / 100))
-          : itemPriceVal
+        const monthlyPay =
+          selectedOption === 'paylater'
+            ? (itemPriceVal / parseInt(installmentMonths)) *
+              (1 + parseFloat(interestRate) / 100)
+            : itemPriceVal
 
-        const totalPay = selectedOption === 'paylater'
-          ? monthlyPay * parseInt(installmentMonths)
-          : itemPriceVal
+        const totalPay =
+          selectedOption === 'paylater'
+            ? monthlyPay * parseInt(installmentMonths)
+            : itemPriceVal
 
         setAnalysisData({
           goodPercent: good,
@@ -230,7 +235,9 @@ export default function DashboardPage() {
           badPercent: bad,
           verdict: verdict,
           monthlyPayment: Math.round(monthlyPay),
-          remainingBudget: Math.round(data.cashflow_after || data.cashflow_after_purchase || 0),
+          remainingBudget: Math.round(
+            data.cashflow_after || data.cashflow_after_purchase || 0,
+          ),
           totalPayment: Math.round(totalPay),
         })
 
@@ -239,7 +246,10 @@ export default function DashboardPage() {
       }
     } catch (err) {
       console.error('Failed to run what-if simulation:', err)
-      const msg = err?.response?.data?.detail?.map(d => d.msg).join('; ') || err.message || 'Unexpected error'
+      const msg =
+        err?.response?.data?.detail?.map((d) => d.msg).join('; ') ||
+        err.message ||
+        'Unexpected error'
       setErrorMsg(msg)
     } finally {
       setIsAnalyzing(false)
@@ -251,8 +261,8 @@ export default function DashboardPage() {
   }
 
   return (
-    <DashboardLayout 
-      activePage="dashboard" 
+    <DashboardLayout
+      activePage="dashboard"
       particleCount={30}
       onShowHelp={() => setShowOnboardingManual(true)}
     >
@@ -297,7 +307,11 @@ export default function DashboardPage() {
                 condition={avatarCondition}
                 monthlyIncome={monthlyIncome}
                 monthlyExpense={monthlyExpense}
-                targetPension={user?.monthlyIncome ? user.monthlyIncome * 12 * 25 : 1500000000}
+                targetPension={
+                  user?.monthlyIncome
+                    ? user.monthlyIncome * 12 * 25
+                    : 1500000000
+                }
               />
             </section>
 
@@ -327,7 +341,10 @@ export default function DashboardPage() {
                     >
                       Pengeluaran
                     </p>
-                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                    <p
+                      className="text-xs"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
                       Tambah baru
                     </p>
                   </div>
@@ -356,7 +373,10 @@ export default function DashboardPage() {
                     >
                       Pendapatan
                     </p>
-                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                    <p
+                      className="text-xs"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
                       Tambah baru
                     </p>
                   </div>
@@ -382,7 +402,10 @@ export default function DashboardPage() {
                     >
                       Tambah Akun
                     </p>
-                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                    <p
+                      className="text-xs"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
                       Hubungkan baru
                     </p>
                   </div>
@@ -411,7 +434,10 @@ export default function DashboardPage() {
                     >
                       Quick Transaksi
                     </p>
-                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                    <p
+                      className="text-xs"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
                       Catat cepat
                     </p>
                   </div>
@@ -457,7 +483,10 @@ export default function DashboardPage() {
                   isAnalyzing={isAnalyzing}
                 />
                 {errorMsg && (
-                  <p className="text-sm text-red-500 mt-2" style={{ color: 'var(--error-red)' }}>
+                  <p
+                    className="text-sm text-red-500 mt-2"
+                    style={{ color: 'var(--error-red)' }}
+                  >
                     {errorMsg}
                   </p>
                 )}
@@ -468,10 +497,6 @@ export default function DashboardPage() {
                   hasResult={hasResult}
                 />
               </div>
-            </section>
-
-            <section>
-              <SmartLedger key={`ledger-${refreshKey}`} onRelabel={handleRefresh} />
             </section>
 
             {/* Budget Section */}
@@ -490,9 +515,9 @@ export default function DashboardPage() {
             </section>
 
             {/* Onboarding Wizard */}
-            <OnboardingWizard 
-              showOnboarding={showOnboardingManual} 
-              onComplete={() => setShowOnboardingManual(false)} 
+            <OnboardingWizard
+              showOnboarding={showOnboardingManual}
+              onComplete={() => setShowOnboardingManual(false)}
             />
           </main>
 
