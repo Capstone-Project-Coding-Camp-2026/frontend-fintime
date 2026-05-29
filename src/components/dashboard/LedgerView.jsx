@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Check, Loader2 } from 'lucide-react'
+import { Check, Loader2, Filter, ChevronDown } from 'lucide-react'
 
 export default function LedgerView({
   loading,
@@ -22,33 +22,26 @@ export default function LedgerView({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 20 }}
     >
-      <div className="flex gap-2 p-3 overflow-x-auto">
-        {LEDGER_FILTERS.map(({ key, label }) => {
-          const active = ledgerFilter === key
-
-          const color = key === 'all' ? '#00f5ff' : CATEGORY_COLORS[key]
-
-          return (
-            <button
-              key={key}
-              onClick={() => setLedgerFilter(key)}
-              className="px-3 py-1.5 rounded-lg text-xs"
-              style={
-                active
-                  ? {
-                      background: `${color}22`,
-                      color,
-                    }
-                  : {
-                      background: 'rgba(0,245,255,0.05)',
-                      color: '#94a3b8',
-                    }
-              }
-            >
-              {label}
-            </button>
-          )
-        })}
+      <div className="px-4 py-3 border-b mb-1" style={{ borderColor: 'rgba(0, 245, 255, 0.08)' }}>
+        <div 
+          className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all relative"
+          style={{ background: 'rgba(0, 245, 255, 0.04)', border: '1px solid rgba(0, 245, 255, 0.1)' }}
+        >
+          <Filter size={16} style={{ color: '#00f5ff' }} />
+          <select
+            value={ledgerFilter}
+            onChange={(e) => setLedgerFilter(e.target.value)}
+            className="flex-1 bg-transparent text-sm font-medium outline-none appearance-none cursor-pointer w-full z-10"
+            style={{ color: ledgerFilter === 'all' ? '#00f5ff' : (CATEGORY_COLORS[ledgerFilter] || '#fff') }}
+          >
+            {LEDGER_FILTERS.map(({ key, label }) => (
+              <option key={key} value={key} style={{ background: 'rgb(2, 17, 31)', color: 'white' }}>
+                {key === 'all' ? 'Tampilkan Semua Kategori' : `Kategori: ${label}`}
+              </option>
+            ))}
+          </select>
+          <ChevronDown size={16} className="absolute right-4 z-0 pointer-events-none" style={{ color: '#94a3b8' }} />
+        </div>
       </div>
       <div className="p-4 space-y-3 max-h-[400px] overflow-y-auto">
         {loading ? (

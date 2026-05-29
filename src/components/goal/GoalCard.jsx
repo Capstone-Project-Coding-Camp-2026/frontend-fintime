@@ -204,12 +204,12 @@ export default function GoalCard({ onRefresh }) {
     >
       {/* Header */}
       <div
-        className="px-6 py-5 flex items-center justify-between"
+        className="px-6 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
         style={{ borderBottom: '1px solid rgba(0,245,255,0.08)' }}
       >
         <div className="flex items-center gap-3">
           <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center"
+            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
             style={{ background: 'rgba(168,85,247,0.1)' }}
           >
             <Target size={20} style={{ color: '#a855f7' }} />
@@ -229,7 +229,7 @@ export default function GoalCard({ onRefresh }) {
             setEditingId(null)
             setShowForm(true)
           }}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold transition-all"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl font-semibold transition-all whitespace-nowrap"
           style={{
             background: 'rgba(0,245,255,0.1)',
             border: '1px solid rgba(0,245,255,0.2)',
@@ -243,30 +243,30 @@ export default function GoalCard({ onRefresh }) {
 
       {/* Summary Stats */}
       <div
-        className="px-6 py-4 grid grid-cols-2 md:grid-cols-4 gap-4"
+        className="px-6 py-4 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4"
         style={{ borderBottom: '1px solid rgba(0,245,255,0.08)' }}
       >
         <div>
           <span className="text-xs" style={{ color: '#7aa6c2' }}>Total Ditabung</span>
-          <p className="text-lg font-bold truncate" style={{ color: '#a855f7' }}>
+          <p className="text-base sm:text-lg font-bold truncate" style={{ color: '#a855f7' }}>
             {formatCurrency(totalSaved)}
           </p>
         </div>
         <div>
           <span className="text-xs" style={{ color: '#7aa6c2' }}>Target Keseluruhan</span>
-          <p className="text-lg font-bold truncate" style={{ color: '#00f5ff' }}>
+          <p className="text-base sm:text-lg font-bold truncate" style={{ color: '#00f5ff' }}>
             {formatCurrency(totalTarget)}
           </p>
         </div>
         <div>
           <span className="text-xs" style={{ color: '#7aa6c2' }}>Aktif</span>
-          <p className="text-lg font-bold" style={{ color: '#fbbf24' }}>
+          <p className="text-base sm:text-lg font-bold" style={{ color: '#fbbf24' }}>
             {activeGoals.length}
           </p>
         </div>
         <div>
           <span className="text-xs" style={{ color: '#7aa6c2' }}>Selesai</span>
-          <p className="text-lg font-bold" style={{ color: '#22c55e' }}>
+          <p className="text-base sm:text-lg font-bold" style={{ color: '#22c55e' }}>
             {completedGoals.length}
           </p>
         </div>
@@ -313,19 +313,19 @@ export default function GoalCard({ onRefresh }) {
                   }}
                 >
                   {/* Header */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{categoryInfo.icon}</span>
-                      <div>
-                        <h3 className="font-bold" style={{ color: 'white' }}>
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-xl sm:text-2xl shrink-0">{categoryInfo.icon}</span>
+                      <div className="min-w-0">
+                        <h3 className="font-bold text-sm sm:text-base truncate" style={{ color: 'white' }}>
                           {goal.name || 'Target'}
                         </h3>
-                        <p className="text-xs" style={{ color: '#7aa6c2' }}>
+                        <p className="text-[11px] sm:text-xs truncate" style={{ color: '#7aa6c2' }}>
                           {categoryInfo.label}
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5 shrink-0">
                       {isCompleted ? (
                         <span
                           className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold"
@@ -345,22 +345,23 @@ export default function GoalCard({ onRefresh }) {
                               setSavingsAmount('')
                               setShowAddSavings(true)
                             }}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-green-500/10 transition-all"
-                            style={{ color: '#22c55e' }}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center bg-green-500/5 hover:bg-green-500/10 transition-all"
+                            style={{ color: '#22c55e', border: '1px solid rgba(34,197,94,0.1)' }}
                             title="Tambah Tabungan"
                           >
                             <TrendingUp size={14} />
                           </button>
                           <button
                             onClick={() => handleEdit(goal)}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/10 transition-all"
-                            style={{ color: '#7aa6c2' }}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 hover:bg-white/10 transition-all"
+                            style={{ color: '#7aa6c2', border: '1px solid rgba(255,255,255,0.05)' }}
                           >
                             <Pencil size={14} />
                           </button>
                           <button
                             onClick={() => handleDelete(goal.id)}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-red-500/10 transition-all text-red-400"
+                            className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-500/5 hover:bg-red-500/10 transition-all text-red-400"
+                            style={{ border: '1px solid rgba(248,113,113,0.1)' }}
                           >
                             <Trash2 size={14} />
                           </button>
@@ -371,7 +372,7 @@ export default function GoalCard({ onRefresh }) {
 
                   {/* Progress */}
                   <div className="mb-3">
-                    <div className="flex items-center justify-between text-sm mb-2">
+                    <div className="flex items-center justify-between text-[11px] sm:text-sm mb-2">
                       <span style={{ color: '#7aa6c2' }}>
                         {formatCurrency(current)} / {formatCurrency(target)}
                       </span>
@@ -383,7 +384,7 @@ export default function GoalCard({ onRefresh }) {
                       </span>
                     </div>
                     <div
-                      className="h-3 rounded-full overflow-hidden"
+                      className="h-2 sm:h-3 rounded-full overflow-hidden"
                       style={{ background: 'rgba(0,245,255,0.1)' }}
                     >
                       <motion.div
@@ -397,7 +398,7 @@ export default function GoalCard({ onRefresh }) {
                   </div>
 
                   {/* Info */}
-                  <div className="flex items-center justify-between text-xs">
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] sm:text-xs">
                     {daysRemaining !== null && (
                       <span
                         className="flex items-center gap-1"
@@ -442,7 +443,7 @@ export default function GoalCard({ onRefresh }) {
 
       {/* Add/Edit Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4">
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowForm(false)}
@@ -450,20 +451,31 @@ export default function GoalCard({ onRefresh }) {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="relative w-full max-w-md rounded-2xl p-6"
+            className="relative w-full sm:max-w-md md:max-w-lg rounded-2xl p-4 sm:p-6 max-h-[95vh] sm:max-h-[90vh] overflow-y-auto custom-scrollbar"
             style={{
               background: 'rgba(6,21,40,0.95)',
               backdropFilter: 'blur(30px)',
               border: '1px solid rgba(0,245,255,0.2)',
             }}
           >
-            <h3 className="text-xl font-bold mb-6">
+            <button
+              type="button"
+              onClick={() => setShowForm(false)}
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/10 transition-all"
+              style={{ color: '#7aa6c2' }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+            <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 pr-8">
               {editingId ? 'Edit Target' : 'Tambah Target Baru'}
             </h3>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#7aa6c2' }}>
+                <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: '#7aa6c2' }}>
                   Nama Target
                 </label>
                 <input
@@ -472,7 +484,7 @@ export default function GoalCard({ onRefresh }) {
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
                   placeholder="Contoh: Dana Liburan Jepang"
-                  className="w-full px-4 py-3 rounded-xl outline-none"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none text-sm sm:text-base"
                   style={{
                     background: '#02111f',
                     border: '1px solid rgba(0,245,255,0.15)',
@@ -482,13 +494,13 @@ export default function GoalCard({ onRefresh }) {
               </div>
 
               <div className="relative">
-               <label className="block text-sm font-medium mb-2" style={{ color: '#7aa6c2' }}>
+               <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: '#7aa6c2' }}>
                  Kategori
                </label>
                <button
                  type="button"
                  onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-                 className="w-full px-4 py-3 rounded-xl outline-none flex items-center justify-between transition-all"
+                 className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none flex items-center justify-between transition-all text-sm sm:text-base"
                  style={{
                    background: '#02111f',
                    border: '1px solid rgba(0,245,255,0.15)',
@@ -497,20 +509,20 @@ export default function GoalCard({ onRefresh }) {
                >
                  <div className="flex items-center gap-2">
                    <span>{GOAL_CATEGORIES.find(c => c.id === formData.category)?.icon}</span>
-                   <span>{GOAL_CATEGORIES.find(c => c.id === formData.category)?.label}</span>
+                   <span className="truncate">{GOAL_CATEGORIES.find(c => c.id === formData.category)?.label}</span>
                  </div>
-                 <ChevronDown 
-                   size={18} 
-                   className={`transition-transform duration-300 ${showCategoryDropdown ? 'rotate-180' : ''}`} 
+                 <ChevronDown
+                   size={16}
+                   className={`flex-shrink-0 transition-transform duration-300 ${showCategoryDropdown ? 'rotate-180' : ''}`}
                    style={{ color: '#00f5ff' }}
                  />
                </button>
 
                {showCategoryDropdown && (
                  <>
-                   <div 
-                     className="fixed inset-0 z-[60]" 
-                     onClick={() => setShowCategoryDropdown(false)} 
+                   <div
+                     className="fixed inset-0 z-[60]"
+                     onClick={() => setShowCategoryDropdown(false)}
                    />
                    <motion.div
                      initial={{ opacity: 0, y: -10 }}
@@ -522,7 +534,7 @@ export default function GoalCard({ onRefresh }) {
                        borderColor: 'rgba(0,245,255,0.2)',
                      }}
                    >
-                     <div className="max-h-60 overflow-y-auto custom-scrollbar">
+                     <div className="max-h-48 sm:max-h-60 overflow-y-auto custom-scrollbar">
                        {GOAL_CATEGORIES.map((cat) => (
                          <button
                            key={cat.id}
@@ -531,14 +543,14 @@ export default function GoalCard({ onRefresh }) {
                              setFormData({ ...formData, category: cat.id })
                              setShowCategoryDropdown(false)
                            }}
-                           className="w-full px-4 py-3 flex items-center gap-3 hover:bg-white/5 transition-all text-left"
+                           className="w-full px-3 sm:px-4 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-3 hover:bg-white/5 transition-all text-left text-sm sm:text-base"
                            style={{
                              color: formData.category === cat.id ? '#00f5ff' : 'white',
                              background: formData.category === cat.id ? 'rgba(0,245,255,0.05)' : 'transparent',
                            }}
                          >
-                           <span className="text-xl">{cat.icon}</span>
-                           <span className="font-medium">{cat.label}</span>
+                           <span className="text-lg sm:text-xl">{cat.icon}</span>
+                           <span className="font-medium truncate">{cat.label}</span>
                          </button>
                        ))}
                      </div>
@@ -546,9 +558,9 @@ export default function GoalCard({ onRefresh }) {
                  </>
                )}
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: '#7aa6c2' }}>
+                  <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: '#7aa6c2' }}>
                     Target Amount (Rp)
                   </label>
                   <input
@@ -557,8 +569,8 @@ export default function GoalCard({ onRefresh }) {
                     onChange={(e) => setFormData({ ...formData, targetAmount: e.target.value })}
                     required
                     min="1000"
-                    placeholder="Contoh: 15000000"
-                    className="w-full px-4 py-3 rounded-xl outline-none"
+                    placeholder="15000000"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none text-sm sm:text-base"
                     style={{
                       background: '#02111f',
                       border: '1px solid rgba(0,245,255,0.15)',
@@ -568,7 +580,7 @@ export default function GoalCard({ onRefresh }) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: '#7aa6c2' }}>
+                  <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: '#7aa6c2' }}>
                     Sudah Tersimpan (Rp)
                   </label>
                   <input
@@ -576,8 +588,8 @@ export default function GoalCard({ onRefresh }) {
                     value={formData.currentAmount}
                     onChange={(e) => setFormData({ ...formData, currentAmount: e.target.value })}
                     min="0"
-                    placeholder="Contoh: 5000000"
-                    className="w-full px-4 py-3 rounded-xl outline-none"
+                    placeholder="5000000"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none text-sm sm:text-base"
                     style={{
                       background: '#02111f',
                       border: '1px solid rgba(0,245,255,0.15)',
@@ -588,7 +600,7 @@ export default function GoalCard({ onRefresh }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#7aa6c2' }}>
+                <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: '#7aa6c2' }}>
                   Target Tanggal
                 </label>
                 <input
@@ -596,7 +608,7 @@ export default function GoalCard({ onRefresh }) {
                   value={formData.targetDate}
                   onChange={(e) => setFormData({ ...formData, targetDate: e.target.value })}
                   required
-                  className="w-full px-4 py-3 rounded-xl outline-none"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none text-sm sm:text-base"
                   style={{
                     background: '#02111f',
                     border: '1px solid rgba(0,245,255,0.15)',
@@ -606,7 +618,7 @@ export default function GoalCard({ onRefresh }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#7aa6c2' }}>
+                <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: '#7aa6c2' }}>
                   Deskripsi (Opsional)
                 </label>
                 <textarea
@@ -614,7 +626,7 @@ export default function GoalCard({ onRefresh }) {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows="2"
                   placeholder="Catatan tambahan..."
-                  className="w-full px-4 py-3 rounded-xl outline-none resize-none"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none resize-none text-sm sm:text-base"
                   style={{
                     background: '#02111f',
                     border: '1px solid rgba(0,245,255,0.15)',
@@ -623,11 +635,11 @@ export default function GoalCard({ onRefresh }) {
                 />
               </div>
 
-              <div className="flex items-center gap-3 pt-4">
+              <div className="flex items-center gap-2 sm:gap-3 pt-2 sm:pt-4">
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="flex-1 px-4 py-3 rounded-xl font-semibold"
+                  className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base"
                   style={{
                     background: 'rgba(248,113,113,0.1)',
                     border: '1px solid rgba(248,113,113,0.2)',
@@ -638,7 +650,7 @@ export default function GoalCard({ onRefresh }) {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-3 rounded-xl font-semibold"
+                  className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base"
                   style={{
                     background: 'linear-gradient(135deg, #00f5ff, #0096c7)',
                     color: '#020b18',
@@ -654,7 +666,7 @@ export default function GoalCard({ onRefresh }) {
 
       {/* Add Savings Modal */}
       {showAddSavings && selectedGoal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4">
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowAddSavings(false)}
@@ -662,24 +674,35 @@ export default function GoalCard({ onRefresh }) {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="relative w-full max-w-md rounded-2xl p-6"
+            className="relative w-full sm:max-w-md rounded-2xl p-4 sm:p-6 max-h-[90vh] sm:max-h-[85vh] overflow-y-auto custom-scrollbar"
             style={{
               background: 'rgba(6,21,40,0.95)',
               backdropFilter: 'blur(30px)',
               border: '1px solid rgba(0,245,255,0.2)',
             }}
           >
-            <h3 className="text-xl font-bold mb-2">Tambah Tabungan</h3>
-            <p className="text-sm mb-4" style={{ color: '#7aa6c2' }}>
+            <button
+              type="button"
+              onClick={() => setShowAddSavings(false)}
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/10 transition-all"
+              style={{ color: '#7aa6c2' }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+            <h3 className="text-lg sm:text-xl font-bold mb-2 pr-8">Tambah Tabungan</h3>
+            <p className="text-sm mb-3 sm:mb-4" style={{ color: '#7aa6c2' }}>
               {selectedGoal.name}
             </p>
-            <p className="text-xs mb-6" style={{ color: '#5a8aab' }}>
+            <p className="text-xs mb-4 sm:mb-6" style={{ color: '#5a8aab' }}>
               Progress: {formatCurrency(selectedGoal.currentAmount || 0)} / {formatCurrency(selectedGoal.targetAmount || 0)}
             </p>
 
-            <form onSubmit={handleAddSavings} className="space-y-4">
+            <form onSubmit={handleAddSavings} className="space-y-3 sm:space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#7aa6c2' }}>
+                <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: '#7aa6c2' }}>
                   Jumlah Tabungan (Rp)
                 </label>
                 <input
@@ -688,8 +711,8 @@ export default function GoalCard({ onRefresh }) {
                   onChange={(e) => setSavingsAmount(e.target.value)}
                   required
                   min="1000"
-                  placeholder="Contoh: 500000"
-                  className="w-full px-4 py-3 rounded-xl outline-none"
+                  placeholder="500000"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none text-sm sm:text-base"
                   style={{
                     background: '#02111f',
                     border: '1px solid rgba(0,245,255,0.15)',
@@ -698,11 +721,11 @@ export default function GoalCard({ onRefresh }) {
                 />
               </div>
 
-              <div className="flex items-center gap-3 pt-4">
+              <div className="flex items-center gap-2 sm:gap-3 pt-2 sm:pt-4">
                 <button
                   type="button"
                   onClick={() => setShowAddSavings(false)}
-                  className="flex-1 px-4 py-3 rounded-xl font-semibold"
+                  className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base"
                   style={{
                     background: 'rgba(248,113,113,0.1)',
                     border: '1px solid rgba(248,113,113,0.2)',
@@ -713,7 +736,7 @@ export default function GoalCard({ onRefresh }) {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
+                  className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl font-semibold flex items-center justify-center gap-2 text-sm sm:text-base"
                   style={{
                     background: 'linear-gradient(135deg, #22c55e, #16a34a)',
                     color: 'white',

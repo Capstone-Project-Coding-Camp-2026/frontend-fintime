@@ -98,7 +98,7 @@ export default function AddTransactionModal({ isOpen, onClose, onSuccess, defaul
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
+        className="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-y-auto"
         style={{ background: 'rgba(2, 11, 24, 0.9)', backdropFilter: 'blur(8px)' }}
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >

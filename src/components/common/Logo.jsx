@@ -30,18 +30,9 @@ const Logo = ({ size = 'md', showText = true, rotateDuration = 10 }) => {
         </motion.span>
       </div>
 
-      {showText && (
-        <span
-          className="text-xl font-extrabold hidden sm:block"
-          style={{
-            background: 'linear-gradient(135deg, #00f5ff, #0096c7)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}
-        >
+        <span className="text-xl font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-[#00f5ff] to-[#0096c7]">
           FinTime
         </span>
-      )}
     </Link>
   )
 }

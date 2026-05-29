@@ -7,6 +7,15 @@ export default function CTASection() {
   const navigate = useNavigate()
   const { ref, isVisible } = useScrollReveal()
 
+  const handleStart = (target) => {
+    const token = localStorage.getItem('fintime_token')
+    if (token) {
+      navigate('/dashboard')
+    } else {
+      navigate(target)
+    }
+  }
+
   return (
     <section id="cta" className="relative py-24 md:py-32 overflow-hidden">
       {/* Background glow effects */}
@@ -72,7 +81,7 @@ export default function CTASection() {
             <motion.button
               whileHover={{ scale: 1.04, y: -2 }}
               whileTap={{ scale: 0.97 }}
-              onClick={() => navigate('/register')}
+              onClick={() => handleStart('/register')}
               className="btn-primary flex items-center gap-2.5 px-8 py-4 text-base font-extrabold rounded-full"
             >
               <Rocket size={18} />
@@ -81,7 +90,7 @@ export default function CTASection() {
             <motion.button
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              onClick={() => navigate('/login')}
+              onClick={() => handleStart('/login')}
               className="btn-ghost flex items-center gap-2 px-6 py-4 text-sm font-bold"
             >
               Sudah punya akun? Masuk

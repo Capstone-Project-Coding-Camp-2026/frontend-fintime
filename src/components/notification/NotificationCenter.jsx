@@ -73,11 +73,11 @@ export default function NotificationCenter({ isOpen, onClose }) {
 
           {/* Panel */}
           <motion.div
-            initial={{ opacity: 0, x: 20, scale: 0.95 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: 20, scale: 0.95 }}
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            className="fixed right-4 top-20 w-96 max-h-[calc(100vh-120px)] rounded-2xl overflow-hidden z-50 shadow-2xl"
+            className="fixed right-4 sm:right-28 lg:right-56 top-[76px] w-[90vw] sm:w-96 max-h-[calc(100vh-100px)] rounded-2xl overflow-hidden z-50 shadow-2xl"
             style={{
               background: 'rgba(6, 21, 40, 0.95)',
               backdropFilter: 'blur(30px)',

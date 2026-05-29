@@ -124,7 +124,7 @@ export default function TransactionView({
                 key={tx.id}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="flex items-center justify-between p-3 rounded-xl"
+                className="flex items-center justify-between p-3 rounded-xl gap-2"
                 style={{
                   background:
                     'rgba(0, 245, 255, 0.03)',
@@ -132,21 +132,18 @@ export default function TransactionView({
                     '1px solid rgba(0, 245, 255, 0.08)',
                 }}
               >
-            <div>
-                  <p className="text-sm font-medium text-white">
-                    {CATEGORY_LABELS[
-                      tx.categoryLabel
-                    ] || 'Lainnya'}
+                <div className="flex-1 min-w-0 pr-2">
+                  <p className="text-sm font-medium text-white truncate">
+                    {CATEGORY_LABELS[tx.categoryLabel] || 'Lainnya'}
                   </p>
 
-                  <p className="text-xs text-gray-400">
-                    {tx.description} •{' '}
-                    {formatDate(tx.dateTime)}
+                  <p className="text-xs text-gray-400 truncate">
+                    {tx.description} • {formatDate(tx.dateTime)}
                   </p>
                 </div>
 
                 <p
-                  className="font-semibold text-sm"
+                  className="font-semibold text-sm shrink-0 whitespace-nowrap text-right"
                   style={{
                     color:
                       tx.transactionType ===

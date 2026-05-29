@@ -136,12 +136,12 @@ export default function BudgetCard({ onRefresh }) {
     >
       {/* Header */}
       <div
-        className="px-6 py-5 flex items-center justify-between"
+        className="px-6 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
         style={{ borderBottom: '1px solid rgba(0,245,255,0.08)' }}
       >
         <div className="flex items-center gap-3">
           <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center"
+            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
             style={{ background: 'rgba(251,191,36,0.1)' }}
           >
             <TrendingUp size={20} style={{ color: '#fbbf24' }} />
@@ -161,7 +161,7 @@ export default function BudgetCard({ onRefresh }) {
             setEditingId(null)
             setShowForm(true)
           }}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold transition-all"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl font-semibold transition-all whitespace-nowrap"
           style={{
             background: 'rgba(0,245,255,0.1)',
             border: '1px solid rgba(0,245,255,0.2)',
@@ -207,10 +207,10 @@ export default function BudgetCard({ onRefresh }) {
                     border: '1px solid rgba(0,245,255,0.08)',
                   }}
                 >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <div className="flex flex-wrap items-center gap-2 min-w-0">
                       <span
-                        className="px-3 py-1 rounded-lg text-sm font-semibold"
+                        className="px-3 py-1 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap"
                         style={{
                           background: 'rgba(0,245,255,0.1)',
                           color: '#00f5ff',
@@ -220,7 +220,7 @@ export default function BudgetCard({ onRefresh }) {
                       </span>
                       {isOver && (
                         <span
-                          className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold"
+                          className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] sm:text-xs font-semibold"
                           style={{
                             background: 'rgba(248,113,113,0.1)',
                             color: '#f87171',
@@ -231,18 +231,19 @@ export default function BudgetCard({ onRefresh }) {
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 shrink-0">
                       <button
                         onClick={() => handleEdit(budget)}
-                        className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/10 transition-all"
-                        style={{ color: '#7aa6c2' }}
+                        className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 hover:bg-white/10 transition-all"
+                        style={{ color: '#7aa6c2', border: '1px solid rgba(255,255,255,0.05)' }}
                       >
                         <Pencil size={14} />
                       </button>
                       <button
                         onClick={() => handleDelete(budget.id)}
                         disabled={deletingId === budget.id}
-                        className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-red-500/10 transition-all text-red-400"
+                        className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-500/5 hover:bg-red-500/10 transition-all text-red-400"
+                        style={{ border: '1px solid rgba(248,113,113,0.1)' }}
                       >
                         <Trash2 size={14} />
                       </button>

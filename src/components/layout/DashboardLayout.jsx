@@ -96,50 +96,59 @@ export default function DashboardLayout({ children, activePage = 'dashboard', pa
         <div className="flex items-center justify-between h-full">
           <Logo />
 
-          {/* Desktop Navigation */}
-          {!isMobile && (
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => navigate('/dashboard')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${
-                  activePage === 'dashboard'
-                    ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
-                    : 'text-gray-400 hover:text-cyan-400'
-                }`}
-              >
-                <LayoutDashboard size={18} />
-                <span className="font-medium">Dashboard</span>
-              </button>
+          {/* Right Section: Navigation, Notifications, Profile */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Desktop Navigation */}
+            {!isMobile && (
+              <>
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all ${
+                    activePage === 'dashboard'
+                      ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
+                      : 'text-gray-400 hover:text-cyan-400 hover:bg-white/5'
+                  }`}
+                  title="Dashboard"
+                >
+                  <LayoutDashboard size={18} />
+                  <span className="hidden xl:inline font-medium">Dashboard</span>
+                </button>
 
-              <button
-                onClick={() => navigate('/reports')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${
-                  activePage === 'reports'
-                    ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
-                    : 'text-gray-400 hover:text-cyan-400'
-                }`}
-              >
-                <FileText size={18} />
-                <span className="font-medium">Laporan</span>
-              </button>
+                <button
+                  onClick={() => navigate('/reports')}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all ${
+                    activePage === 'reports'
+                      ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
+                      : 'text-gray-400 hover:text-cyan-400 hover:bg-white/5'
+                  }`}
+                  title="Laporan"
+                >
+                  <FileText size={18} />
+                  <span className="hidden xl:inline font-medium">Laporan</span>
+                </button>
 
-              <button
-                onClick={() => navigate('/settings')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${
-                  activePage === 'settings'
-                    ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
-                    : 'text-gray-400 hover:text-cyan-400'
-                }`}
-              >
-                <Settings size={18} />
-                <span className="font-medium">Settings</span>
-              </button>
+                <button
+                  onClick={() => navigate('/settings')}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all ${
+                    activePage === 'settings'
+                      ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
+                      : 'text-gray-400 hover:text-cyan-400 hover:bg-white/5'
+                  }`}
+                  title="Settings"
+                >
+                  <Settings size={18} />
+                  <span className="hidden xl:inline font-medium">Settings</span>
+                </button>
 
-              <div className="w-px h-6 mx-2" style={{ background: 'rgba(255,255,255,0.1)' }} />
+                <div className="w-px h-6 mx-1 sm:mx-2" style={{ background: 'rgba(255,255,255,0.1)' }} />
+              </>
+            )}
 
+            {/* Utility Icons (Visible on Mobile & Desktop) */}
+            <div className="flex items-center gap-1.5">
               <button
                 onClick={onShowHelp}
-                className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all text-gray-300 hover:text-cyan-400"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all text-gray-300 hover:text-cyan-400"
                 title="Bantuan & Panduan"
               >
                 <HelpCircle size={18} />
@@ -147,86 +156,26 @@ export default function DashboardLayout({ children, activePage = 'dashboard', pa
 
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center relative hover:bg-white/10 transition-all"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center relative hover:bg-white/10 transition-all"
+                title="Notifikasi"
               >
                 <Bell size={18} className="text-gray-300" />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center border-2 border-[#020b18]">
+                  <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] sm:min-w-[18px] sm:h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] sm:text-xs font-bold flex items-center justify-center border-2 border-[#020b18]">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
               </button>
-
-              <UserDropdown user={user} onLogout={handleLogout} />
             </div>
-          )}
 
-          {/* Mobile Menu Button */}
-          {isMobile && (
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{ background: 'rgba(0,245,255,0.1)' }}
-            >
-              {mobileMenuOpen ? (
-                <X size={20} style={{ color: '#00f5ff' }} />
-              ) : (
-                <Menu size={20} style={{ color: '#00f5ff' }} />
-              )}
-            </button>
-          )}
+            {/* User Profile (Desktop only, mobile has it in BottomNav) */}
+            {!isMobile && (
+              <div className="ml-1">
+                <UserDropdown user={user} onLogout={handleLogout} />
+              </div>
+            )}
+          </div>
         </div>
-
-        {/* Mobile Menu Dropdown */}
-        <AnimatePresence>
-          {mobileMenuOpen && isMobile && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="mt-4 rounded-xl overflow-hidden"
-              style={{
-                background: '#061528',
-                border: '1px solid rgba(0,245,255,0.15)',
-              }}
-            >
-              <div className="p-4 border-b border-white/5">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-lg font-bold">
-                    {user.fullName?.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="font-semibold">{user.fullName}</p>
-                    <p className="text-sm text-gray-500">{user.email}</p>
-                  </div>
-                </div>
-              </div>
-              <div className="p-2">
-                <button
-                  onClick={() => { navigate('/dashboard'); setMobileMenuOpen(false) }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activePage === 'dashboard' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'text-gray-400 hover:bg-white/5'}`}
-                >
-                  <LayoutDashboard size={18} />
-                  <span className="font-medium">Dashboard</span>
-                </button>
-                <button
-                  onClick={() => { navigate('/profile'); setMobileMenuOpen(false) }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activePage === 'profile' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'text-gray-400 hover:bg-white/5'}`}
-                >
-                  <UserIcon size={18} />
-                  <span className="font-medium">Profil Saya</span>
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10 transition-all"
-                >
-                  <LogOut size={18} />
-                  <span className="font-medium">Keluar</span>
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </header>
 
       {/* Page Content */}

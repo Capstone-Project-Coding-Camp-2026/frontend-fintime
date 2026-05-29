@@ -122,54 +122,7 @@ export default function ProfilePage() {
                   <h1 className="text-3xl lg:text-4xl font-bold mb-2 grad-text">Profil User</h1>
                   <p className="text-gray-400">Kelola informasi akun dan pengaturan Anda</p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <AnimatePresence mode="wait">
-                    {!isEditing ? (
-                      <motion.button
-                        key="edit"
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        onClick={() => setIsEditing(true)}
-                        className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-all"
-                        style={{
-                          background: 'linear-gradient(135deg, #00f5ff, #0096c7)',
-                          color: '#020b18',
-                        }}
-                      >
-                        <Edit2 size={18} />
-                        <span>Edit Profil</span>
-                      </motion.button>
-                    ) : (
-                      <motion.div
-                        key="buttons"
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        className="flex items-center gap-2"
-                      >
-                        <button
-                          onClick={handleCancel}
-                          className="flex items-center gap-2 px-5 py-3 rounded-xl bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 transition-all font-semibold"
-                        >
-                          <X size={18} />
-                          <span>Batal</span>
-                        </button>
-                        <button
-                          onClick={handleSave}
-                          className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-all"
-                          style={{
-                            background: 'linear-gradient(135deg, #22c55e, #16a34a)',
-                            color: '#fff',
-                          }}
-                        >
-                          <Save size={18} />
-                          <span>Simpan</span>
-                        </button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
+
               </div>
             </div>
           </div>
@@ -284,12 +237,64 @@ export default function ProfilePage() {
                   backdropFilter: 'blur(20px)',
                 }}
               >
-                <h3 className="text-lg font-bold mb-6 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(0,245,255,0.1)' }}>
-                    <UserCircle size={20} style={{ color: '#00f5ff' }} />
+                <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-4 mb-6">
+                  <h3 className="text-lg font-bold flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(0,245,255,0.1)' }}>
+                      <UserCircle size={20} style={{ color: '#00f5ff' }} />
+                    </div>
+                    Informasi Personal
+                  </h3>
+
+                  <div className="flex items-center gap-2">
+                    <AnimatePresence mode="wait">
+                      {!isEditing ? (
+                        <motion.button
+                          key="edit"
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.9 }}
+                          onClick={() => setIsEditing(true)}
+                          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:scale-105"
+                          style={{
+                            background: 'rgba(0,245,255,0.1)',
+                            border: '1px solid rgba(0,245,255,0.2)',
+                            color: '#00f5ff',
+                          }}
+                        >
+                          <Edit2 size={16} />
+                          <span>Edit</span>
+                        </motion.button>
+                      ) : (
+                        <motion.div
+                          key="buttons"
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.9 }}
+                          className="flex items-center gap-2"
+                        >
+                          <button
+                            onClick={handleCancel}
+                            className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 transition-all text-sm font-semibold"
+                          >
+                            <X size={16} />
+                            <span className="hidden sm:inline">Batal</span>
+                          </button>
+                          <button
+                            onClick={handleSave}
+                            className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:scale-105"
+                            style={{
+                              background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                              color: '#fff',
+                            }}
+                          >
+                            <Save size={16} />
+                            <span className="hidden sm:inline">Simpan</span>
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
-                  Informasi Personal
-                </h3>
+                </div>
 
                 <AnimatePresence mode="wait">
                   {isEditing ? (
@@ -401,21 +406,17 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                <div
-                  className="rounded-2xl p-6 border"
-                  style={{
-                    background: 'rgba(248,113,113,0.03)',
-                    borderColor: 'rgba(248,113,113,0.15)',
-                  }}
-                >
-                  <h3 className="text-lg font-bold mb-4 text-red-400">Zona Berbahaya</h3>
-                  <p className="text-sm text-gray-400 mb-4">Tindakan di bawah tidak dapat dibatalkan.</p>
+                <div className="pt-4">
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 transition-all font-semibold"
+                    className="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl transition-all font-semibold hover:bg-red-500/10"
+                    style={{
+                      border: '1px solid rgba(248,113,113,0.3)',
+                      color: '#f87171'
+                    }}
                   >
                     <LogOut size={18} />
-                    <span>Logout dari Perangkat</span>
+                    <span>Keluar dari Akun</span>
                   </button>
                 </div>
               </motion.div>

@@ -73,7 +73,7 @@ export default function AddAccountModal({ isOpen, onClose, onSuccess, userId }) 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
+        className="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-y-auto"
         style={{ background: 'rgba(2, 11, 24, 0.9)', backdropFilter: 'blur(8px)' }}
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >
@@ -150,7 +150,7 @@ export default function AddAccountModal({ isOpen, onClose, onSuccess, userId }) 
                     <label className="text-[10px] mb-1.5 block uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
                       Provider <span style={{ color: '#f87171' }}>*</span>
                     </label>
-                    <div className="grid grid-cols-4 gap-1.5 max-h-40 overflow-y-auto p-1 rounded-lg" style={{ background: 'rgba(0, 245, 255, 0.02)' }}>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-1.5 max-h-40 overflow-y-auto p-1 rounded-lg custom-scrollbar" style={{ background: 'rgba(0, 245, 255, 0.02)' }}>
                       {providers.map((provider) => (
                         <button
                           key={provider.id}

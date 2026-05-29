@@ -88,16 +88,16 @@ export default function EditAccountModal({ isOpen, onClose, onSuccess, account }
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-8 overflow-y-auto"
+        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto"
         style={{ background: 'rgba(2, 11, 24, 0.9)', backdropFilter: 'blur(8px)' }}
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >
         <motion.div
-          initial={{ opacity: 0, y: -20, scale: 0.95 }}
+          initial={{ opacity: 0, y: 100, scale: 1 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -20, scale: 0.95 }}
+          exit={{ opacity: 0, y: 100, scale: 1 }}
           transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full max-w-md rounded-2xl my-4"
+          className="w-full max-w-md rounded-t-3xl sm:rounded-2xl mt-4 sm:my-4 pb-4 sm:pb-0"
           style={{
             background: 'linear-gradient(135deg, #061528 0%, #020b18 100%)',
             border: '1px solid rgba(0, 245, 255, 0.15)',
@@ -165,7 +165,7 @@ export default function EditAccountModal({ isOpen, onClose, onSuccess, account }
                     <label className="text-[10px] mb-1.5 block uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
                       Provider <span style={{ color: '#f87171' }}>*</span>
                     </label>
-                    <div className="grid grid-cols-4 gap-1.5 max-h-40 overflow-y-auto p-1 rounded-lg" style={{ background: 'rgba(0, 245, 255, 0.02)' }}>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 max-h-48 overflow-y-auto p-1 rounded-lg" style={{ background: 'rgba(0, 245, 255, 0.02)' }}>
                       {providers.map((provider) => (
                         <button
                           key={provider.id}

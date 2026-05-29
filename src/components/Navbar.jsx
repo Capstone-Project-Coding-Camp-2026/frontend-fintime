@@ -15,12 +15,14 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
-  const scrollTo = (href) => {
-    setMobileOpen(false);
-    if (href.startsWith("#")) {
-      const el = document.querySelector(href);
-      if (el) el.scrollIntoView({ behavior: "smooth" });
+  const handleLaunchApp = () => {
+    const token = localStorage.getItem('fintime_token');
+    if (token) {
+      navigate('/dashboard');
+    } else {
+      navigate('/login');
     }
+    setMobileOpen(false);
   };
 
   return (
@@ -74,7 +76,7 @@ export default function Navbar() {
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
-            onClick={() => navigate("/login")}
+            onClick={handleLaunchApp}
             className="hidden md:flex items-center gap-2 btn-ghost text-sm font-bold px-4 py-2"
             style={{ fontFamily: "Sora, sans-serif" }}
           >
@@ -85,7 +87,7 @@ export default function Navbar() {
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             className="btn-primary text-sm font-bold px-5 py-2.5"
-            onClick={() => navigate("/login")}
+            onClick={handleLaunchApp}
           >
             Launch App
           </motion.button>
@@ -158,10 +160,7 @@ export default function Navbar() {
           </button>
         ))}
         <button
-          onClick={() => {
-            navigate("/login");
-            setMobileOpen(false);
-          }}
+          onClick={handleLaunchApp}
           className="btn-ghost text-sm font-bold py-2.5 mt-2"
         >
           Login

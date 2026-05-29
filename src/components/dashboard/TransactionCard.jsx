@@ -174,7 +174,7 @@ export default function TransactionCard({ userId, onAddNew, onRefresh }) {
     >
       {/* Header */}
       <div
-        className="flex items-center justify-between p-5 border-b"
+        className="flex flex-col sm:flex-row sm:items-center justify-between p-5 gap-4 border-b"
         style={{ borderColor: 'rgba(0, 245, 255, 0.08)' }}
       >
         <div className="flex items-center gap-3">

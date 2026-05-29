@@ -145,7 +145,7 @@ export default function OnboardingWizard({ onComplete, showOnboarding = false })
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
           transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-          className="relative w-full max-w-lg rounded-3xl overflow-hidden"
+          className="relative w-full max-w-lg rounded-3xl overflow-hidden max-h-[90vh] flex flex-col"
           style={{
             background: 'linear-gradient(180deg, rgba(6,21,40,0.95) 0%, rgba(2,11,24,0.98) 100%)',
             border: '1px solid rgba(0,245,255,0.2)',
@@ -155,14 +155,14 @@ export default function OnboardingWizard({ onComplete, showOnboarding = false })
           {/* Skip Button */}
           <button
             onClick={handleSkip}
-            className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center transition-all hover:bg-white/10 z-10"
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 w-8 h-8 rounded-full flex items-center justify-center transition-all hover:bg-white/10 z-10"
             style={{ color: 'rgba(255,255,255,0.5)' }}
           >
             <X size={18} />
           </button>
 
           {/* Progress Bar */}
-          <div className="h-1" style={{ background: 'rgba(0,245,255,0.1)' }}>
+          <div className="h-1 flex-shrink-0" style={{ background: 'rgba(0,245,255,0.1)' }}>
             <motion.div
               className="h-full"
               initial={{ width: '0%' }}
@@ -173,21 +173,21 @@ export default function OnboardingWizard({ onComplete, showOnboarding = false })
           </div>
 
           {/* Content */}
-          <div className="p-8">
+          <div className="p-5 sm:p-8 overflow-y-auto flex-1">
             {/* Icon */}
             <motion.div
               key={currentStep}
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-              className="w-20 h-20 rounded-2xl mx-auto mb-6 flex items-center justify-center"
+              className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl mx-auto mb-4 sm:mb-6 flex items-center justify-center flex-shrink-0"
               style={{
                 background: `${step.color}15`,
                 border: `2px solid ${step.color}40`,
                 boxShadow: `0 0 30px ${step.color}30`,
               }}
             >
-              <StepIcon size={36} style={{ color: step.color }} />
+              <StepIcon size={32} className="sm:w-9 sm:h-9" style={{ color: step.color }} />
             </motion.div>
 
             {/* Title */}
@@ -196,7 +196,7 @@ export default function OnboardingWizard({ onComplete, showOnboarding = false })
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-2xl font-bold text-center mb-3"
+              className="text-xl sm:text-2xl font-bold text-center mb-2 sm:mb-3"
               style={{ color: 'white' }}
             >
               {step.title}
@@ -208,7 +208,7 @@ export default function OnboardingWizard({ onComplete, showOnboarding = false })
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
-              className="text-center mb-6"
+              className="text-center text-sm sm:text-base mb-4 sm:mb-6"
               style={{ color: '#7aa6c2' }}
             >
               {step.description}
@@ -221,7 +221,7 @@ export default function OnboardingWizard({ onComplete, showOnboarding = false })
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="space-y-3 mb-8"
+                className="space-y-2.5 sm:space-y-3 mb-6 sm:mb-8"
               >
                 {step.features.map((feature, index) => (
                   <motion.div
@@ -229,16 +229,16 @@ export default function OnboardingWizard({ onComplete, showOnboarding = false })
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.25 + index * 0.1 }}
-                    className="flex items-center gap-3 p-3 rounded-xl"
+                    className="flex items-center gap-3 p-2.5 sm:p-3 rounded-xl"
                     style={{ background: 'rgba(0,245,255,0.03)' }}
                   >
                     <div
-                      className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                      className="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center flex-shrink-0"
                       style={{ background: `${step.color}20` }}
                     >
-                      <Check size={14} style={{ color: step.color }} />
+                      <Check size={12} className="sm:w-3.5 sm:h-3.5" style={{ color: step.color }} />
                     </div>
-                    <span className="text-sm" style={{ color: 'white' }}>
+                    <span className="text-xs sm:text-sm" style={{ color: 'white' }}>
                       {feature}
                     </span>
                   </motion.div>
@@ -247,7 +247,7 @@ export default function OnboardingWizard({ onComplete, showOnboarding = false })
             )}
 
             {/* Navigation */}
-            <div className="flex items-center justify-between mt-2 pt-6 border-t border-white/5">
+            <div className="flex items-center justify-between mt-auto pt-4 sm:pt-6 border-t border-white/5">
               <div className="flex-1">
                 <button
                   onClick={handlePrev}
