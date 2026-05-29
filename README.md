@@ -68,10 +68,4 @@ src/
 └── index.css         # Styling global Tailwind CSS
 ```
 
----
 
-## 🤝 Kontribusi
-
-Aplikasi ini dikembangkan untuk keperluan *Capstone Project*. Jika Anda ingin berkontribusi, silakan buat *pull request* ke *branch* `development`.
-
-© 2026 FinTime Team. Dibuat dengan 💡 dan ☕.
