@@ -1,7 +1,14 @@
-import { useState, useRef, useEffect } from 'react'
+﻿import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
-import { ChevronLeft, ArrowRight, Loader2, AlertCircle, ShieldCheck, RefreshCw } from 'lucide-react'
+import {
+  ChevronLeft,
+  ArrowRight,
+  Loader2,
+  AlertCircle,
+  ShieldCheck,
+  RefreshCw,
+} from 'lucide-react'
 
 import ParticleField from '../components/Particlefield'
 import api from '../lib/api'
@@ -40,14 +47,19 @@ export default function RegisterPage() {
   // OTP Countdown timer
   useEffect(() => {
     if (otpCountdown <= 0) return
-    const timer = setTimeout(() => setOtpCountdown(c => c - 1), 1000)
+    const timer = setTimeout(() => setOtpCountdown((c) => c - 1), 1000)
     return () => clearTimeout(timer)
   }, [otpCountdown])
 
   // ─── Validasi step ────────────────────────────────────────
   const canNext = () => {
     if (currentStep === 0) {
-      return formData.fullName && formData.gender && formData.birthDate && formData.jobType
+      return (
+        formData.fullName &&
+        formData.gender &&
+        formData.birthDate &&
+        formData.jobType
+      )
     }
     if (currentStep === 1) {
       return step2CanNext
@@ -63,13 +75,13 @@ export default function RegisterPage() {
     setError('')
 
     if (currentStep < STEPS.length - 1) {
-      setCurrentStep(s => s + 1)
+      setCurrentStep((s) => s + 1)
     } else {
       setIsLoading(true)
       try {
         const response = await api.post('/auth/register', formData)
 
-        const data = response.data.data || response.data;
+        const data = response.data.data || response.data
 
         // Simpan token sementara untuk verify-otp nanti
         if (data.token) {
@@ -90,7 +102,9 @@ export default function RegisterPage() {
         setOtpValues(['', '', '', '', '', ''])
       } catch (err) {
         console.error('Register error:', err)
-        setError(err.response?.data?.message || 'Gagal mendaftar. Silakan coba lagi.')
+        setError(
+          err.response?.data?.message || 'Gagal mendaftar. Silakan coba lagi.',
+        )
       } finally {
         setIsLoading(false)
       }
@@ -98,13 +112,13 @@ export default function RegisterPage() {
   }
 
   const handleBack = () => {
-    if (currentStep > 0) setCurrentStep(s => s - 1)
+    if (currentStep > 0) setCurrentStep((s) => s - 1)
   }
 
   // Reset step2CanNext saat kembali ke step lain
   const handleBackReset = () => {
     if (currentStep > 0) {
-      setCurrentStep(s => s - 1)
+      setCurrentStep((s) => s - 1)
       if (currentStep === 1) {
         setStep2CanNext(false)
       }
@@ -133,7 +147,10 @@ export default function RegisterPage() {
   }
 
   const handleOtpPaste = (e) => {
-    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6)
+    const pasted = e.clipboardData
+      .getData('text')
+      .replace(/\D/g, '')
+      .slice(0, 6)
     if (pasted.length === 6) {
       setOtpValues(pasted.split(''))
       otpRefs.current[5]?.focus()
@@ -174,7 +191,10 @@ export default function RegisterPage() {
       setIsSuccess(true)
     } catch (err) {
       console.error('OTP verify failed:', err)
-      setOtpError(err.response?.data?.message || 'Kode OTP tidak valid. Silakan coba lagi.')
+      setOtpError(
+        err.response?.data?.message ||
+          'Kode OTP tidak valid. Silakan coba lagi.',
+      )
     } finally {
       setOtpLoading(false)
     }
@@ -182,21 +202,20 @@ export default function RegisterPage() {
 
   // ─── Render ───────────────────────────────────────────────
   return (
-    <div className="relative min-h-screen min-h-[100dvh] flex overflow-hidden" style={{ background: 'var(--dark)' }}>
-
+    <div
+      className="relative min-h-screen min-h-[100dvh] flex overflow-hidden"
+      style={{ background: 'var(--dark)' }}
+    >
       <div className="absolute inset-0 pointer-events-none">
         <ParticleField count={40} />
       </div>
 
-
       <RegisterLeftPanel />
-
 
       <div
         className="flex-1 flex flex-col justify-center relative z-10"
         style={{ padding: 'clamp(2rem, 5vw, 4rem)' }}
       >
-
         <Link
           to="/"
           className="absolute top-6 right-6 flex items-center gap-1.5 text-sm font-semibold no-underline"
@@ -232,14 +251,23 @@ export default function RegisterPage() {
           {!isSuccess && (
             <div className="mb-8">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-mono font-bold tracking-widest" style={{ color: 'var(--text-dim)' }}>
+                <span
+                  className="text-xs font-mono font-bold tracking-widest"
+                  style={{ color: 'var(--text-dim)' }}
+                >
                   {Math.round(progressPct)}% COMPLETE
                 </span>
-                <span className="text-xs font-mono" style={{ color: 'var(--text-dim)' }}>
+                <span
+                  className="text-xs font-mono"
+                  style={{ color: 'var(--text-dim)' }}
+                >
                   {currentStep + 1} / {STEPS.length}
                 </span>
               </div>
-              <div className="h-0.5 rounded-full overflow-hidden" style={{ background: 'rgba(0,245,255,0.1)' }}>
+              <div
+                className="h-0.5 rounded-full overflow-hidden"
+                style={{ background: 'rgba(0,245,255,0.1)' }}
+              >
                 <motion.div
                   className="h-full rounded-full"
                   animate={{ width: `${progressPct}%` }}
@@ -257,7 +285,6 @@ export default function RegisterPage() {
               </div>
             </div>
           )}
-
 
           <AnimatePresence mode="wait">
             {isSuccess ? (
@@ -294,20 +321,25 @@ export default function RegisterPage() {
                 </div>
 
                 {/* OTP Inputs */}
-                <div className="flex gap-3 justify-center" onPaste={handleOtpPaste}>
+                <div
+                  className="flex gap-3 justify-center"
+                  onPaste={handleOtpPaste}
+                >
                   {otpValues.map((val, i) => (
                     <input
                       key={i}
-                      ref={el => otpRefs.current[i] = el}
+                      ref={(el) => (otpRefs.current[i] = el)}
                       type="text"
                       inputMode="numeric"
                       maxLength={1}
                       value={val}
-                      onChange={e => handleOtpChange(i, e.target.value)}
-                      onKeyDown={e => handleOtpKeyDown(i, e)}
+                      onChange={(e) => handleOtpChange(i, e.target.value)}
+                      onKeyDown={(e) => handleOtpKeyDown(i, e)}
                       className="w-12 h-14 rounded-xl text-center text-xl font-bold outline-none transition-all"
                       style={{
-                        background: val ? 'rgba(0,245,255,0.1)' : 'rgba(0,245,255,0.04)',
+                        background: val
+                          ? 'rgba(0,245,255,0.1)'
+                          : 'rgba(0,245,255,0.04)',
                         border: `2px solid ${val ? 'rgba(0,245,255,0.5)' : 'rgba(0,245,255,0.12)'}`,
                         color: '#00f5ff',
                         caretColor: '#00f5ff',
@@ -325,7 +357,7 @@ export default function RegisterPage() {
                     style={{
                       backgroundColor: 'rgba(248, 113, 113, 0.1)',
                       border: '1px solid rgba(248, 113, 113, 0.3)',
-                      color: '#f87171'
+                      color: '#f87171',
                     }}
                   >
                     <AlertCircle size={16} />
@@ -341,14 +373,23 @@ export default function RegisterPage() {
                   disabled={otpLoading || otpValues.join('').length !== 6}
                   className="btn-primary w-full flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-extrabold rounded-full"
                   style={{
-                    opacity: otpLoading || otpValues.join('').length !== 6 ? 0.5 : 1,
-                    cursor: otpLoading || otpValues.join('').length !== 6 ? 'not-allowed' : 'pointer',
+                    opacity:
+                      otpLoading || otpValues.join('').length !== 6 ? 0.5 : 1,
+                    cursor:
+                      otpLoading || otpValues.join('').length !== 6
+                        ? 'not-allowed'
+                        : 'pointer',
                   }}
                 >
                   {otpLoading ? (
-                    <><Loader2 size={16} className="animate-spin" /> Memverifikasi...</>
+                    <>
+                      <Loader2 size={16} className="animate-spin" />{' '}
+                      Memverifikasi...
+                    </>
                   ) : (
-                    <><ShieldCheck size={16} /> Verifikasi OTP</>
+                    <>
+                      <ShieldCheck size={16} /> Verifikasi OTP
+                    </>
                   )}
                 </motion.button>
 
@@ -364,17 +405,34 @@ export default function RegisterPage() {
                     }}
                   >
                     <RefreshCw size={12} />
-                    {otpCountdown > 0 ? `Kirim ulang dalam ${otpCountdown}s` : 'Kirim Ulang OTP'}
+                    {otpCountdown > 0
+                      ? `Kirim ulang dalam ${otpCountdown}s`
+                      : 'Kirim Ulang OTP'}
                   </button>
                 </div>
               </motion.div>
             ) : (
               <>
-                {currentStep === 0 && <StepPersonal data={formData} setData={setFormData} />}
-                {currentStep === 1 && <StepContact data={formData} setData={setFormData} canNext={step2CanNext} setCanNext={setStep2CanNext} />}
-                {currentStep === 2 && <StepFinancial data={formData} setData={setFormData} />}
-                {currentStep === 3 && <StepBankEWallet data={formData} setData={setFormData} />}
-                {currentStep === 4 && <StepPensiun data={formData} setData={setFormData} />}
+                {currentStep === 0 && (
+                  <StepPersonal data={formData} setData={setFormData} />
+                )}
+                {currentStep === 1 && (
+                  <StepContact
+                    data={formData}
+                    setData={setFormData}
+                    canNext={step2CanNext}
+                    setCanNext={setStep2CanNext}
+                  />
+                )}
+                {currentStep === 2 && (
+                  <StepFinancial data={formData} setData={setFormData} />
+                )}
+                {currentStep === 3 && (
+                  <StepBankEWallet data={formData} setData={setFormData} />
+                )}
+                {currentStep === 4 && (
+                  <StepPensiun data={formData} setData={setFormData} />
+                )}
               </>
             )}
           </AnimatePresence>
@@ -388,7 +446,7 @@ export default function RegisterPage() {
               style={{
                 backgroundColor: 'rgba(248, 113, 113, 0.1)',
                 border: '1px solid rgba(248, 113, 113, 0.3)',
-                color: '#f87171'
+                color: '#f87171',
               }}
             >
               <AlertCircle size={16} />
@@ -396,10 +454,8 @@ export default function RegisterPage() {
             </motion.div>
           )}
 
-
           {!isSuccess && !showOtp && (
             <div className="flex items-center justify-between mt-8">
-
               <button
                 onClick={handleBackReset}
                 className="btn-ghost text-sm font-bold px-6 py-3"
@@ -407,7 +463,6 @@ export default function RegisterPage() {
               >
                 <ChevronLeft size={14} className="inline mr-1" /> Kembali
               </button>
-
 
               <motion.button
                 whileHover={{ scale: canNext() && !isLoading ? 1.04 : 1 }}
@@ -435,31 +490,36 @@ export default function RegisterPage() {
             </div>
           )}
 
-
           {!isSuccess && !showOtp && (
-            <p className="text-center text-xs mt-6" style={{ color: 'var(--text-dim)' }}>
+            <p
+              className="text-center text-xs mt-6"
+              style={{ color: 'var(--text-dim)' }}
+            >
               Sudah punya akun?{' '}
-              <Link to="/login" className="font-bold no-underline" style={{ color: '#00f5ff' }}>
+              <Link
+                to="/login"
+                className="font-bold no-underline"
+                style={{ color: '#00f5ff' }}
+              >
                 Masuk di sini
               </Link>
             </p>
           )}
 
-
           {isSuccess && (
             <div className="flex flex-col gap-3 mt-6">
               <Link
-                to="/"
+                to="/dashboard"
                 className="btn-primary flex items-center justify-center gap-2 px-6 py-3 text-sm font-extrabold rounded-full no-underline"
               >
                 Mulai Perjalanan Finansialmu <ArrowRight size={14} />
               </Link>
-              <Link
+              {/* <Link
                 to="/login"
                 className="btn-ghost flex items-center justify-center gap-2 px-6 py-3 text-sm font-bold rounded-full no-underline"
               >
                 Masuk ke Akun
-              </Link>
+              </Link> */}
             </div>
           )}
         </div>

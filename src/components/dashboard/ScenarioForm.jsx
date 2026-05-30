@@ -18,10 +18,9 @@ export default function ScenarioForm({
   selectedOption, setSelectedOption,
   installmentMonths, setInstallmentMonths,
   interestRate, setInterestRate,
-  monthlyBudget, setMonthlyBudget,
   onAnalyze, isAnalyzing
 }) {
-  const isDisabled = isAnalyzing || !price || !selectedOption || !monthlyBudget
+  const isDisabled = isAnalyzing || !price || !selectedOption
 
   const formatInputCurrency = (value) => {
     const num = value.replace(/\D/g, '')
@@ -167,36 +166,6 @@ export default function ScenarioForm({
             </div>
           </motion.div>
         )}
-
-        {/* Budget Bulanan */}
-        <div>
-          <label className="text-xs mb-2 block uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-            Budget Bulanan
-          </label>
-          <div className="relative">
-            <span
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold"
-              style={{ color: 'var(--text-dim)' }}
-            >
-              Rp
-            </span>
-            <input
-              type="text"
-              value={formatInputCurrency(monthlyBudget)}
-              onChange={(e) => setMonthlyBudget(e.target.value.replace(/\D/g, ''))}
-              placeholder="8.000.000"
-              style={{ ...inputBaseStyle, paddingLeft: '2.5rem', paddingRight: '1rem', paddingTop: '0.75rem', paddingBottom: '0.75rem' }}
-              onFocus={(e) => {
-                e.target.style.borderColor = 'var(--cyan)'
-                e.target.style.background = 'rgba(0, 245, 255, 0.08)'
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = 'rgba(0, 245, 255, 0.12)'
-                e.target.style.background = 'rgba(0, 245, 255, 0.04)'
-              }}
-            />
-          </div>
-        </div>
 
         {/* Tombol Analisis */}
         <button
