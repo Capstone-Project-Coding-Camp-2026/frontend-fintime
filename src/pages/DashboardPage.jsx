@@ -5,7 +5,11 @@ import {
   ArrowDownCircle,
   Wallet,
   CreditCard,
+  AlertTriangle,
+  BookOpen,
+  UserCircle,
 } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 import api from '../lib/api'
 import DashboardLayout from '../components/layout/DashboardLayout'
@@ -34,8 +38,9 @@ export default function DashboardPage() {
   const [projectedWealth, setProjectedWealth] = useState(0)
   const [pensionSurvivalYears, setPensionSurvivalYears] = useState(0)
   const [avatarCondition, setAvatarCondition] = useState('normal')
-  const [monthlyIncome, setMonthlyIncome] = useState(5000000)
-  const [monthlyExpense, setMonthlyExpense] = useState(3500000)
+  const [monthlyIncome, setMonthlyIncome] = useState(0)
+  const [monthlyExpense, setMonthlyExpense] = useState(0)
+  const [unlabelledCount, setUnlabelledCount] = useState(0)
 
   // What-If Form States
   const [price, setPrice] = useState('')
@@ -70,7 +75,7 @@ export default function DashboardPage() {
       return
     }
 
-    setMonthlyIncome(u.monthlyIncome || 5000000)
+    setMonthlyIncome(u.monthlyIncome || 0)
 
     // 1. Fetch Instant Avatar State from DB (Cached)
     api
@@ -124,6 +129,22 @@ export default function DashboardPage() {
         }
       })
       .catch((err) => console.error('Failed to run forecast:', err))
+
+    // 4. Fetch unlabelled count for notification banner
+    api
+      .get(`/dashboard/${u.id}`)
+      .then((res) => {
+        if (res.data?.success) {
+          const d = res.data.data
+          setUnlabelledCount(d.notifications?.unlabelledTransactions || 0)
+          // Also sync income/expense from aggregation if available
+          if (d.currentMonth?.totalIncome)
+            setMonthlyIncome(d.currentMonth.totalIncome)
+          if (d.currentMonth?.totalExpense)
+            setMonthlyExpense(d.currentMonth.totalExpense)
+        }
+      })
+      .catch((err) => console.error('Failed to get dashboard data:', err))
   }, [refreshKey])
 
   const handleAnalyze = async () => {
@@ -138,7 +159,12 @@ export default function DashboardPage() {
 
       const payload = {
         user_profile: {
-          age: u?.age || 22,
+          age: u?.birthDate
+            ? Math.floor(
+                (Date.now() - new Date(u.birthDate).getTime()) /
+                  (365.25 * 24 * 60 * 60 * 1000),
+              )
+            : 25,
           total_income: monthlyIncome,
           monthly_expenses: monthlyExpense,
           current_savings: totalBalance,
@@ -155,11 +181,23 @@ export default function DashboardPage() {
           pinjol_active: 0,
           total_debt: 0,
 
-          credit_card_utilization: 0.2,
+          credit_card_utilization: 0,
 
-          financial_literacy_score: 70,
+          financial_literacy_score:
+            !u?.birthDate || !u?.monthlyIncome || !u?.retirementAge ? 50 : 75,
 
-          employment_type: 'full_time',
+          employment_type: (() => {
+            const jt = u?.jobType || 'permanent'
+            const map = {
+              permanent: 'full_time',
+              freelance: 'freelance',
+              gig: 'freelance',
+              civil_servant: 'government',
+              entrepreneur: 'self_employed',
+              not_working: 'unemployed',
+            }
+            return map[jt] || 'full_time'
+          })(),
 
           city_tier: 'tier_2',
 
@@ -266,7 +304,10 @@ export default function DashboardPage() {
       particleCount={30}
       onShowHelp={() => setShowOnboardingManual(true)}
     >
-      {({ user }) => (
+      {({ user, handleLogout }) => {
+        const isProfileIncomplete = !user?.monthlyIncome || !user?.birthDate || !user?.retirementAge;
+        
+        return (
         <>
           {/* Main Content */}
           <main className="pt-24 px-4 sm:px-6 lg:px-8 relative z-10 pb-24">
@@ -296,6 +337,70 @@ export default function DashboardPage() {
               </div>
             </div>
 
+            {/* Notification Banners */}
+            {isProfileIncomplete && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-4 p-4 rounded-xl flex items-center gap-3"
+                style={{
+                  background: 'rgba(251, 191, 36, 0.08)',
+                  border: '1px solid rgba(251, 191, 36, 0.25)',
+                }}
+              >
+                <UserCircle size={20} style={{ color: '#fbbf24' }} />
+                <div className="flex-1">
+                  <p
+                    className="text-sm font-semibold"
+                    style={{ color: '#fbbf24' }}
+                  >
+                    Profil Belum Lengkap
+                  </p>
+                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                    Lengkapi data diri untuk analisis keuangan yang lebih
+                    akurat.
+                  </p>
+                </div>
+                <Link
+                  to="/profile"
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold no-underline"
+                  style={{
+                    background: 'rgba(251,191,36,0.15)',
+                    color: '#fbbf24',
+                    border: '1px solid rgba(251,191,36,0.3)',
+                  }}
+                >
+                  Lengkapi
+                </Link>
+              </motion.div>
+            )}
+            {unlabelledCount > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="mb-4 p-4 rounded-xl flex items-center gap-3"
+                style={{
+                  background: 'rgba(249, 115, 22, 0.08)',
+                  border: '1px solid rgba(249, 115, 22, 0.25)',
+                }}
+              >
+                <BookOpen size={20} style={{ color: '#f97316' }} />
+                <div className="flex-1">
+                  <p
+                    className="text-sm font-semibold"
+                    style={{ color: '#f97316' }}
+                  >
+                    Transaksi Belum Dikategorisasi
+                  </p>
+                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                    Ada {unlabelledCount} transaksi yang perlu klasifikasi
+                    manual di Smart Ledger.
+                  </p>
+                </div>
+              </motion.div>
+            )}
+
             {/* Banner Section */}
             <section className="mb-8">
               <AvatarConditionBanner
@@ -307,11 +412,18 @@ export default function DashboardPage() {
                 condition={avatarCondition}
                 monthlyIncome={monthlyIncome}
                 monthlyExpense={monthlyExpense}
-                targetPension={
-                  user?.monthlyIncome
-                    ? user.monthlyIncome * 12 * 25
-                    : 1500000000
-                }
+                targetPension={(() => {
+                  const income = user?.monthlyIncome || monthlyIncome || 0
+                  const currentAge = user?.birthDate
+                    ? Math.floor(
+                        (Date.now() - new Date(user.birthDate).getTime()) /
+                          (365.25 * 24 * 60 * 60 * 1000),
+                      )
+                    : 25
+                  const retAge = user?.retirementAge || 55
+                  const yearsLeft = Math.max(retAge - currentAge, 1)
+                  return income * 12 * yearsLeft
+                })()}
               />
             </section>
 
@@ -537,7 +649,8 @@ export default function DashboardPage() {
             userId={user?.id}
           />
         </>
-      )}
+        )
+      }}
     </DashboardLayout>
   )
 }

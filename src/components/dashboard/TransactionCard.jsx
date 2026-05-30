@@ -6,7 +6,7 @@ import {
   CATEGORY_COLORS,
   TRANSACTION_FILTERS,
   LEDGER_FILTERS,
-  ALL_CATEGORIES,
+  TRANSACTION_CATEGORIES,
 } from './dashboardConstants'
 
 import {
@@ -40,7 +40,7 @@ export default function TransactionCard({ userId, onAddNew, onRefresh }) {
   const loadTransactions = async () => {
     try {
       setLoading(true)
-      const response = await api.get(`/transactions/${userId}?limit=50`)
+      const response = await api.get(`/transactions/${userId}?limit=1000`)
       setTransactions(response.data.data || [])
     } catch (error) {
       console.error('Error loading transactions:', error)
@@ -52,10 +52,14 @@ export default function TransactionCard({ userId, onAddNew, onRefresh }) {
   const loadUnlabelledCount = async () => {
     try {
       const response = await getUnlabelledTransactions(userId)
-
       const data = response.data || []
-
-      setPendingCount(data.length)
+      const filtered = data.filter((tx) => {
+        const cat = (tx.categoryLabel || '').toLowerCase().trim()
+        return (
+          !tx.categoryLabel || cat === 'lainnya' || cat === 'tidak_diketahui'
+        )
+      })
+      setPendingCount(filtered.length)
     } catch (error) {
       console.error('Error loading unlabelled count:', error)
     }
@@ -64,12 +68,16 @@ export default function TransactionCard({ userId, onAddNew, onRefresh }) {
   const loadUnlabelledTransactions = async () => {
     try {
       setUnlabelledLoading(true)
-
       const response = await getUnlabelledTransactions(userId)
-
-      setUnlabelledTx(response.data || [])
-
-      setPendingCount((response.data || []).length)
+      const data = response.data || []
+      const filtered = data.filter((tx) => {
+        const cat = (tx.categoryLabel || '').toLowerCase().trim()
+        return (
+          !tx.categoryLabel || cat === 'lainnya' || cat === 'tidak_diketahui'
+        )
+      })
+      setUnlabelledTx(filtered)
+      setPendingCount(filtered.length)
     } catch (error) {
       console.error('Error loading unlabelled:', error)
     } finally {
@@ -140,11 +148,21 @@ export default function TransactionCard({ userId, onAddNew, onRefresh }) {
     : filteredTransactions.slice(0, 5)
 
   const totalIncome = transactions
-    .filter((tx) => tx.transactionType === 'credit')
+    .filter(
+      (tx) =>
+        tx.transactionType === 'credit' &&
+        tx.categoryLabel !== 'topup_ewallet' &&
+        tx.categoryLabel !== 'transfer_internal',
+    )
     .reduce((sum, tx) => sum + tx.amount, 0)
 
   const totalExpense = transactions
-    .filter((tx) => tx.transactionType === 'debit')
+    .filter(
+      (tx) =>
+        tx.transactionType === 'debit' &&
+        tx.categoryLabel !== 'topup_ewallet' &&
+        tx.categoryLabel !== 'transfer_internal',
+    )
     .reduce((sum, tx) => sum + tx.amount, 0)
 
   const balance = totalIncome - totalExpense
@@ -157,7 +175,11 @@ export default function TransactionCard({ userId, onAddNew, onRefresh }) {
     if (diff === 0) return 'Hari ini'
     if (diff === 1) return 'Kemarin'
     if (diff < 7) return `${diff} hari lalu`
-    return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
+    return date.toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    })
   }
 
   return (
@@ -285,7 +307,7 @@ export default function TransactionCard({ userId, onAddNew, onRefresh }) {
             CATEGORY_ICON_MAP={CATEGORY_ICON_MAP}
             CATEGORY_COLORS={CATEGORY_COLORS}
             LEDGER_FILTERS={LEDGER_FILTERS}
-            ALL_CATEGORIES={ALL_CATEGORIES}
+            TRANSACTION_CATEGORIES={TRANSACTION_CATEGORIES}
           />
         )}
       </AnimatePresence>

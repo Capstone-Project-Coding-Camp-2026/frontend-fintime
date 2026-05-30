@@ -48,7 +48,7 @@ export default function GamificationPage() {
       setUnlocked(savedAchievements)
 
       // Get stats from various sources
-      const transactionsRes = await api.get(`/transactions/${user.id}`).catch(() => ({ data: [] }))
+      const transactionsRes = await api.get(`/transactions/${user.id}?limit=1000`).catch(() => ({ data: [] }))
       const transactions = Array.isArray(transactionsRes.data) ? transactionsRes.data : (transactionsRes.data?.data || [])
       const goalsRes = await api.get(`/goals/${user.id}`).catch(() => ({ data: [] }))
       const goals = Array.isArray(goalsRes.data) ? goalsRes.data : (goalsRes.data?.data || [])

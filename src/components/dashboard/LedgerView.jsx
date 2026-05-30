@@ -13,7 +13,7 @@ export default function LedgerView({
   CATEGORY_LABELS,
   CATEGORY_COLORS,
   LEDGER_FILTERS,
-  ALL_CATEGORIES,
+  TRANSACTION_CATEGORIES,
 }) {
   return (
     <motion.div
@@ -22,25 +22,46 @@ export default function LedgerView({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 20 }}
     >
-      <div className="px-4 py-3 border-b mb-1" style={{ borderColor: 'rgba(0, 245, 255, 0.08)' }}>
-        <div 
+      <div
+        className="px-4 py-3 border-b mb-1"
+        style={{ borderColor: 'rgba(0, 245, 255, 0.08)' }}
+      >
+        <div
           className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all relative"
-          style={{ background: 'rgba(0, 245, 255, 0.04)', border: '1px solid rgba(0, 245, 255, 0.1)' }}
+          style={{
+            background: 'rgba(0, 245, 255, 0.04)',
+            border: '1px solid rgba(0, 245, 255, 0.1)',
+          }}
         >
           <Filter size={16} style={{ color: '#00f5ff' }} />
           <select
             value={ledgerFilter}
             onChange={(e) => setLedgerFilter(e.target.value)}
             className="flex-1 bg-transparent text-sm font-medium outline-none appearance-none cursor-pointer w-full z-10"
-            style={{ color: ledgerFilter === 'all' ? '#00f5ff' : (CATEGORY_COLORS[ledgerFilter] || '#fff') }}
+            style={{
+              color:
+                ledgerFilter === 'all'
+                  ? '#00f5ff'
+                  : CATEGORY_COLORS[ledgerFilter] || '#fff',
+            }}
           >
             {LEDGER_FILTERS.map(({ key, label }) => (
-              <option key={key} value={key} style={{ background: 'rgb(2, 17, 31)', color: 'white' }}>
-                {key === 'all' ? 'Tampilkan Semua Kategori' : `Kategori: ${label}`}
+              <option
+                key={key}
+                value={key}
+                style={{ background: 'rgb(2, 17, 31)', color: 'white' }}
+              >
+                {key === 'all'
+                  ? 'Tampilkan Semua Kategori'
+                  : `Kategori: ${label}`}
               </option>
             ))}
           </select>
-          <ChevronDown size={16} className="absolute right-4 z-0 pointer-events-none" style={{ color: '#94a3b8' }} />
+          <ChevronDown
+            size={16}
+            className="absolute right-4 z-0 pointer-events-none"
+            style={{ color: '#94a3b8' }}
+          />
         </div>
       </div>
       <div className="p-4 space-y-3 max-h-[400px] overflow-y-auto">
@@ -51,7 +72,6 @@ export default function LedgerView({
         ) : transactions.length === 0 ? (
           <div className="text-center py-8">
             <Check size={36} className="mx-auto mb-3 text-green-400" />
-
             <p className="text-white font-semibold">
               Semua transaksi sudah terlabel
             </p>
@@ -71,12 +91,10 @@ export default function LedgerView({
                   <p className="text-white font-medium text-sm">
                     {tx.description}
                   </p>
-
                   <p className="text-xs text-gray-400">
                     {formatDate(tx.dateTime)}
                   </p>
                 </div>
-
                 <p
                   className="font-semibold text-sm"
                   style={{
@@ -100,7 +118,7 @@ export default function LedgerView({
                     color: 'white',
                   }}
                 >
-                  {ALL_CATEGORIES.map((cat) => (
+                  {TRANSACTION_CATEGORIES.map((cat) => (
                     <option
                       key={cat}
                       value={cat}
@@ -109,7 +127,7 @@ export default function LedgerView({
                         color: 'white',
                       }}
                     >
-                      {CATEGORY_LABELS[cat]}
+                      {CATEGORY_LABELS[cat] || cat}
                     </option>
                   ))}
                 </select>
@@ -120,12 +138,11 @@ export default function LedgerView({
                     const select = document.getElementById(
                       `cat-select-${tx.id}`,
                     )
-
                     if (select) {
                       handleRelabel(tx.id, select.value)
                     }
                   }}
-                  className="px-5 py-2 rounded-xl font-bold"
+                  className="px-5 py-2 rounded-xl font-bold transition-all hover:brightness-125 disabled:opacity-50 text-xs"
                   style={{
                     background: 'rgba(0, 245, 255, 0.12)',
                     border: '1px solid rgba(0, 245, 255, 0.2)',

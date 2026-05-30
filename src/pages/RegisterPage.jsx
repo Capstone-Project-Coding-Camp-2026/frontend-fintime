@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
-import { ChevronLeft, ArrowRight, Loader2, AlertCircle } from 'lucide-react'
+import { ChevronLeft, ArrowRight, Loader2, AlertCircle, ShieldCheck, RefreshCw } from 'lucide-react'
 
 import ParticleField from '../components/Particlefield'
 import api from '../lib/api'
@@ -27,6 +27,22 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState(INITIAL_FORM_DATA)
   const [step2CanNext, setStep2CanNext] = useState(false) // Untuk StepContact
   const navigate = useNavigate()
+
+  // ─── OTP State ──────────────────────────────────────────
+  const [showOtp, setShowOtp] = useState(false)
+  const [otpValues, setOtpValues] = useState(['', '', '', '', '', ''])
+  const [otpLoading, setOtpLoading] = useState(false)
+  const [otpError, setOtpError] = useState('')
+  const [otpCountdown, setOtpCountdown] = useState(0)
+  const [registeredEmail, setRegisteredEmail] = useState('')
+  const otpRefs = useRef([])
+
+  // OTP Countdown timer
+  useEffect(() => {
+    if (otpCountdown <= 0) return
+    const timer = setTimeout(() => setOtpCountdown(c => c - 1), 1000)
+    return () => clearTimeout(timer)
+  }, [otpCountdown])
 
   // ─── Validasi step ────────────────────────────────────────
   const canNext = () => {
@@ -55,12 +71,23 @@ export default function RegisterPage() {
 
         const data = response.data.data || response.data;
 
+        // Simpan token sementara untuk verify-otp nanti
         if (data.token) {
           localStorage.setItem('fintime_token', data.token)
           localStorage.setItem('fintime_user', JSON.stringify(data.user))
         }
 
-        setIsSuccess(true)
+        // Kirim OTP ke email user
+        setRegisteredEmail(formData.email)
+        try {
+          await api.post('/mock/send-otp', { email: formData.email })
+        } catch (otpErr) {
+          console.warn('OTP send failed (mock):', otpErr)
+        }
+
+        setShowOtp(true)
+        setOtpCountdown(60)
+        setOtpValues(['', '', '', '', '', ''])
       } catch (err) {
         console.error('Register error:', err)
         setError(err.response?.data?.message || 'Gagal mendaftar. Silakan coba lagi.')
@@ -86,6 +113,72 @@ export default function RegisterPage() {
 
   // ─── Progress calculation ─────────────────────────────────
   const progressPct = (currentStep / (STEPS.length - 1)) * 100
+
+  // ─── OTP Handlers ─────────────────────────────────────────
+  const handleOtpChange = (index, value) => {
+    if (!/^\d?$/.test(value)) return
+    const newOtp = [...otpValues]
+    newOtp[index] = value
+    setOtpValues(newOtp)
+    // Auto-focus next input
+    if (value && index < 5) {
+      otpRefs.current[index + 1]?.focus()
+    }
+  }
+
+  const handleOtpKeyDown = (index, e) => {
+    if (e.key === 'Backspace' && !otpValues[index] && index > 0) {
+      otpRefs.current[index - 1]?.focus()
+    }
+  }
+
+  const handleOtpPaste = (e) => {
+    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6)
+    if (pasted.length === 6) {
+      setOtpValues(pasted.split(''))
+      otpRefs.current[5]?.focus()
+    }
+  }
+
+  const handleResendOtp = async () => {
+    if (otpCountdown > 0) return
+    try {
+      await api.post('/mock/send-otp', { email: registeredEmail })
+      setOtpCountdown(60)
+      setOtpValues(['', '', '', '', '', ''])
+      setOtpError('')
+    } catch (err) {
+      console.error('Resend OTP failed:', err)
+    }
+  }
+
+  const handleVerifyOtp = async () => {
+    const otpCode = otpValues.join('')
+    if (otpCode.length !== 6) {
+      setOtpError('Masukkan 6 digit kode OTP')
+      return
+    }
+    setOtpLoading(true)
+    setOtpError('')
+    try {
+      const response = await api.post('/auth/verify-otp', {
+        email: registeredEmail,
+        otp: otpCode,
+      })
+      const data = response.data.data || response.data
+      if (data.token) {
+        localStorage.setItem('fintime_token', data.token)
+        localStorage.setItem('fintime_user', JSON.stringify(data.user))
+      }
+      setShowOtp(false)
+      setIsSuccess(true)
+    } catch (err) {
+      console.error('OTP verify failed:', err)
+      setOtpError(err.response?.data?.message || 'Kode OTP tidak valid. Silakan coba lagi.')
+    } finally {
+      setOtpLoading(false)
+    }
+  }
 
   // ─── Render ───────────────────────────────────────────────
   return (
@@ -169,6 +262,112 @@ export default function RegisterPage() {
           <AnimatePresence mode="wait">
             {isSuccess ? (
               <RegisterSuccess key="success" data={formData} />
+            ) : showOtp ? (
+              <motion.div
+                key="otp-form"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="flex flex-col items-center text-center gap-5 py-4"
+              >
+                <div
+                  className="w-16 h-16 rounded-full flex items-center justify-center"
+                  style={{
+                    background: 'rgba(0,245,255,0.1)',
+                    border: '2px solid rgba(0,245,255,0.4)',
+                    boxShadow: '0 0 30px rgba(0,245,255,0.2)',
+                  }}
+                >
+                  <ShieldCheck size={32} style={{ color: '#00f5ff' }} />
+                </div>
+
+                <div>
+                  <h2 className="text-2xl font-extrabold tracking-tight mb-1">
+                    Verifikasi <span className="grad-text">OTP</span>
+                  </h2>
+                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                    Kode verifikasi telah dikirim ke
+                  </p>
+                  <p className="text-sm font-bold" style={{ color: '#00f5ff' }}>
+                    {registeredEmail}
+                  </p>
+                </div>
+
+                {/* OTP Inputs */}
+                <div className="flex gap-3 justify-center" onPaste={handleOtpPaste}>
+                  {otpValues.map((val, i) => (
+                    <input
+                      key={i}
+                      ref={el => otpRefs.current[i] = el}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={val}
+                      onChange={e => handleOtpChange(i, e.target.value)}
+                      onKeyDown={e => handleOtpKeyDown(i, e)}
+                      className="w-12 h-14 rounded-xl text-center text-xl font-bold outline-none transition-all"
+                      style={{
+                        background: val ? 'rgba(0,245,255,0.1)' : 'rgba(0,245,255,0.04)',
+                        border: `2px solid ${val ? 'rgba(0,245,255,0.5)' : 'rgba(0,245,255,0.12)'}`,
+                        color: '#00f5ff',
+                        caretColor: '#00f5ff',
+                      }}
+                    />
+                  ))}
+                </div>
+
+                {/* OTP Error */}
+                {otpError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-2 p-3 rounded-xl text-sm w-full"
+                    style={{
+                      backgroundColor: 'rgba(248, 113, 113, 0.1)',
+                      border: '1px solid rgba(248, 113, 113, 0.3)',
+                      color: '#f87171'
+                    }}
+                  >
+                    <AlertCircle size={16} />
+                    <span>{otpError}</span>
+                  </motion.div>
+                )}
+
+                {/* Verify Button */}
+                <motion.button
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={handleVerifyOtp}
+                  disabled={otpLoading || otpValues.join('').length !== 6}
+                  className="btn-primary w-full flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-extrabold rounded-full"
+                  style={{
+                    opacity: otpLoading || otpValues.join('').length !== 6 ? 0.5 : 1,
+                    cursor: otpLoading || otpValues.join('').length !== 6 ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {otpLoading ? (
+                    <><Loader2 size={16} className="animate-spin" /> Memverifikasi...</>
+                  ) : (
+                    <><ShieldCheck size={16} /> Verifikasi OTP</>
+                  )}
+                </motion.button>
+
+                {/* Resend */}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleResendOtp}
+                    disabled={otpCountdown > 0}
+                    className="flex items-center gap-1.5 text-xs font-semibold transition-all"
+                    style={{
+                      color: otpCountdown > 0 ? 'var(--text-dim)' : '#00f5ff',
+                      cursor: otpCountdown > 0 ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    <RefreshCw size={12} />
+                    {otpCountdown > 0 ? `Kirim ulang dalam ${otpCountdown}s` : 'Kirim Ulang OTP'}
+                  </button>
+                </div>
+              </motion.div>
             ) : (
               <>
                 {currentStep === 0 && <StepPersonal data={formData} setData={setFormData} />}
@@ -198,7 +397,7 @@ export default function RegisterPage() {
           )}
 
 
-          {!isSuccess && (
+          {!isSuccess && !showOtp && (
             <div className="flex items-center justify-between mt-8">
 
               <button
@@ -237,7 +436,7 @@ export default function RegisterPage() {
           )}
 
 
-          {!isSuccess && (
+          {!isSuccess && !showOtp && (
             <p className="text-center text-xs mt-6" style={{ color: 'var(--text-dim)' }}>
               Sudah punya akun?{' '}
               <Link to="/login" className="font-bold no-underline" style={{ color: '#00f5ff' }}>
