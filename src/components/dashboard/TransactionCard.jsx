@@ -17,6 +17,7 @@ import { BookOpen, Filter } from 'lucide-react'
 import api from '../../lib/api'
 import TransactionView from './TransactionView'
 import LedgerView from './LedgerView'
+import { saveLabelRule } from '../../lib/transactionApi'
 
 export default function TransactionCard({ userId, onAddNew, onRefresh }) {
   const [transactions, setTransactions] = useState([])
@@ -102,6 +103,13 @@ export default function TransactionCard({ userId, onAddNew, onRefresh }) {
       const result = await relabelTransaction(transactionId, categoryLabel)
       console.log('RELABEL RESULT:', result)
 
+      // cari transaksi yg direlabel
+      const tx = transactions.find((t) => t.id === transactionId)
+
+      // simpan auto-learning label rule
+      if (tx) {
+        await saveLabelRule(userId, tx.description, categoryLabel)
+      }
       // refresh semua data
       await loadTransactions()
       await loadUnlabelledTransactions()
