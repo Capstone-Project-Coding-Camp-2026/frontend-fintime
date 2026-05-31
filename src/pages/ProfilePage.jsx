@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Mail, Phone, Briefcase, DollarSign, UserCircle,
   Edit2, Save, X, Camera, Shield, Calendar,
-  TrendingUp, Clock, LogOut,
+  TrendingUp, Clock, LogOut, Users, Target,
 } from 'lucide-react'
 
 import api from '../lib/api'
@@ -16,8 +16,11 @@ export default function ProfilePage() {
     fullName: '',
     email: '',
     phone: '',
+    gender: '',
+    birthDate: '',
     jobType: '',
-    monthlyIncome: ''
+    monthlyIncome: '',
+    retirementAge: '',
   })
 
   useEffect(() => {
@@ -30,9 +33,16 @@ export default function ProfilePage() {
           fullName: userData.fullName || '',
           email: userData.email || '',
           phone: userData.phone || '',
+          gender: userData.gender || '',
+          birthDate: userData.birthDate ? new Date(userData.birthDate).toISOString().split('T')[0] : '',
           jobType: userData.jobType || userData.occupation || '',
-          monthlyIncome: userData.monthlyIncome || ''
+          monthlyIncome: userData.monthlyIncome || '',
+          retirementAge: userData.retirementAge || '',
         })
+        
+        if (!userData.birthDate || !userData.monthlyIncome || !userData.retirementAge || !userData.jobType) {
+          setIsEditing(true)
+        }
       } catch (e) {
         console.error('Failed to parse user in profile:', e)
       }
@@ -47,16 +57,19 @@ export default function ProfilePage() {
   const handleSave = async () => {
     try {
       const response = await api.put('/auth/profile', formData)
-      if (response.data?.user) {
-        const updatedUser = response.data.user
+      if (response.data?.data || response.data?.user) {
+        const updatedUser = response.data.data || response.data.user
         localStorage.setItem('fintime_user', JSON.stringify(updatedUser))
         setUser(updatedUser)
         setFormData({
           fullName: updatedUser.fullName || '',
           email: updatedUser.email || '',
           phone: updatedUser.phone || '',
+          gender: updatedUser.gender || '',
+          birthDate: updatedUser.birthDate ? new Date(updatedUser.birthDate).toISOString().split('T')[0] : '',
           jobType: updatedUser.jobType || updatedUser.occupation || '',
           monthlyIncome: updatedUser.monthlyIncome || '',
+          retirementAge: updatedUser.retirementAge || '',
         })
       }
       setIsEditing(false)
@@ -71,8 +84,11 @@ export default function ProfilePage() {
       fullName: user.fullName || '',
       email: user.email || '',
       phone: user.phone || '',
+      gender: user.gender || '',
+      birthDate: user.birthDate ? new Date(user.birthDate).toISOString().split('T')[0] : '',
       jobType: user.jobType || user.occupation || '',
-      monthlyIncome: user.monthlyIncome || ''
+      monthlyIncome: user.monthlyIncome || '',
+      retirementAge: user.retirementAge || '',
     })
     setIsEditing(false)
   }
@@ -81,8 +97,20 @@ export default function ProfilePage() {
     { icon: UserCircle, label: 'Nama Lengkap', name: 'fullName', type: 'text', value: formData.fullName, placeholder: 'Masukkan nama lengkap' },
     { icon: Mail, label: 'Alamat Email', name: 'email', type: 'email', value: formData.email, placeholder: 'nama@email.com' },
     { icon: Phone, label: 'Nomor Telepon', name: 'phone', type: 'tel', value: formData.phone, placeholder: '+62 xxx xxxx xxxx' },
-    { icon: Briefcase, label: 'Pekerjaan', name: 'jobType', type: 'text', value: formData.jobType, placeholder: 'Contoh: Karyawan Swasta' },
+    { icon: Users, label: 'Jenis Kelamin', name: 'gender', type: 'select', value: formData.gender, placeholder: 'Pilih jenis kelamin',
+      options: [{ value: '', label: 'Pilih...' }, { value: 'male', label: 'Laki-laki' }, { value: 'female', label: 'Perempuan' }] },
+    { icon: Calendar, label: 'Tanggal Lahir', name: 'birthDate', type: 'date', value: formData.birthDate, placeholder: 'YYYY-MM-DD' },
+    { icon: Briefcase, label: 'Pekerjaan', name: 'jobType', type: 'select', value: formData.jobType, placeholder: 'Pilih pekerjaan',
+      options: [
+        { value: '', label: 'Pilih...' },
+        { value: 'permanent', label: 'Karyawan Tetap' },
+        { value: 'freelance', label: 'Freelancer' },
+        { value: 'civil_servant', label: 'PNS / ASN' },
+        { value: 'entrepreneur', label: 'Wirausaha' },
+        { value: 'not_working', label: 'Belum Bekerja / Pelajar' },
+      ] },
     { icon: DollarSign, label: 'Pendapatan Bulanan', name: 'monthlyIncome', type: 'text', value: formData.monthlyIncome, placeholder: 'Rp. x.xxx.xxx' },
+    { icon: Target, label: 'Usia Pensiun', name: 'retirementAge', type: 'number', value: formData.retirementAge, placeholder: '55' },
   ]
 
   const stats = [
@@ -305,25 +333,43 @@ export default function ProfilePage() {
                       exit={{ opacity: 0 }}
                       className="grid grid-cols-1 md:grid-cols-2 gap-5"
                     >
-                      {profileFields.map((field) => (
+                        {profileFields.map((field) => (
                         <div key={field.name} className="space-y-2">
                           <label className="text-xs font-bold uppercase tracking-widest text-gray-500 flex items-center gap-2">
                             <field.icon size={14} />
                             {field.label}
                           </label>
-                          <input
-                            type={field.type}
-                            name={field.name}
-                            value={formData[field.name]}
-                            onChange={handleInputChange}
-                            placeholder={field.placeholder}
-                            className="w-full px-4 py-3 rounded-xl transition-all focus:outline-none"
-                            style={{
-                              background: 'rgba(0,245,255,0.05)',
-                              border: '1px solid rgba(0,245,255,0.15)',
-                              color: '#e0f7ff',
-                            }}
-                          />
+                          {field.type === 'select' ? (
+                            <select
+                              name={field.name}
+                              value={formData[field.name]}
+                              onChange={handleInputChange}
+                              className="w-full px-4 py-3 rounded-xl transition-all focus:outline-none appearance-none"
+                              style={{
+                                background: 'rgba(0,245,255,0.05)',
+                                border: '1px solid rgba(0,245,255,0.15)',
+                                color: '#e0f7ff',
+                              }}
+                            >
+                              {field.options.map(opt => (
+                                <option key={opt.value} value={opt.value} style={{ background: '#020b18' }}>{opt.label}</option>
+                              ))}
+                            </select>
+                          ) : (
+                            <input
+                              type={field.type}
+                              name={field.name}
+                              value={formData[field.name]}
+                              onChange={handleInputChange}
+                              placeholder={field.placeholder}
+                              className="w-full px-4 py-3 rounded-xl transition-all focus:outline-none"
+                              style={{
+                                background: 'rgba(0,245,255,0.05)',
+                                border: '1px solid rgba(0,245,255,0.15)',
+                                color: '#e0f7ff',
+                              }}
+                            />
+                          )}
                         </div>
                       ))}
                     </motion.div>
@@ -352,6 +398,14 @@ export default function ProfilePage() {
                           <p className="text-lg font-medium">
                             {field.name === 'monthlyIncome' && field.value 
                               ? `Rp ${Number(field.value).toLocaleString('id-ID')}`
+                              : field.name === 'gender'
+                              ? (field.value === 'male' ? 'Laki-laki' : field.value === 'female' ? 'Perempuan' : <span className="text-gray-500 italic">Belum diisi</span>)
+                              : field.name === 'birthDate' && field.value
+                              ? new Date(field.value).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+                              : field.name === 'retirementAge' && field.value
+                              ? `${field.value} tahun`
+                              : field.name === 'jobType' && field.value
+                              ? field.value.charAt(0).toUpperCase() + field.value.slice(1).replace(/_/g, ' ')
                               : field.value || <span className="text-gray-500 italic">Belum diisi</span>
                             }
                           </p>

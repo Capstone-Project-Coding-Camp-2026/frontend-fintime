@@ -161,7 +161,7 @@ export default function ReportsPage() {
       }
 
       // Fetch transactions
-      const transRes = await api.get(`/transactions/${userId}?limit=500`, { params })
+      const transRes = await api.get(`/transactions/${userId}?limit=1000`, { params })
       const transData = transRes.data?.data || transRes.data || []
 
       // Calculate summary
@@ -833,7 +833,7 @@ export default function ReportsPage() {
                           style={{ borderBottom: '1px solid rgba(0,245,255,0.04)' }}
                         >
                           <td className="px-6 py-4 text-sm" style={{ color: '#7aa6c2' }}>
-                            {formatDate(trans.date || trans.createdAt)}
+                            {formatDate(trans.dateTime || trans.date || trans.createdAt)}
                           </td>
                           <td className="px-6 py-4 text-sm font-medium" style={{ color: 'white' }}>
                             {trans.description}

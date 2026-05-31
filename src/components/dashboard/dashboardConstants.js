@@ -110,24 +110,22 @@ export const TRANSACTION_FILTERS = [
 
 export const LEDGER_FILTERS = [
   { key: 'all', label: 'Semua' },
-  { key: 'makanan', label: 'Makanan' },
-  { key: 'tagihan', label: 'Tagihan' },
-  { key: 'transport', label: 'Transport' },
-  { key: 'belanja', label: 'Belanja' },
-  { key: 'hiburan', label: 'Hiburan' },
-  { key: 'perumahan', label: 'Perumahan' },
-  { key: 'kesehatan', label: 'Kesehatan' },
-  { key: 'pendidikan', label: 'Pendidikan' },
-  { key: 'gaji', label: 'Gaji' },
-  { key: 'investasi', label: 'Investasi' },
-  { key: 'freelance', label: 'Freelance' },
-  { key: 'hadiah', label: 'Hadiah' },
   { key: 'lainnya', label: 'Lainnya' },
   { key: 'tidak_diketahui', label: 'Tidak Diketahui' },
-  { key: 'topup_ewallet', label: 'Top Up E-Wallet' },
-  { key: 'transfer_internal', label: 'Transfer Internal' },
-  { key: 'transfer_keluarga', label: 'Transfer Keluarga' },
-  { key: 'transfer_sosial', label: 'Transfer Sosial' },
 ]
 
-export const ALL_CATEGORIES = Object.keys(CATEGORY_LABELS)
+export const ALL_CATEGORIES = [
+  'makanan',
+  'transport',
+  'hiburan',
+  'belanja',
+  'tagihan',
+  'kesehatan',
+  'pendidikan',
+  'lainnya',
+  'transfer_keluarga',
+  'transfer_sosial',
+  'tidak_diketahui',
+  'topup_ewallet',
+  'transfer_internal',
+]

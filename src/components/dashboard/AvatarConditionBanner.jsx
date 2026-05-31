@@ -9,7 +9,8 @@ const conditionConfig = {
     score: 85,
     scoreLabel: 'Sangat Baik',
     message: 'Finansialmu dalam kondisi sangat baik! Terus pertahankan.',
-    recommendation: 'Alokasikan 10% pendapatan tambahanmu ke instrumen investasi agresif.',
+    recommendation:
+      'Alokasikan 10% pendapatan tambahanmu ke instrumen investasi agresif.',
   },
   normal: {
     label: 'On Track',
@@ -18,7 +19,8 @@ const conditionConfig = {
     score: 62,
     scoreLabel: 'Cukup Baik',
     message: 'Finansialmu cukup baik. Masih ada ruang untuk perbaikan.',
-    recommendation: 'Coba kurangi pengeluaran hiburan sebesar 5% untuk dana darurat.',    
+    recommendation:
+      'Coba kurangi pengeluaran hiburan sebesar 5% untuk dana darurat.',
   },
   bad: {
     label: 'Perlu Perbaikan',
@@ -27,31 +29,36 @@ const conditionConfig = {
     score: 35,
     scoreLabel: 'Perlu Perhatian',
     message: 'Finansialmu membutuhkan perhatian lebih. Buat rencana perbaikan.',
-    recommendation: 'Fokus lunasi hutang berbunga tinggi dan tunda pengeluaran besar.',   
+    recommendation:
+      'Fokus lunasi hutang berbunga tinggi dan tunda pengeluaran besar.',
   },
 }
 
-export default function AvatarConditionBanner({ 
-  balance = 0, 
-  targetPension = 500000000, 
+export default function AvatarConditionBanner({
+  balance = 0,
+  targetPension = 500000000,
   userName = 'User',
   gender = 'male',
   condition: propCondition,
+  recommendedAssetClass,
   projectedWealth = 0,
   pensionSurvivalYears = 0,
   monthlyIncome = 5000000,
-  monthlyExpense = 3500000
+  monthlyExpense = 3500000,
 }) {
   // Use propCondition if passed, otherwise default to normal
   const condition = propCondition || 'normal'
   const config = conditionConfig[condition] || conditionConfig.normal
 
-  // Calculate pension target progress
-  // If we have projected wealth from the backend, we use it to calculate progress towards target retirement fund
+  // Menghitung progress menuju target pension
+  // jika memiliki wealth yang diproyeksikan dari backend, gunakan untuk menghitung kemajuan menuju dana pensiun target
   const wealthForProgress = projectedWealth > 0 ? projectedWealth : balance
-  const progressPercent = Math.min(100, Math.max(0, (wealthForProgress / targetPension) * 100))     
-  
-  // Calculate dynamic Health Score
+  const progressPercent = Math.min(
+    100,
+    Math.max(0, (wealthForProgress / targetPension) * 100),
+  )
+
+  // Menghitung Skor Kesehatan berdasarkan kondisi dan proyeksi survival pension
   let healthScore = 50
   if (condition === 'good') {
     healthScore = Math.min(100, Math.round(75 + pensionSurvivalYears))
@@ -73,13 +80,13 @@ export default function AvatarConditionBanner({
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-5 items-stretch">       
+    <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-5 items-stretch">
       {/* Avatar Card */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
-        className="relative overflow-hidden rounded-2xl border p-6 sm:p-7 flex flex-col"  
+        className="relative overflow-hidden rounded-2xl border p-6 sm:p-7 flex flex-col"
         style={{
           background: `linear-gradient(135deg, ${config.colorDim} 0%, rgba(6, 21, 40, 0.6) 100%)`,
           borderColor: `${config.color}40`,
@@ -95,7 +102,7 @@ export default function AvatarConditionBanner({
           style={{ backgroundColor: config.color }}
         />
 
-        <div className="relative z-10 flex flex-col items-center text-center flex-1">     
+        <div className="relative z-10 flex flex-col items-center text-center flex-1">
           {/* Avatar dengan glow effect */}
           <div className="relative mb-4">
             <div
@@ -123,10 +130,15 @@ export default function AvatarConditionBanner({
             />
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-bold mb-1" style={{ color: 'var(--text)' }}>
+          <h2
+            className="text-2xl sm:text-3xl font-bold mb-1"
+            style={{ color: 'var(--text)' }}
+          >
             {userName}
           </h2>
-          <p className="text-sm mb-5" style={{ color: 'var(--text-muted)' }}>Financial Profile</p>
+          <p className="text-sm mb-5" style={{ color: 'var(--text-muted)' }}>
+            Financial Profile
+          </p>
 
           {/* Status Badge */}
           <motion.div
@@ -151,10 +163,16 @@ export default function AvatarConditionBanner({
           <div className="flex-1" />
 
           {/* Health Score */}
-          <div className="w-full mt-6 pt-6 border-t" style={{ borderColor: `${config.color}20` }}>
+          <div
+            className="w-full mt-6 pt-6 border-t"
+            style={{ borderColor: `${config.color}20` }}
+          >
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+                <span
+                  className="text-xs font-medium uppercase tracking-wider"
+                  style={{ color: 'var(--text-muted)' }}
+                >
                   Health Score
                 </span>
                 <div
@@ -163,10 +181,18 @@ export default function AvatarConditionBanner({
                 />
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-base" style={{ color: config.color }}>    
+                <span
+                  className="font-bold text-base"
+                  style={{ color: config.color }}
+                >
                   {healthScore}
                 </span>
-                <span className="text-sm" style={{ color: 'var(--text-muted)' }}>/100</span>
+                <span
+                  className="text-sm"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  /100
+                </span>
               </div>
             </div>
 
@@ -193,8 +219,18 @@ export default function AvatarConditionBanner({
                 </motion.div>
               </div>
               <div className="flex items-center justify-between mt-2">
-                <span className="text-[10px]" style={{ color: 'var(--text-dim)' }}>{config.scoreLabel}</span>
-                <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Survival: {pensionSurvivalYears.toFixed(1)} tahun</span>
+                <span
+                  className="text-[10px]"
+                  style={{ color: 'var(--text-dim)' }}
+                >
+                  {config.scoreLabel}
+                </span>
+                <span
+                  className="text-[10px]"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  Survival: {pensionSurvivalYears.toFixed(1)} tahun
+                </span>
               </div>
             </div>
           </div>
@@ -211,7 +247,9 @@ export default function AvatarConditionBanner({
           className="glass-card rounded-2xl p-5 border"
           style={{ borderColor: 'var(--glass-border)' }}
         >
-          <h3 className="font-semibold mb-4" style={{ color: 'var(--text)' }}>Statistik Keuangan</h3>
+          <h3 className="font-semibold mb-4" style={{ color: 'var(--text)' }}>
+            Statistik Keuangan
+          </h3>
           <div className="grid grid-cols-2 gap-3">
             <div
               className="p-4 rounded-xl text-center"
@@ -220,9 +258,18 @@ export default function AvatarConditionBanner({
                 border: '1px solid rgba(74, 222, 128, 0.2)',
               }}
             >
-              <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Pendapatan</p>
-              <p className="text-lg font-bold" style={{ color: '#4ade80' }}>+{formatIDR(monthlyIncome)}</p> 
-              <p className="text-xs" style={{ color: 'var(--text-dim)' }}>Per bulan</p>   
+              <p
+                className="text-xs uppercase tracking-wider mb-1"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                Pendapatan
+              </p>
+              <p className="text-lg font-bold" style={{ color: '#4ade80' }}>
+                +{formatIDR(monthlyIncome)}
+              </p>
+              <p className="text-xs" style={{ color: 'var(--text-dim)' }}>
+                Per bulan
+              </p>
             </div>
             <div
               className="p-4 rounded-xl text-center"
@@ -231,18 +278,37 @@ export default function AvatarConditionBanner({
                 border: '1px solid rgba(248, 113, 113, 0.2)',
               }}
             >
-              <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Pengeluaran</p>
-              <p className="text-lg font-bold" style={{ color: '#f87171' }}>-{formatIDR(monthlyExpense)}</p> 
-              <p className="text-xs" style={{ color: 'var(--text-dim)' }}>Per bulan</p>   
+              <p
+                className="text-xs uppercase tracking-wider mb-1"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                Pengeluaran
+              </p>
+              <p className="text-lg font-bold" style={{ color: '#f87171' }}>
+                -{formatIDR(monthlyExpense)}
+              </p>
+              <p className="text-xs" style={{ color: 'var(--text-dim)' }}>
+                Per bulan
+              </p>
             </div>
           </div>
 
           {/* Progress Pension */}
-          <div className="mt-4 pt-4 border-t" style={{ borderColor: 'var(--glass-border)' }}>
+          <div
+            className="mt-4 pt-4 border-t"
+            style={{ borderColor: 'var(--glass-border)' }}
+          >
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Proyeksi Dana Pensiun</span>
-                <span className="font-bold text-lg grad-text">{progressPercent.toFixed(1)}%</span>
+                <span
+                  className="text-xs font-medium"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  Proyeksi Dana Pensiun
+                </span>
+                <span className="font-bold text-lg grad-text">
+                  {progressPercent.toFixed(1)}%
+                </span>
               </div>
             </div>
             <div
@@ -264,8 +330,12 @@ export default function AvatarConditionBanner({
               />
             </div>
             <div className="flex items-center justify-between mt-2">
-              <span className="text-xs" style={{ color: 'var(--text-dim)' }}>Terproyeksi: {formatIDR(wealthForProgress)}</span>
-              <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Target: {formatIDR(targetPension)}</span>
+              <span className="text-xs" style={{ color: 'var(--text-dim)' }}>
+                Terproyeksi: {formatIDR(wealthForProgress)}
+              </span>
+              <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                Target: {formatIDR(targetPension)}
+              </span>
             </div>
           </div>
         </motion.div>
@@ -289,13 +359,23 @@ export default function AvatarConditionBanner({
               <span className="text-xl">💡</span>
             </div>
             <div>
-              <p className="font-semibold text-sm mb-1" style={{ color: config.color }}>Insight AI</p>
-              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>{config.message}</p>
+              <p
+                className="font-semibold text-sm mb-1"
+                style={{ color: config.color }}
+              >
+                Insight AI
+              </p>
+              <p
+                className="text-sm leading-relaxed"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                {config.message}
+              </p>
             </div>
           </div>
         </motion.div>
 
-        {/* Recommended Action - NEW SECTION to fill space */}
+        {/* Alokasi Aset Recommended*/}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -307,24 +387,41 @@ export default function AvatarConditionBanner({
             <div className="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
               <span className="text-sm">🎯</span>
             </div>
-            <h3 className="font-semibold text-sm" style={{ color: 'var(--text)' }}>Rekomendasi Alokasi Aset</h3>
+            <h3
+              className="font-semibold text-sm"
+              style={{ color: 'var(--text)' }}
+            >
+              Rekomendasi Alokasi Aset
+            </h3>
           </div>
 
           <div className="space-y-3">
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-              <p className="text-xs font-medium mb-1" style={{ color: 'var(--cyan)' }}>Instrumen Disarankan</p>
-              <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                {propCondition === 'good' ? 'Saham, reksadana saham, campuran' : 
-                 propCondition === 'normal' ? 'Obligasi, reksadana pendapatan tetap' : 
-                 'Dana darurat, kurangi pengeluaran, reksadana pasar uang'}
+              <p
+                className="text-xs font-medium mb-1"
+                style={{ color: 'var(--cyan)' }}
+              >
+                Instrumen Disarankan
+              </p>
+              <p
+                className="text-xs leading-relaxed"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                {recommendedAssetClass ||
+                  (propCondition === 'good'
+                    ? 'Saham, reksadana saham, campuran'
+                    : propCondition === 'normal'
+                      ? 'Obligasi, reksadana pendapatan tetap'
+                      : 'Dana darurat, kurangi pengeluaran, reksadana pasar uang')}
               </p>
             </div>
 
-            <button className="w-full py-2.5 rounded-xl text-xs font-bold transition-all hover:bg-cyan-500/20"
+            <button
+              className="w-full py-2.5 rounded-xl text-xs font-bold transition-all hover:bg-cyan-500/20"
               style={{
                 border: '1px solid var(--cyan)',
                 color: 'var(--cyan)',
-                background: 'rgba(0, 245, 255, 0.05)'
+                background: 'rgba(0, 245, 255, 0.05)',
               }}
             >
               Lihat Detail Strategi Investasi

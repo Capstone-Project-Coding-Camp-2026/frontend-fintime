@@ -36,10 +36,11 @@ export default function AnalysisResult({
   verdict,
   price,
   monthlyPayment,
-  remainingBudget,
+  // remainingBudget,
   totalPayment,
   selectedOption,
-  hasResult
+  hasResult,
+  alternatives = []
 }) {
   const data = [
     { name: 'Aman', value: goodPercent, color: '#4ade80' },
@@ -163,11 +164,11 @@ export default function AnalysisResult({
           { label: 'Harga', value: `Rp ${price.toLocaleString('id-ID')}` },
           { label: 'Total Pembayaran', value: `Rp ${totalPayment.toLocaleString('id-ID')}` },
           ...(selectedOption === 'paylater' ? [{ label: 'Cicilan/bulan', value: `Rp ${monthlyPayment.toLocaleString('id-ID')}` }] : []),
-          {
-            label: 'Sisa Budget',
-            value: `Rp ${remainingBudget.toLocaleString('id-ID')}`,
-            valueColor: remainingBudget >= 0 ? '#4ade80' : '#f87171',
-          },
+          // {
+          //   label: 'Sisa Budget',
+          //   value: `Rp ${remainingBudget.toLocaleString('id-ID')}`,
+          //   valueColor: remainingBudget >= 0 ? '#4ade80' : '#f87171',
+          // },
         ].map((item) => (
           <div
             key={item.label}
@@ -179,6 +180,60 @@ export default function AnalysisResult({
           </div>
         ))}
       </div>
+
+      {/* Komparasi Skenario */}
+      {alternatives && alternatives.length > 0 && (
+        <div className="mt-6 pt-5 border-t" style={{ borderColor: 'var(--glass-border)' }}>
+          <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--text)' }}>
+            Komparasi Skenario
+          </h4>
+          <div className="space-y-2">
+            {alternatives.map((alt, idx) => {
+              let tagColor = '#fbbf24';
+              let tagBg = 'rgba(251, 191, 36, 0.1)';
+              let label = 'Waspada';
+              
+              if (alt.recommendation === 'just_buy') {
+                tagColor = '#4ade80';
+                tagBg = 'rgba(74, 222, 128, 0.1)';
+                label = 'Aman';
+              } else if (alt.recommendation === 'dont_buy') {
+                tagColor = '#f87171';
+                tagBg = 'rgba(248, 113, 113, 0.1)';
+                label = 'Risiko Tinggi';
+              }
+
+              return (
+                <div
+                  key={idx}
+                  className="flex items-center justify-between p-3 rounded-xl border transition-all"
+                  style={{
+                    background: 'rgba(0, 245, 255, 0.02)',
+                    borderColor: 'rgba(0, 245, 255, 0.08)',
+                  }}
+                >
+                  <div>
+                    <p className="text-sm font-medium" style={{ color: 'var(--text)' }}>
+                      {alt.name}
+                    </p>
+                    <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
+                      {alt.monthly_payment > 0 
+                        ? `Cicilan Rp ${alt.monthly_payment.toLocaleString('id-ID')}/bln` 
+                        : `Total Rp ${alt.total_payment.toLocaleString('id-ID')}`}
+                    </p>
+                  </div>
+                  <div
+                    className="px-3 py-1 rounded-full text-xs font-bold"
+                    style={{ backgroundColor: tagBg, color: tagColor }}
+                  >
+                    {label}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </motion.div>
   )
 }
