@@ -165,7 +165,7 @@ export default function TransactionCard({ userId, onAddNew, onRefresh }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
-      className="rounded-2xl overflow-hidden"
+      className="rounded-2xl overflow-hidden h-full flex flex-col"
       style={{
         background:
           'linear-gradient(135deg, rgba(6, 21, 40, 0.95), rgba(2, 11, 24, 0.95))',
@@ -205,10 +205,10 @@ export default function TransactionCard({ userId, onAddNew, onRefresh }) {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
           <button
             onClick={onAddNew}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+            className="flex-1 sm:flex-none justify-center flex px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
             style={{
               background: 'linear-gradient(135deg, #00f5ff, #0096c7)',
               color: '#020b18',
@@ -218,7 +218,7 @@ export default function TransactionCard({ userId, onAddNew, onRefresh }) {
           </button>
           <button
             onClick={handleToggleLedger}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all hover:scale-105 relative"
+            className="flex-1 sm:flex-none justify-center flex px-3 py-1.5 rounded-lg text-xs font-medium transition-all hover:scale-105 relative"
             style={
               viewMode === 'ledger'
                 ? {

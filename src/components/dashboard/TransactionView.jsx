@@ -28,6 +28,7 @@ export default function TransactionView({
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
+      className="flex-1 flex flex-col min-h-0"
     >
       <div
         className="grid grid-cols-3 divide-x"
@@ -43,7 +44,7 @@ export default function TransactionView({
             Pemasukan
           </p>
 
-          <p className="font-semibold text-sm text-green-400">
+          <p className="font-semibold text-[11px] sm:text-sm text-green-400 truncate px-1">
             +Rp {formatCurrency(totalIncome)}
           </p>
         </div>
@@ -53,7 +54,7 @@ export default function TransactionView({
             Pengeluaran
           </p>
 
-          <p className="font-semibold text-sm text-red-400">
+          <p className="font-semibold text-[11px] sm:text-sm text-red-400 truncate px-1">
             -Rp {formatCurrency(totalExpense)}
           </p>
         </div>
@@ -63,7 +64,7 @@ export default function TransactionView({
             Saldo
           </p>
 
-          <p className="font-semibold text-sm text-cyan-400">
+          <p className="font-semibold text-[11px] sm:text-sm text-cyan-400 truncate px-1">
             Rp {formatCurrency(balance)}
           </p>
         </div>
@@ -98,7 +99,7 @@ export default function TransactionView({
         })}
       </div>
 
-      <div className="p-5 pt-3 space-y-3 max-h-[350px] overflow-y-auto">
+      <div className="p-5 pt-3 space-y-3 flex-1 overflow-y-auto custom-scrollbar">
         {loading ? (
           <div className="text-center py-8 text-gray-400">
             Memuat...

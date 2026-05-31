@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import {
@@ -15,7 +15,16 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [rememberMe, setRememberMe] = useState(false)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('fintime_remembered_email')
+    if (savedEmail) {
+      setEmail(savedEmail)
+      setRememberMe(true)
+    }
+  }, [])
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -32,14 +41,23 @@ export default function LoginPage() {
         localStorage.setItem('fintime_token', data.token)
         localStorage.setItem('fintime_user', JSON.stringify(data.user))
         
+        if (rememberMe) {
+          localStorage.setItem('fintime_remembered_email', email)
+        } else {
+          localStorage.removeItem('fintime_remembered_email')
+        }
+        
+        // Tetap biarkan status loading = true selama proses redirect
         setTimeout(() => {
           navigate('/dashboard')
         }, 1000)
+      } else {
+        setError('Terjadi kesalahan pada respons server.')
+        setLoading(false)
       }
     } catch (err) {
       console.error('Login error:', err)
       setError(err.response?.data?.message || 'Email atau password salah.')
-    } finally {
       setLoading(false)
     }
   }
@@ -260,7 +278,12 @@ export default function LoginPage() {
 
               <div className="flex items-center justify-between">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" className="accent-[#00f5ff]" />
+                  <input 
+                    type="checkbox" 
+                    className="accent-[#00f5ff]"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                  />
                   <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Ingat saya</span>
                 </label>
                 <Link

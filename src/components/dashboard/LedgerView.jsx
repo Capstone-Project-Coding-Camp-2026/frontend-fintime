@@ -21,6 +21,7 @@ export default function LedgerView({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 20 }}
+      className="flex-1 flex flex-col min-h-0"
     >
       <div className="px-4 py-3 border-b mb-1" style={{ borderColor: 'rgba(0, 245, 255, 0.08)' }}>
         <div 
@@ -43,7 +44,7 @@ export default function LedgerView({
           <ChevronDown size={16} className="absolute right-4 z-0 pointer-events-none" style={{ color: '#94a3b8' }} />
         </div>
       </div>
-      <div className="p-4 space-y-3 max-h-[400px] overflow-y-auto">
+      <div className="p-4 space-y-3 flex-1 overflow-y-auto custom-scrollbar">
         {loading ? (
           <div className="text-center py-8">
             <Loader2 className="animate-spin mx-auto" />
@@ -90,29 +91,32 @@ export default function LedgerView({
               </div>
 
               <div className="flex gap-2">
-                <select
-                  defaultValue={tx.categoryLabel || 'lainnya'}
-                  id={`cat-select-${tx.id}`}
-                  className="flex-1 px-4 py-2 rounded-xl outline-none"
-                  style={{
-                    background: 'rgb(2, 17, 31)',
-                    border: '1px solid rgba(0, 245, 255, 0.15)',
-                    color: 'white',
-                  }}
-                >
-                  {ALL_CATEGORIES.map((cat) => (
-                    <option
-                      key={cat}
-                      value={cat}
-                      style={{
-                        background: 'rgb(2, 17, 31)',
-                        color: 'white',
-                      }}
-                    >
-                      {CATEGORY_LABELS[cat]}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative flex-1">
+                  <select
+                    defaultValue={tx.categoryLabel || 'lainnya'}
+                    id={`cat-select-${tx.id}`}
+                    className="w-full px-4 py-2 rounded-xl outline-none appearance-none cursor-pointer pr-10"
+                    style={{
+                      background: 'rgb(2, 17, 31)',
+                      border: '1px solid rgba(0, 245, 255, 0.15)',
+                      color: 'white',
+                    }}
+                  >
+                    {ALL_CATEGORIES.map((cat) => (
+                      <option
+                        key={cat}
+                        value={cat}
+                        style={{
+                          background: 'rgb(2, 17, 31)',
+                          color: 'white',
+                        }}
+                      >
+                        {CATEGORY_LABELS[cat]}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: '#94a3b8' }} />
+                </div>
 
                 <button
                   disabled={savingId === tx.id}

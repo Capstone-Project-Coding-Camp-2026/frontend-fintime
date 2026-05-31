@@ -389,12 +389,14 @@ export default function BudgetCard({ onRefresh }) {
                   Limit Budget (Rp)
                 </label>
                 <input
-                  type="number"
-                  value={formData.limit}
-                  onChange={(e) => setFormData({ ...formData, limit: e.target.value })}
+                  type="text"
+                  value={formData.limit ? new Intl.NumberFormat('id-ID').format(formData.limit) : ''}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '')
+                    setFormData({ ...formData, limit: val })
+                  }}
                   required
-                  min="1000"
-                  placeholder="Contoh: 500000"
+                  placeholder="Contoh: 500.000"
                   className="w-full px-4 py-3 rounded-xl outline-none"
                   style={{
                     background: '#02111f',

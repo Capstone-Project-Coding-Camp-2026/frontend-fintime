@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
-import { Target, Plus, Pencil, Trash2, Calendar, TrendingUp, Award, CheckCircle, Clock, ChevronDown } from 'lucide-react'
+import { Target, Plus, Pencil, Trash2, Calendar, Wallet, Award, CheckCircle, Clock, ChevronDown, History } from 'lucide-react'
 import { useToast } from '../../context/ToastContext'
 import api from '../../lib/api'
 
@@ -11,6 +11,14 @@ const formatCurrency = (value) => {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(value)
+}
+
+const formatDate = (date) => {
+  return new Date(date).toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
 }
 
 const GOAL_CATEGORIES = [
@@ -46,6 +54,8 @@ export default function GoalCard({ onRefresh }) {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [showAddSavings, setShowAddSavings] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
+  const [selectedHistoryGoal, setSelectedHistoryGoal] = useState(null)
   const [editingId, setEditingId] = useState(null)
   const [selectedGoal, setSelectedGoal] = useState(null)
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false)
@@ -341,6 +351,17 @@ export default function GoalCard({ onRefresh }) {
                         <>
                           <button
                             onClick={() => {
+                              setSelectedHistoryGoal(goal)
+                              setShowHistory(true)
+                            }}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/5 hover:bg-blue-500/10 transition-all"
+                            style={{ color: '#3b82f6', border: '1px solid rgba(59,130,246,0.1)' }}
+                            title="Riwayat Tabungan"
+                          >
+                            <History size={14} />
+                          </button>
+                          <button
+                            onClick={() => {
                               setSelectedGoal(goal)
                               setSavingsAmount('')
                               setShowAddSavings(true)
@@ -349,7 +370,7 @@ export default function GoalCard({ onRefresh }) {
                             style={{ color: '#22c55e', border: '1px solid rgba(34,197,94,0.1)' }}
                             title="Tambah Tabungan"
                           >
-                            <TrendingUp size={14} />
+                            <Wallet size={14} />
                           </button>
                           <button
                             onClick={() => handleEdit(goal)}
@@ -564,12 +585,14 @@ export default function GoalCard({ onRefresh }) {
                     Target Amount (Rp)
                   </label>
                   <input
-                    type="number"
-                    value={formData.targetAmount}
-                    onChange={(e) => setFormData({ ...formData, targetAmount: e.target.value })}
+                    type="text"
+                    value={formData.targetAmount ? new Intl.NumberFormat('id-ID').format(formData.targetAmount) : ''}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '')
+                      setFormData({ ...formData, targetAmount: val })
+                    }}
                     required
-                    min="1000"
-                    placeholder="15000000"
+                    placeholder="15.000.000"
                     className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none text-sm sm:text-base"
                     style={{
                       background: '#02111f',
@@ -584,11 +607,13 @@ export default function GoalCard({ onRefresh }) {
                     Sudah Tersimpan (Rp)
                   </label>
                   <input
-                    type="number"
-                    value={formData.currentAmount}
-                    onChange={(e) => setFormData({ ...formData, currentAmount: e.target.value })}
-                    min="0"
-                    placeholder="5000000"
+                    type="text"
+                    value={formData.currentAmount ? new Intl.NumberFormat('id-ID').format(formData.currentAmount) : ''}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '')
+                      setFormData({ ...formData, currentAmount: val })
+                    }}
+                    placeholder="5.000.000"
                     className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none text-sm sm:text-base"
                     style={{
                       background: '#02111f',
@@ -706,12 +731,14 @@ export default function GoalCard({ onRefresh }) {
                   Jumlah Tabungan (Rp)
                 </label>
                 <input
-                  type="number"
-                  value={savingsAmount}
-                  onChange={(e) => setSavingsAmount(e.target.value)}
+                  type="text"
+                  value={savingsAmount ? new Intl.NumberFormat('id-ID').format(savingsAmount) : ''}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '')
+                    setSavingsAmount(val)
+                  }}
                   required
-                  min="1000"
-                  placeholder="500000"
+                  placeholder="500.000"
                   className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none text-sm sm:text-base"
                   style={{
                     background: '#02111f',
@@ -742,11 +769,80 @@ export default function GoalCard({ onRefresh }) {
                     color: 'white',
                   }}
                 >
-                  <TrendingUp size={16} />
+                  <Wallet size={16} />
                   Simpan
                 </button>
               </div>
             </form>
+          </motion.div>
+        </div>
+      )}
+
+      {/* History Modal */}
+      {showHistory && selectedHistoryGoal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowHistory(false)}
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative w-full sm:max-w-md rounded-2xl p-4 sm:p-6 max-h-[90vh] sm:max-h-[85vh] overflow-y-auto custom-scrollbar"
+            style={{
+              background: 'rgba(6,21,40,0.95)',
+              backdropFilter: 'blur(30px)',
+              border: '1px solid rgba(0,245,255,0.2)',
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setShowHistory(false)}
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/10 transition-all"
+              style={{ color: '#7aa6c2' }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+            <h3 className="text-lg sm:text-xl font-bold mb-2 pr-8">Riwayat Tabungan</h3>
+            <p className="text-sm mb-4 sm:mb-6" style={{ color: '#7aa6c2' }}>
+              {selectedHistoryGoal.name}
+            </p>
+
+            <div className="space-y-3">
+              {(!selectedHistoryGoal.savings || selectedHistoryGoal.savings.length === 0) ? (
+                <p className="text-center text-sm py-4" style={{ color: '#7aa6c2' }}>
+                  Belum ada riwayat tabungan.
+                </p>
+              ) : (
+                selectedHistoryGoal.savings.map((saving, index) => (
+                  <div key={index} className="flex justify-between items-center p-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)' }}>
+                    <div>
+                      <p className="text-sm font-semibold text-white">{formatCurrency(saving.amount)}</p>
+                      <p className="text-xs" style={{ color: '#7aa6c2' }}>{formatDate(saving.savedAt)}</p>
+                    </div>
+                    {saving.notes && <span className="text-xs" style={{ color: '#5a8aab' }}>{saving.notes}</span>}
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="mt-6">
+              <button
+                type="button"
+                onClick={() => setShowHistory(false)}
+                className="w-full px-4 py-3 rounded-xl font-semibold text-sm sm:text-base"
+                style={{
+                  background: 'rgba(248,113,113,0.1)',
+                  border: '1px solid rgba(248,113,113,0.2)',
+                  color: '#f87171',
+                }}
+              >
+                Tutup
+              </button>
+            </div>
           </motion.div>
         </div>
       )}

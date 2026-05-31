@@ -42,7 +42,6 @@ export default function DashboardPage() {
   const [selectedOption, setSelectedOption] = useState('cash')
   const [installmentMonths, setInstallmentMonths] = useState('12')
   const [interestRate, setInterestRate] = useState('2')
-  const [monthlyBudget, setMonthlyBudget] = useState('')
 
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [hasResult, setHasResult] = useState(false)
@@ -137,56 +136,10 @@ export default function DashboardPage() {
       const itemPriceVal = parseFloat(price) || 0
 
       const payload = {
-        user_profile: {
-          age: u?.age || 22,
-          total_income: monthlyIncome,
-          monthly_expenses: monthlyExpense,
-          current_savings: totalBalance,
-
-          has_emergency_fund: totalBalance >= monthlyExpense * 3 ? 1 : 0,
-
-          emergency_fund_months:
-            monthlyExpense > 0
-              ? Number((totalBalance / monthlyExpense).toFixed(1))
-              : 0,
-
-          has_kpr: 0,
-          has_vehicle_credit: 0,
-          pinjol_active: 0,
-          total_debt: 0,
-
-          credit_card_utilization: 0.2,
-
-          financial_literacy_score: 70,
-
-          employment_type: 'full_time',
-
-          city_tier: 'tier_2',
-
-          paylater_usage_history:
-            selectedOption === 'paylater' ? 'medium' : 'low',
-
-          impulse_spending_tendency: 'medium',
-
-          savings_rate:
-            monthlyIncome > 0
-              ? Number(
-                  ((monthlyIncome - monthlyExpense) / monthlyIncome).toFixed(2),
-                )
-              : 0,
-        },
-
-        simulation: {
-          item_price: itemPriceVal,
-
-          available_cash: totalBalance,
-
-          paylater_interest_rate:
-            selectedOption === 'paylater' ? parseFloat(interestRate) / 100 : 0,
-
-          paylater_tenor_months:
-            selectedOption === 'paylater' ? parseInt(installmentMonths) : 1,
-        },
+        itemPrice: itemPriceVal,
+        selectedOption: selectedOption,
+        installmentMonths: parseInt(installmentMonths) || 1,
+        interestRate: parseFloat(interestRate) || 0,
       }
       const response = await api.post('/ai/whatif', payload)
 
@@ -218,15 +171,16 @@ export default function DashboardPage() {
         }
 
         // Calculate payment metrics
+        const interestPerMonth = parseFloat(interestRate) / 100;
+        const months = parseInt(installmentMonths) || 1;
         const monthlyPay =
           selectedOption === 'paylater'
-            ? (itemPriceVal / parseInt(installmentMonths)) *
-              (1 + parseFloat(interestRate) / 100)
+            ? (itemPriceVal / months) + (itemPriceVal * interestPerMonth)
             : itemPriceVal
 
         const totalPay =
           selectedOption === 'paylater'
-            ? monthlyPay * parseInt(installmentMonths)
+            ? monthlyPay * months
             : itemPriceVal
 
         setAnalysisData({
@@ -236,7 +190,7 @@ export default function DashboardPage() {
           verdict: verdict,
           monthlyPayment: Math.round(monthlyPay),
           remainingBudget: Math.round(
-            data.cashflow_after || data.cashflow_after_purchase || 0,
+            data.financial_impact?.post_purchase_cashflow || data.financial_impact?.monthly_cashflow_after || data.cashflow_after || data.cashflow_after_purchase || 0,
           ),
           totalPayment: Math.round(totalPay),
         })
@@ -478,8 +432,6 @@ export default function DashboardPage() {
                   setInstallmentMonths={setInstallmentMonths}
                   interestRate={interestRate}
                   setInterestRate={setInterestRate}
-                  monthlyBudget={monthlyBudget}
-                  setMonthlyBudget={setMonthlyBudget}
                   onAnalyze={handleAnalyze}
                   isAnalyzing={isAnalyzing}
                 />

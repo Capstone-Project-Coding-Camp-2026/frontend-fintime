@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
-import { AlertTriangle, Plus, Pencil, Trash2, Calendar, CreditCard, TrendingDown, CheckCircle, ChevronDown } from 'lucide-react'
+import { AlertTriangle, Plus, Pencil, Trash2, Calendar, CreditCard, Wallet, CheckCircle, ChevronDown, History } from 'lucide-react'
 import { useToast } from '../../context/ToastContext'
 import api from '../../lib/api'
 
@@ -36,6 +36,8 @@ export default function DebtCard({ onRefresh }) {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [showPayment, setShowPayment] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
+  const [selectedHistoryDebt, setSelectedHistoryDebt] = useState(null)
   const [editingId, setEditingId] = useState(null)
   const [selectedDebt, setSelectedDebt] = useState(null)
   const [showTypeDropdown, setShowTypeDropdown] = useState(false)
@@ -341,6 +343,17 @@ export default function DebtCard({ onRefresh }) {
                     <div className="flex items-center gap-1.5 shrink-0">
                       <button
                         onClick={() => {
+                          setSelectedHistoryDebt(debt)
+                          setShowHistory(true)
+                        }}
+                        className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/5 hover:bg-blue-500/10 transition-all"
+                        style={{ color: '#3b82f6', border: '1px solid rgba(59,130,246,0.1)' }}
+                        title="Riwayat Pembayaran"
+                      >
+                        <History size={14} />
+                      </button>
+                      <button
+                        onClick={() => {
                           setSelectedDebt(debt)
                           setPaymentAmount('')
                           setShowPayment(true)
@@ -349,7 +362,7 @@ export default function DebtCard({ onRefresh }) {
                         style={{ color: '#22c55e', border: '1px solid rgba(34,197,94,0.1)' }}
                         title="Catat Pembayaran"
                       >
-                        <TrendingDown size={14} />
+                        <Wallet size={14} />
                       </button>
                       <button
                         onClick={() => handleEdit(debt)}
@@ -576,12 +589,14 @@ export default function DebtCard({ onRefresh }) {
                     Total Pinjaman (Rp)
                   </label>
                   <input
-                    type="number"
-                    value={formData.totalAmount}
-                    onChange={(e) => setFormData({ ...formData, totalAmount: e.target.value })}
+                    type="text"
+                    value={formData.totalAmount ? new Intl.NumberFormat('id-ID').format(formData.totalAmount) : ''}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '')
+                      setFormData({ ...formData, totalAmount: val })
+                    }}
                     required
-                    min="1000"
-                    placeholder="25000000"
+                    placeholder="25.000.000"
                     className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none text-sm sm:text-base"
                     style={{
                       background: '#02111f',
@@ -596,11 +611,13 @@ export default function DebtCard({ onRefresh }) {
                     Sisa Hutang (Rp)
                   </label>
                   <input
-                    type="number"
-                    value={formData.remainingAmount}
-                    onChange={(e) => setFormData({ ...formData, remainingAmount: e.target.value })}
-                    min="0"
-                    placeholder="15000000"
+                    type="text"
+                    value={formData.remainingAmount ? new Intl.NumberFormat('id-ID').format(formData.remainingAmount) : ''}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '')
+                      setFormData({ ...formData, remainingAmount: val })
+                    }}
+                    placeholder="15.000.000"
                     className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none text-sm sm:text-base"
                     style={{
                       background: '#02111f',
@@ -655,11 +672,13 @@ export default function DebtCard({ onRefresh }) {
                     Cicilan/Bulan (Rp)
                   </label>
                   <input
-                    type="number"
-                    value={formData.monthlyPayment}
-                    onChange={(e) => setFormData({ ...formData, monthlyPayment: e.target.value })}
-                    min="0"
-                    placeholder="800000"
+                    type="text"
+                    value={formData.monthlyPayment ? new Intl.NumberFormat('id-ID').format(formData.monthlyPayment) : ''}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '')
+                      setFormData({ ...formData, monthlyPayment: val })
+                    }}
+                    placeholder="800.000"
                     className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none text-sm sm:text-base"
                     style={{
                       background: '#02111f',
@@ -772,13 +791,18 @@ export default function DebtCard({ onRefresh }) {
                   Jumlah Pembayaran (Rp)
                 </label>
                 <input
-                  type="number"
-                  value={paymentAmount}
-                  onChange={(e) => setPaymentAmount(e.target.value)}
+                  type="text"
+                  value={paymentAmount ? new Intl.NumberFormat('id-ID').format(paymentAmount) : ''}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '')
+                    if (val === '' || parseInt(val) <= (selectedDebt?.remainingAmount || 0)) {
+                      setPaymentAmount(val)
+                    } else {
+                      setPaymentAmount(selectedDebt?.remainingAmount?.toString() || val)
+                    }
+                  }}
                   required
-                  min="1000"
-                  max={selectedDebt.remainingAmount}
-                  placeholder="800000"
+                  placeholder="800.000"
                   className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none text-sm sm:text-base"
                   style={{
                     background: '#02111f',
@@ -814,6 +838,75 @@ export default function DebtCard({ onRefresh }) {
                 </button>
               </div>
             </form>
+          </motion.div>
+        </div>
+      )}
+
+      {/* History Modal */}
+      {showHistory && selectedHistoryDebt && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowHistory(false)}
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative w-full sm:max-w-md rounded-2xl p-4 sm:p-6 max-h-[90vh] sm:max-h-[85vh] overflow-y-auto custom-scrollbar"
+            style={{
+              background: 'rgba(6,21,40,0.95)',
+              backdropFilter: 'blur(30px)',
+              border: '1px solid rgba(0,245,255,0.2)',
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setShowHistory(false)}
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/10 transition-all"
+              style={{ color: '#7aa6c2' }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+            <h3 className="text-lg sm:text-xl font-bold mb-2 pr-8">Riwayat Pembayaran</h3>
+            <p className="text-sm mb-4 sm:mb-6" style={{ color: '#7aa6c2' }}>
+              {selectedHistoryDebt.name}
+            </p>
+
+            <div className="space-y-3">
+              {(!selectedHistoryDebt.payments || selectedHistoryDebt.payments.length === 0) ? (
+                <p className="text-center text-sm py-4" style={{ color: '#7aa6c2' }}>
+                  Belum ada riwayat pembayaran.
+                </p>
+              ) : (
+                selectedHistoryDebt.payments.map((payment, index) => (
+                  <div key={index} className="flex justify-between items-center p-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)' }}>
+                    <div>
+                      <p className="text-sm font-semibold text-white">{formatCurrency(payment.amount)}</p>
+                      <p className="text-xs" style={{ color: '#7aa6c2' }}>{formatDate(payment.paidAt)}</p>
+                    </div>
+                    {payment.notes && <span className="text-xs" style={{ color: '#5a8aab' }}>{payment.notes}</span>}
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="mt-6">
+              <button
+                type="button"
+                onClick={() => setShowHistory(false)}
+                className="w-full px-4 py-3 rounded-xl font-semibold text-sm sm:text-base"
+                style={{
+                  background: 'rgba(248,113,113,0.1)',
+                  border: '1px solid rgba(248,113,113,0.2)',
+                  color: '#f87171',
+                }}
+              >
+                Tutup
+              </button>
+            </div>
           </motion.div>
         </div>
       )}

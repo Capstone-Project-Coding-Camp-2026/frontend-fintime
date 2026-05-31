@@ -67,9 +67,10 @@ export default function AccountCard({ userId, onDelete, onAddNew }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
+        className="h-full"
       >
         <div
-          className="rounded-2xl overflow-hidden"
+          className="rounded-2xl overflow-hidden h-full flex flex-col"
           style={{
             background: 'linear-gradient(135deg, rgba(6, 21, 40, 0.95), rgba(2, 11, 24, 0.95))',
             border: '1px solid rgba(0, 245, 255, 0.1)',
@@ -102,7 +103,7 @@ export default function AccountCard({ userId, onDelete, onAddNew }) {
             </div>
           )}
 
-          <div className="p-5 pt-3 space-y-3 max-h-[300px] overflow-y-auto">
+          <div className="p-5 pt-3 space-y-3 flex-1 overflow-y-auto custom-scrollbar">
             {loading ? (
               <div className="text-center py-8">
                 <p className="text-sm" style={{ color: 'var(--text-dim)' }}>Memuat...</p>
