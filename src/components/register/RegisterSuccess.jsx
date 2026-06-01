@@ -40,7 +40,7 @@ export function RegisterSuccess({ data }) {
           { label: 'Nama', value: data.fullName },
           { label: 'Email', value: data.email },
           { label: 'Telepon', value: data.phone },
-          { label: 'Pendapatan', value: `Rp ${INCOME_OPTIONS.find(o => o.key === data.monthlyIncome)?.label || '—'} / bulan` },
+          { label: 'Pendapatan', value: `Rp ${data.monthlyIncome ? parseInt(data.monthlyIncome).toLocaleString('id-ID') : '—'} / bulan` },
           { label: 'Target Pensiun', value: `${data.retirementAge} tahun` },
           { label: 'Akun Dihubungkan', value: `${(data.linkedAccounts || []).length} akun` },
         ].map((item) => (
