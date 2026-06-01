@@ -53,6 +53,7 @@ export default function AccountCard({ userId, onDelete, onAddNew }) {
         .map(a => a.id === updatedAccount.id ? updatedAccount : a)
         .reduce((sum, acc) => sum + (acc.balance || 0), 0)
       setTotalBalance(newTotal)
+      onDelete?.() // Triggers dashboard refresh to update analytics/transactions if needed
     }
     setEditModalOpen(false)
     setSelectedAccount(null)

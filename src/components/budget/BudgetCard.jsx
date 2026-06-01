@@ -23,6 +23,7 @@ export default function BudgetCard({ onRefresh }) {
   const { success, error: showError, warning } = useToast()
   const [budgets, setBudgets] = useState([])
   const [loading, setLoading] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
@@ -70,8 +71,12 @@ export default function BudgetCard({ onRefresh }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
+      setIsSubmitting(true)
       const storedUser = localStorage.getItem('fintime_user')
-      if (!storedUser) return
+      if (!storedUser) {
+        setIsSubmitting(false)
+        return
+      }
       const user = JSON.parse(storedUser)
 
       const payload = {
@@ -97,6 +102,8 @@ export default function BudgetCard({ onRefresh }) {
     } catch (err) {
       console.error('Failed to save budget:', err)
       showError('Gagal menyimpan budget')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -421,13 +428,25 @@ export default function BudgetCard({ onRefresh }) {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-3 rounded-xl font-semibold"
+                  disabled={isSubmitting}
+                  className="flex-1 px-4 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all"
                   style={{
-                    background: 'linear-gradient(135deg, #00f5ff, #0096c7)',
+                    background: isSubmitting ? 'rgba(0, 245, 255, 0.5)' : 'linear-gradient(135deg, #00f5ff, #0096c7)',
                     color: '#020b18',
+                    opacity: isSubmitting ? 0.7 : 1,
+                    cursor: isSubmitting ? 'not-allowed' : 'pointer'
                   }}
                 >
-                  {editingId ? 'Update' : 'Simpan'}
+                  {isSubmitting ? (
+                    <>
+                      <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>
+                        <span className="block w-4 h-4 border-2 border-[#020b18] border-t-transparent rounded-full" />
+                      </motion.div>
+                      Menyimpan...
+                    </>
+                  ) : (
+                    editingId ? 'Update' : 'Simpan'
+                  )}
                 </button>
               </div>
             </form>

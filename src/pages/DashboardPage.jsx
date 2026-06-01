@@ -415,7 +415,7 @@ export default function DashboardPage() {
                     setDefaultTransactionType('expense')
                     setShowAddTransaction(true)
                   }}
-                  onRefreshParent={handleRefresh}
+                  onRefresh={handleRefresh}
                 />
               </div>
             </section>

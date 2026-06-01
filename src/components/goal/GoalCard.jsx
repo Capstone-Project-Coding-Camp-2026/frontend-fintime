@@ -52,6 +52,7 @@ export default function GoalCard({ onRefresh }) {
   const { success, error: showError } = useToast()
   const [goals, setGoals] = useState([])
   const [loading, setLoading] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [showAddSavings, setShowAddSavings] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
@@ -100,8 +101,12 @@ export default function GoalCard({ onRefresh }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
+      setIsSubmitting(true)
       const storedUser = localStorage.getItem('fintime_user')
-      if (!storedUser) return
+      if (!storedUser) {
+        setIsSubmitting(false)
+        return
+      }
       const user = JSON.parse(storedUser)
 
       const payload = {
@@ -130,6 +135,8 @@ export default function GoalCard({ onRefresh }) {
     } catch (err) {
       console.error('Failed to save goal:', err)
       showError('Gagal menyimpan target')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -138,6 +145,7 @@ export default function GoalCard({ onRefresh }) {
     if (!selectedGoal) return
 
     try {
+      setIsSubmitting(true)
       await api.post(`/goals/${selectedGoal.id}/savings`, {
         amount: parseFloat(savingsAmount),
       })
@@ -150,6 +158,8 @@ export default function GoalCard({ onRefresh }) {
     } catch (err) {
       console.error('Failed to add savings:', err)
       showError('Gagal menambahkan tabungan')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -675,13 +685,25 @@ export default function GoalCard({ onRefresh }) {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base"
+                  disabled={isSubmitting}
+                  className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base flex items-center justify-center gap-2 transition-all"
                   style={{
-                    background: 'linear-gradient(135deg, #00f5ff, #0096c7)',
+                    background: isSubmitting ? 'rgba(0, 245, 255, 0.5)' : 'linear-gradient(135deg, #00f5ff, #0096c7)',
                     color: '#020b18',
+                    opacity: isSubmitting ? 0.7 : 1,
+                    cursor: isSubmitting ? 'not-allowed' : 'pointer'
                   }}
                 >
-                  {editingId ? 'Update' : 'Simpan'}
+                  {isSubmitting ? (
+                    <>
+                      <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>
+                        <span className="block w-4 h-4 border-2 border-[#020b18] border-t-transparent rounded-full" />
+                      </motion.div>
+                      Menyimpan...
+                    </>
+                  ) : (
+                    editingId ? 'Update' : 'Simpan'
+                  )}
                 </button>
               </div>
             </form>
@@ -763,14 +785,28 @@ export default function GoalCard({ onRefresh }) {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl font-semibold flex items-center justify-center gap-2 text-sm sm:text-base"
+                  disabled={isSubmitting}
+                  className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl font-semibold flex items-center justify-center gap-2 text-sm sm:text-base transition-all"
                   style={{
-                    background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                    background: isSubmitting ? 'rgba(34, 197, 94, 0.5)' : 'linear-gradient(135deg, #22c55e, #16a34a)',
                     color: 'white',
+                    opacity: isSubmitting ? 0.7 : 1,
+                    cursor: isSubmitting ? 'not-allowed' : 'pointer'
                   }}
                 >
-                  <Wallet size={16} />
-                  Simpan
+                  {isSubmitting ? (
+                    <>
+                      <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>
+                        <span className="block w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                      </motion.div>
+                      Menyimpan...
+                    </>
+                  ) : (
+                    <>
+                      <Wallet size={16} />
+                      Simpan
+                    </>
+                  )}
                 </button>
               </div>
             </form>

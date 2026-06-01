@@ -34,6 +34,7 @@ export default function DebtCard({ onRefresh }) {
   const { success, error: showError, warning } = useToast()
   const [debts, setDebts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [showPayment, setShowPayment] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
@@ -86,8 +87,12 @@ export default function DebtCard({ onRefresh }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
+      setIsSubmitting(true)
       const storedUser = localStorage.getItem('fintime_user')
-      if (!storedUser) return
+      if (!storedUser) {
+        setIsSubmitting(false)
+        return
+      }
       const user = JSON.parse(storedUser)
 
       const payload = {
@@ -120,6 +125,8 @@ export default function DebtCard({ onRefresh }) {
     } catch (err) {
       console.error('Failed to save debt:', err)
       showError('Gagal menyimpan hutang')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -128,6 +135,7 @@ export default function DebtCard({ onRefresh }) {
     if (!selectedDebt) return
 
     try {
+      setIsSubmitting(true)
       await api.post(`/debts/${selectedDebt.id}/payments`, {
         amount: parseFloat(paymentAmount),
         date: new Date().toISOString(),
@@ -142,6 +150,8 @@ export default function DebtCard({ onRefresh }) {
     } catch (err) {
       console.error('Failed to record payment:', err)
       showError('Gagal mencatat pembayaran')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -738,13 +748,25 @@ export default function DebtCard({ onRefresh }) {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base"
+                  disabled={isSubmitting}
+                  className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base flex items-center justify-center gap-2 transition-all"
                   style={{
-                    background: 'linear-gradient(135deg, #00f5ff, #0096c7)',
+                    background: isSubmitting ? 'rgba(0, 245, 255, 0.5)' : 'linear-gradient(135deg, #00f5ff, #0096c7)',
                     color: '#020b18',
+                    opacity: isSubmitting ? 0.7 : 1,
+                    cursor: isSubmitting ? 'not-allowed' : 'pointer'
                   }}
                 >
-                  {editingId ? 'Update' : 'Simpan'}
+                  {isSubmitting ? (
+                    <>
+                      <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>
+                        <span className="block w-4 h-4 border-2 border-[#020b18] border-t-transparent rounded-full" />
+                      </motion.div>
+                      Menyimpan...
+                    </>
+                  ) : (
+                    editingId ? 'Update' : 'Simpan'
+                  )}
                 </button>
               </div>
             </form>
@@ -827,14 +849,28 @@ export default function DebtCard({ onRefresh }) {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
+                  disabled={isSubmitting}
+                  className="flex-1 px-4 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all"
                   style={{
-                    background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                    background: isSubmitting ? 'rgba(34, 197, 94, 0.5)' : 'linear-gradient(135deg, #22c55e, #16a34a)',
                     color: 'white',
+                    opacity: isSubmitting ? 0.7 : 1,
+                    cursor: isSubmitting ? 'not-allowed' : 'pointer'
                   }}
                 >
-                  <CheckCircle size={16} />
-                  Bayar
+                  {isSubmitting ? (
+                    <>
+                      <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>
+                        <span className="block w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                      </motion.div>
+                      Memproses...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle size={16} />
+                      Bayar
+                    </>
+                  )}
                 </button>
               </div>
             </form>
