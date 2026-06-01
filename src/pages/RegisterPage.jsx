@@ -168,15 +168,11 @@ export default function RegisterPage() {
     setOtpError('')
     try {
       // Panggil Register DAN Verify OTP sekaligus
-      const response = await api.post('/auth/register', {
+      await api.post('/auth/register', {
         ...formData,
         otp: otpCode,
       })
-      const data = response.data.data || response.data
-      if (data.token) {
-        localStorage.setItem('fintime_token', data.token)
-        localStorage.setItem('fintime_user', JSON.stringify(data.user))
-      }
+      // Berhasil mendaftar, tapi TIDAK otomatis login
       setShowOtp(false)
       setIsSuccess(true)
     } catch (err) {
@@ -499,17 +495,11 @@ export default function RegisterPage() {
           {isSuccess && (
             <div className="flex flex-col gap-3 mt-6">
               <Link
-                to="/dashboard"
+                to="/login"
                 className="btn-primary flex items-center justify-center gap-2 px-6 py-3 text-sm font-extrabold rounded-full no-underline"
               >
-                Mulai Perjalanan Finansialmu <ArrowRight size={14} />
+                Lanjut ke Halaman Login <ArrowRight size={14} />
               </Link>
-              {/* <Link
-                to="/login"
-                className="btn-ghost flex items-center justify-center gap-2 px-6 py-3 text-sm font-bold rounded-full no-underline"
-              >
-                Masuk ke Akun
-              </Link> */}
             </div>
           )}
         </div>
