@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import {
@@ -79,31 +79,18 @@ export default function RegisterPage() {
     } else {
       setIsLoading(true)
       try {
-        const response = await api.post('/auth/register', formData)
-
-        const data = response.data.data || response.data
-
-        // Simpan token sementara untuk verify-otp nanti
-        if (data.token) {
-          localStorage.setItem('fintime_token', data.token)
-          localStorage.setItem('fintime_user', JSON.stringify(data.user))
-        }
-
-        // Kirim OTP ke email user
+        // 1. Kirim OTP ke email user (TIDAK register dulu)
         setRegisteredEmail(formData.email)
-        try {
-          await api.post('/mock/send-otp', { email: formData.email })
-        } catch (otpErr) {
-          console.warn('OTP send failed (mock):', otpErr)
-        }
+        await api.post('/mock/send-otp', { email: formData.email })
 
+        // 2. Tampilkan layar OTP
         setShowOtp(true)
         setOtpCountdown(60)
         setOtpValues(['', '', '', '', '', ''])
       } catch (err) {
-        console.error('Register error:', err)
+        console.error('OTP send error:', err)
         setError(
-          err.response?.data?.message || 'Gagal mendaftar. Silakan coba lagi.',
+          err.response?.data?.message || 'Gagal mengirim OTP. Pastikan email Anda valid.'
         )
       } finally {
         setIsLoading(false)
@@ -164,8 +151,10 @@ export default function RegisterPage() {
       setOtpCountdown(60)
       setOtpValues(['', '', '', '', '', ''])
       setOtpError('')
+      alert('Kode OTP baru telah berhasil dikirim ulang ke email Anda!')
     } catch (err) {
       console.error('Resend OTP failed:', err)
+      alert('Gagal mengirim ulang OTP.')
     }
   }
 
@@ -178,8 +167,9 @@ export default function RegisterPage() {
     setOtpLoading(true)
     setOtpError('')
     try {
-      const response = await api.post('/auth/verify-otp', {
-        email: registeredEmail,
+      // Panggil Register DAN Verify OTP sekaligus
+      const response = await api.post('/auth/register', {
+        ...formData,
         otp: otpCode,
       })
       const data = response.data.data || response.data
@@ -190,10 +180,10 @@ export default function RegisterPage() {
       setShowOtp(false)
       setIsSuccess(true)
     } catch (err) {
-      console.error('OTP verify failed:', err)
+      console.error('Register/OTP verify failed:', err)
       setOtpError(
         err.response?.data?.message ||
-          'Kode OTP tidak valid. Silakan coba lagi.',
+          'Kode OTP tidak valid atau pendaftaran gagal.',
       )
     } finally {
       setOtpLoading(false)
