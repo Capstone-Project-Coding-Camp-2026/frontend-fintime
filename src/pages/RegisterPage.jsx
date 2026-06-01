@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import {
@@ -8,6 +8,7 @@ import {
   AlertCircle,
   ShieldCheck,
   RefreshCw,
+  Clock,
 } from 'lucide-react'
 
 import ParticleField from '../components/Particlefield'
@@ -220,7 +221,7 @@ export default function RegisterPage() {
               className="w-8 h-8 rounded-full border border-cyan-DEFAULT/40 flex items-center justify-center text-sm"
               style={{ borderColor: 'rgba(0,245,255,0.4)' }}
             >
-              â±
+              <Clock size={16} color="#00f5ff" />
             </motion.div>
             <span
               className="text-xl font-bold tracking-tight"
