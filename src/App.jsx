@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
@@ -16,6 +17,11 @@ import CustomCursor from './components/CustomCursor'
 import ToastContainer from './components/notification/ToastContainer'
 
 function App() {
+  useEffect(() => {
+    const theme = localStorage.getItem('fintime_theme') || 'dark'
+    document.documentElement.setAttribute('data-theme', theme)
+  }, [])
+
   return (
     <>
       <CustomCursor />

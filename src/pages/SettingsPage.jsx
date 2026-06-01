@@ -68,6 +68,11 @@ export default function SettingsPage() {
 
     // Persist to localStorage
     localStorage.setItem(`fintime_${key}`, value)
+    
+    // Apply theme immediately
+    if (key === 'theme') {
+      document.documentElement.setAttribute('data-theme', value)
+    }
   }
 
   const updateNotification = (key, value) => {
