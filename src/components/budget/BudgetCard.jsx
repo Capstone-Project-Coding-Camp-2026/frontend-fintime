@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
+import useSWR from 'swr'
 import { TrendingUp, TrendingDown, Plus, Pencil, Trash2, AlertTriangle, Check, ChevronDown } from 'lucide-react'
 import { useToast } from '../../context/ToastContext'
 import { useConfirm } from '../../context/ConfirmContext'
-import api from '../../lib/api'
+import api, { fetcher } from '../../lib/api'
 import { CATEGORY_LABELS } from '../dashboard/dashboardConstants'
 
 const formatCurrency = (value) => {
@@ -24,13 +25,26 @@ const getProgressColor = (percent) => {
 export default function BudgetCard({ onRefresh, refreshTrigger }) {
   const { error: showError, success } = useToast()
   const { confirm } = useConfirm()
-  const [budgets, setBudgets] = useState([])
-  const [loading, setLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false)
+
+  // Get user from localStorage
+  const storedUser = localStorage.getItem('fintime_user')
+  const user = storedUser ? JSON.parse(storedUser) : null
+
+  // SWR fetching
+  const { data: responseData, error, isLoading, mutate } = useSWR(user?.id ? `/budgets/${user.id}` : null, fetcher)
+  const budgets = responseData?.success ? (responseData.data || []) : (responseData || [])
+
+  // Refetch when global refreshTrigger changes
+  useEffect(() => {
+    if (refreshTrigger) {
+      mutate()
+    }
+  }, [refreshTrigger, mutate])
 
   // Form state
   const [formData, setFormData] = useState({
@@ -44,43 +58,14 @@ export default function BudgetCard({ onRefresh, refreshTrigger }) {
     'pendidikan', 'tagihan', 'lainnya'
   ]
 
-  const loadBudgets = async () => {
-    try {
-      setLoading(true)
-      const storedUser = localStorage.getItem('fintime_user')
-      if (!storedUser) return
-      const user = JSON.parse(storedUser)
-
-      const response = await api.get(`/budgets/${user.id}`)
-      if (response.data?.success) {
-        setBudgets(response.data.data || [])
-      } else {
-        setBudgets(response.data || [])
-      }
-    } catch (err) {
-      console.error('Failed to load budgets:', err)
-      // Use mock data if backend doesn't exist
-      setBudgets([])
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // Load on mount and on refresh
-  useEffect(() => {
-    loadBudgets()
-  }, [refreshTrigger])
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
       setIsSubmitting(true)
-      const storedUser = localStorage.getItem('fintime_user')
-      if (!storedUser) {
+      if (!user) {
         setIsSubmitting(false)
         return
       }
-      const user = JSON.parse(storedUser)
 
       const payload = {
         category: formData.category,
@@ -100,7 +85,7 @@ export default function BudgetCard({ onRefresh, refreshTrigger }) {
       setShowForm(false)
       setEditingId(null)
       setFormData({ category: '', limit: '', period: 'monthly' })
-      loadBudgets()
+      mutate() // Revalidate cache
       if (onRefresh) onRefresh()
     } catch (err) {
       console.error('Failed to save budget:', err)
@@ -126,7 +111,7 @@ export default function BudgetCard({ onRefresh, refreshTrigger }) {
       setDeletingId(budgetId)
       await api.delete(`/budgets/${budgetId}`)
       success('Budget berhasil dihapus')
-      loadBudgets()
+      mutate() // Revalidate cache
       if (onRefresh) onRefresh()
     } catch (err) {
       console.error('Failed to delete budget:', err)
@@ -185,8 +170,10 @@ export default function BudgetCard({ onRefresh, refreshTrigger }) {
 
       {/* Content */}
       <div className="p-6">
-        {loading ? (
+        {isLoading ? (
           <p className="text-center py-4" style={{ color: '#7aa6c2' }}>Memuat...</p>
+        ) : error ? (
+          <p className="text-center py-4 text-red-400">Gagal memuat budget</p>
         ) : budgets.length === 0 ? (
           <div className="text-center py-8">
             <p className="font-semibold" style={{ color: '#7aa6c2' }}>

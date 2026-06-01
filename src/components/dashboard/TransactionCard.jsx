@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import useSWR from 'swr'
 import {
   CATEGORY_LABELS,
   CATEGORY_ICON_MAP,
@@ -10,89 +11,53 @@ import {
 } from './dashboardConstants'
 
 import {
-  getUnlabelledTransactions,
   relabelTransaction,
+  saveLabelRule
 } from '../../lib/transactionApi'
 import { BookOpen, Filter } from 'lucide-react'
-import api from '../../lib/api'
+import api, { fetcher } from '../../lib/api'
 import TransactionView from './TransactionView'
 import LedgerView from './LedgerView'
-import { saveLabelRule } from '../../lib/transactionApi'
 
 export default function TransactionCard({ userId, onAddNew, onRefresh, refreshTrigger }) {
-  const [transactions, setTransactions] = useState([])
   const [showAll, setShowAll] = useState(false)
   const [transactionFilter, setTransactionFilter] = useState('all')
   const [ledgerFilter, setLedgerFilter] = useState('all')
-  const [loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState('transactions')
-  const [unlabelledTx, setUnlabelledTx] = useState([])
-  const [unlabelledLoading, setUnlabelledLoading] = useState(false)
   const [savingId, setSavingId] = useState(null)
-  const [pendingCount, setPendingCount] = useState(0)
 
+  // SWR fetching
+  const { data: txResponse, error: txError, isLoading: txLoading, mutate: mutateTx } = useSWR(
+    userId ? `/transactions/${userId}?limit=1000` : null, 
+    fetcher
+  )
+  
+  const { data: unlabelledResponse, error: unlabelledError, isLoading: unlabelledLoading, mutate: mutateUnlabelled } = useSWR(
+    userId ? `/transactions/${userId}/unlabelled` : null, 
+    fetcher
+  )
+
+  const transactions = txResponse?.data || []
+  const unlabelledTx = unlabelledResponse?.data?.filter((tx) => {
+    const cat = (tx.categoryLabel || '').toLowerCase().trim()
+    return (!tx.categoryLabel || cat === 'lainnya' || cat === 'tidak_diketahui')
+  }) || []
+  const pendingCount = unlabelledTx.length
+  const loading = txLoading
+
+  // Refetch when global refreshTrigger changes
   useEffect(() => {
-    if (userId) {
-      loadTransactions()
-      loadUnlabelledCount()
+    if (refreshTrigger) {
+      mutateTx()
+      mutateUnlabelled()
     }
-  }, [userId, refreshTrigger])
-
-  const loadTransactions = async () => {
-    try {
-      setLoading(true)
-      const response = await api.get(`/transactions/${userId}?limit=1000`)
-      setTransactions(response.data.data || [])
-    } catch (error) {
-      console.error('Error loading transactions:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const loadUnlabelledCount = async () => {
-    try {
-      const response = await getUnlabelledTransactions(userId)
-      const data = response.data || []
-      const filtered = data.filter((tx) => {
-        const cat = (tx.categoryLabel || '').toLowerCase().trim()
-        return (
-          !tx.categoryLabel || cat === 'lainnya' || cat === 'tidak_diketahui'
-        )
-      })
-      setPendingCount(filtered.length)
-    } catch (error) {
-      console.error('Error loading unlabelled count:', error)
-    }
-  }
-
-  const loadUnlabelledTransactions = async () => {
-    try {
-      setUnlabelledLoading(true)
-      const response = await getUnlabelledTransactions(userId)
-      const data = response.data || []
-      const filtered = data.filter((tx) => {
-        const cat = (tx.categoryLabel || '').toLowerCase().trim()
-        return (
-          !tx.categoryLabel || cat === 'lainnya' || cat === 'tidak_diketahui'
-        )
-      })
-      setUnlabelledTx(filtered)
-      setPendingCount(filtered.length)
-    } catch (error) {
-      console.error('Error loading unlabelled:', error)
-    } finally {
-      setUnlabelledLoading(false)
-    }
-  }
+  }, [refreshTrigger, mutateTx, mutateUnlabelled])
 
   const handleToggleLedger = () => {
     if (viewMode === 'transactions') {
       setViewMode('ledger')
-      loadUnlabelledTransactions()
     } else {
       setViewMode('transactions')
-      loadTransactions()
     }
   }
 
@@ -110,15 +75,25 @@ export default function TransactionCard({ userId, onAddNew, onRefresh, refreshTr
       if (tx) {
         await saveLabelRule(userId, tx.description, categoryLabel)
       }
-      // refresh semua data
-      await loadTransactions()
-      await loadUnlabelledTransactions()
+      
+      // Update local SWR cache immediately for snappier UI
+      mutateUnlabelled(
+        (currentData) => {
+          if (!currentData) return currentData
+          const updatedData = currentData.data.filter((t) => t.id !== transactionId)
+          return { ...currentData, data: updatedData, count: updatedData.length }
+        },
+        false // Do not revalidate yet
+      )
+      
+      mutateTx() // Trigger refetch of main transactions list
 
       if (onRefresh) {
         await onRefresh()
       }
     } catch (error) {
       console.error('Failed to relabel:', error)
+      mutateUnlabelled() // Revert on failure
     } finally {
       setSavingId(null)
     }

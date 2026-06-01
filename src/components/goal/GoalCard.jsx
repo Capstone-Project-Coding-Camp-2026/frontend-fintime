@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
+import useSWR from 'swr'
 import { Target, Plus, Pencil, Trash2, Calendar, Wallet, Award, CheckCircle, Clock, ChevronDown, History, HeartPulse, Plane, Car, Smartphone, GraduationCap, Users, Home, TrendingUp, Package } from 'lucide-react'
 import { useToast } from '../../context/ToastContext'
-import api from '../../lib/api'
+import api, { fetcher } from '../../lib/api'
 
 const formatCurrency = (value) => {
   return new Intl.NumberFormat('id-ID', {
@@ -50,8 +51,6 @@ const getProgressColor = (percent) => {
 
 export default function GoalCard({ onRefresh, refreshTrigger }) {
   const { success, error: showError } = useToast()
-  const [goals, setGoals] = useState([])
-  const [loading, setLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [showAddSavings, setShowAddSavings] = useState(false)
@@ -60,6 +59,21 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
   const [editingId, setEditingId] = useState(null)
   const [selectedGoal, setSelectedGoal] = useState(null)
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false)
+
+  // Get user from localStorage
+  const storedUser = localStorage.getItem('fintime_user')
+  const user = storedUser ? JSON.parse(storedUser) : null
+
+  // SWR fetching
+  const { data: responseData, error, isLoading, mutate } = useSWR(user?.id ? `/goals/${user.id}` : null, fetcher)
+  const goals = responseData?.success ? (responseData.data || []) : (responseData || [])
+
+  // Refetch when global refreshTrigger changes
+  useEffect(() => {
+    if (refreshTrigger) {
+      mutate()
+    }
+  }, [refreshTrigger, mutate])
 
   // Form state
   const [formData, setFormData] = useState({
@@ -72,31 +86,6 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
   })
 
   const [savingsAmount, setSavingsAmount] = useState('')
-
-  const loadGoals = async () => {
-    try {
-      setLoading(true)
-      const storedUser = localStorage.getItem('fintime_user')
-      if (!storedUser) return
-      const user = JSON.parse(storedUser)
-
-      const response = await api.get(`/goals/${user.id}`)
-      if (response.data?.success) {
-        setGoals(response.data.data || [])
-      } else {
-        setGoals(response.data || [])
-      }
-    } catch (err) {
-      console.error('Failed to load goals:', err)
-      setGoals([])
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    loadGoals()
-  }, [refreshTrigger])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -130,7 +119,7 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
       setShowForm(false)
       setEditingId(null)
       resetForm()
-      loadGoals()
+      mutate()
       if (onRefresh) onRefresh()
     } catch (err) {
       console.error('Failed to save goal:', err)
@@ -153,7 +142,7 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
       setShowAddSavings(false)
       setSelectedGoal(null)
       setSavingsAmount('')
-      loadGoals()
+      mutate()
       if (onRefresh) onRefresh()
     } catch (err) {
       console.error('Failed to add savings:', err)
@@ -181,7 +170,7 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
     try {
       await api.delete(`/goals/${goalId}`)
       success('Target berhasil dihapus')
-      loadGoals()
+      mutate()
       if (onRefresh) onRefresh()
     } catch (err) {
       console.error('Failed to delete goal:', err)
@@ -294,8 +283,10 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
 
       {/* Content */}
       <div className="p-6">
-        {loading ? (
+        {isLoading ? (
           <p className="text-center py-4" style={{ color: '#7aa6c2' }}>Memuat...</p>
+        ) : error ? (
+          <p className="text-center py-4 text-red-400">Gagal memuat target</p>
         ) : goals.length === 0 ? (
           <div className="text-center py-8">
             <p className="font-semibold" style={{ color: '#7aa6c2' }}>

@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
+import useSWR from 'swr'
 import { AlertTriangle, Plus, Pencil, Trash2, Calendar, CreditCard, Wallet, CheckCircle, ChevronDown, History, Home, Car, Smartphone, Users, Package } from 'lucide-react'
 import { useToast } from '../../context/ToastContext'
-import api from '../../lib/api'
+import api, { fetcher } from '../../lib/api'
 import { useConfirm } from '../../context/ConfirmContext';
 
 const formatCurrency = (value) => {
@@ -34,8 +35,6 @@ const DEBT_TYPES = [
 export default function DebtCard({ onRefresh, refreshTrigger }) {
   const { success, error: showError, warning } = useToast()
   const { confirm } = useConfirm();
-  const [debts, setDebts] = useState([])
-  const [loading, setLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [showPayment, setShowPayment] = useState(false)
@@ -44,6 +43,21 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
   const [editingId, setEditingId] = useState(null)
   const [selectedDebt, setSelectedDebt] = useState(null)
   const [showTypeDropdown, setShowTypeDropdown] = useState(false)
+
+  // Get user from localStorage
+  const storedUser = localStorage.getItem('fintime_user')
+  const user = storedUser ? JSON.parse(storedUser) : null
+
+  // SWR fetching
+  const { data: responseData, error, isLoading, mutate } = useSWR(user?.id ? `/debts/${user.id}` : null, fetcher)
+  const debts = responseData?.success ? (responseData.data || []) : (responseData || [])
+
+  // Refetch when global refreshTrigger changes
+  useEffect(() => {
+    if (refreshTrigger) {
+      mutate()
+    }
+  }, [refreshTrigger, mutate])
 
   // Form state
   const [formData, setFormData] = useState({
@@ -60,31 +74,6 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
   })
 
   const [paymentAmount, setPaymentAmount] = useState('')
-
-  const loadDebts = async () => {
-    try {
-      setLoading(true)
-      const storedUser = localStorage.getItem('fintime_user')
-      if (!storedUser) return
-      const user = JSON.parse(storedUser)
-
-      const response = await api.get(`/debts/${user.id}`)
-      if (response.data?.success) {
-        setDebts(response.data.data || [])
-      } else {
-        setDebts(response.data || [])
-      }
-    } catch (err) {
-      console.error('Failed to load debts:', err)
-      setDebts([])
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    loadDebts()
-  }, [refreshTrigger])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -122,7 +111,7 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
       setShowForm(false)
       setEditingId(null)
       resetForm()
-      loadDebts()
+      mutate()
       if (onRefresh) onRefresh()
     } catch (err) {
       console.error('Failed to save debt:', err)
@@ -147,7 +136,7 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
       setShowPayment(false)
       setSelectedDebt(null)
       setPaymentAmount('')
-      loadDebts()
+      mutate()
       if (onRefresh) onRefresh()
     } catch (err) {
       console.error('Failed to record payment:', err)
@@ -179,7 +168,7 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
     try {
       await api.delete(`/debts/${debtId}`)
       success('Hutang berhasil dihapus')
-      loadDebts()
+      mutate()
       if (onRefresh) onRefresh()
     } catch (err) {
       console.error('Failed to delete debt:', err)
@@ -309,7 +298,7 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
 
       {/* Content */}
       <div className="p-6">
-        {loading ? (
+        {isLoading ? (
           <p className="text-center py-4" style={{ color: '#7aa6c2' }}>Memuat...</p>
         ) : debts.length === 0 ? (
           <div className="text-center py-8">
