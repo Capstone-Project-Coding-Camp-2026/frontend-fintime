@@ -160,6 +160,11 @@ export default function HeroSection() {
   );
   const heroRef = useRef(null);
 
+  // Cek token secara sinkron saat inisialisasi state untuk menghindari "cascading render"
+  const [isLoggedIn] = useState(() => {
+    const token = localStorage.getItem('fintime_token') || localStorage.getItem('token');
+    return !!token;
+  });
 
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -199,6 +204,14 @@ export default function HeroSection() {
 
   const scrollToNext = () => {
     document.getElementById("timeline")?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleCTA = () => {
+    if (isLoggedIn) {
+      navigate('/dashboard');
+    } else {
+      navigate('/register');
+    }
   };
 
   return (
@@ -328,10 +341,10 @@ export default function HeroSection() {
             whileHover={{ scale: 1.04, y: -2 }}
             whileTap={{ scale: 0.97 }}
             className="btn-primary flex items-center gap-2.5 px-8 py-4 text-base font-extrabold rounded-full"
-            onClick={() => navigate('/register')}
+            onClick={handleCTA}
           >
             <span>🚀</span>
-            <span>Start Your Time Machine</span>
+            <span>{isLoggedIn ? 'Buka Dashboard' : 'Start Your Time Machine'}</span>
           </motion.button>
         </motion.div>
 

@@ -7,17 +7,22 @@ import Logo from "./common/Logo";
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handler);
+    
+    // Check login status
+    const token = localStorage.getItem('fintime_token') || localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
   const handleLaunchApp = () => {
-    const token = localStorage.getItem('fintime_token');
-    if (token) {
+    if (isLoggedIn) {
       navigate('/dashboard');
     } else {
       navigate('/login');
@@ -73,23 +78,25 @@ export default function Navbar() {
 
         {/* CTA */}
         <div className="flex items-center gap-3">
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={handleLaunchApp}
-            className="hidden md:flex items-center gap-2 btn-ghost text-sm font-bold px-4 py-2"
-            style={{ fontFamily: "Sora, sans-serif" }}
-          >
-            <span>Login</span>
-            <span style={{ color: "var(--cyan)" }}>→</span>
-          </motion.button>
+          {!isLoggedIn && (
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => navigate('/login')}
+              className="hidden md:flex items-center gap-2 btn-ghost text-sm font-bold px-4 py-2"
+              style={{ fontFamily: "Sora, sans-serif" }}
+            >
+              <span>Login</span>
+              <span style={{ color: "var(--cyan)" }}>→</span>
+            </motion.button>
+          )}
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             className="btn-primary text-sm font-bold px-5 py-2.5"
             onClick={handleLaunchApp}
           >
-            Launch App
+            {isLoggedIn ? "Dashboard" : "Launch App"}
           </motion.button>
 
           {/* Mobile Menu Toggle */}
@@ -159,12 +166,14 @@ export default function Navbar() {
             {link.label}
           </button>
         ))}
-        <button
-          onClick={handleLaunchApp}
-          className="btn-ghost text-sm font-bold py-2.5 mt-2"
-        >
-          Login
-        </button>
+        {!isLoggedIn && (
+          <button
+            onClick={() => navigate('/login')}
+            className="btn-ghost text-sm font-bold py-2.5 mt-2"
+          >
+            Login
+          </button>
+        )}
       </motion.div>
     </>
   );

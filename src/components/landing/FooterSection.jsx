@@ -1,7 +1,14 @@
 import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 
 export default function FooterSection() {
   const currentYear = new Date().getFullYear()
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    const token = localStorage.getItem('fintime_token') || localStorage.getItem('token')
+    setIsLoggedIn(!!token)
+  }, [])
 
   return (
     <footer
@@ -43,20 +50,32 @@ export default function FooterSection() {
 
           {/* Links */}
           <div className="flex items-center gap-6">
-            <Link
-              to="/login"
-              className="text-sm font-medium no-underline transition-colors hover:text-cyan-400"
-              style={{ color: 'var(--text-muted)' }}
-            >
-              Login
-            </Link>
-            <Link
-              to="/register"
-              className="text-sm font-medium no-underline transition-colors hover:text-cyan-400"
-              style={{ color: 'var(--text-muted)' }}
-            >
-              Daftar
-            </Link>
+            {isLoggedIn ? (
+              <Link
+                to="/dashboard"
+                className="text-sm font-medium no-underline transition-colors hover:text-cyan-400"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="text-sm font-medium no-underline transition-colors hover:text-cyan-400"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="text-sm font-medium no-underline transition-colors hover:text-cyan-400"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  Daftar
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Credits */}
@@ -73,3 +92,4 @@ export default function FooterSection() {
     </footer>
   )
 }
+
