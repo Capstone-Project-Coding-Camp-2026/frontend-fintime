@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { NAV_LINKS } from "../data/timeline";
-import Logo from "./common/logo";
+import Logo from "./common/Logo";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);

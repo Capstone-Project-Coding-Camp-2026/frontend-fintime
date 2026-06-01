@@ -7,7 +7,7 @@ import {
   HelpCircle,
 } from 'lucide-react'
 
-import Logo from '../common/logo'
+import Logo from '../common/Logo'
 import ParticleField from '../Particlefield'
 import UserDropdown from './UserDropdown'
 import BottomNav from './BottomNav'
