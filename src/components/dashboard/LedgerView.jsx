@@ -13,7 +13,7 @@ export default function LedgerView({
   CATEGORY_LABELS,
   CATEGORY_COLORS,
   LEDGER_FILTERS,
-  ALL_CATEGORIES,
+  TRANSACTION_CATEGORIES,
 }) {
   return (
     <motion.div
@@ -102,7 +102,7 @@ export default function LedgerView({
                       color: 'white',
                     }}
                   >
-                    {ALL_CATEGORIES.map((cat) => (
+                    {TRANSACTION_CATEGORIES.map((cat) => (
                       <option
                         key={cat}
                         value={cat}
