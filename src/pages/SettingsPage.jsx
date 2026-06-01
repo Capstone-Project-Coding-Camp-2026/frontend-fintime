@@ -16,7 +16,6 @@ import {
   Languages,
   Palette,
   ChevronDown,
-  Rocket,
 } from 'lucide-react'
 import DashboardLayout from '../components/layout/DashboardLayout'
 import { useToast } from '../context/ToastContext'
@@ -371,7 +370,7 @@ export default function SettingsPage() {
                   border: '1px solid rgba(0,245,255,0.2)',
                 }}
               >
-                <Rocket size={40} color="#00f5ff" />
+                â±
               </div>
               <h3 className="text-xl font-bold mb-1" style={{ color: 'white' }}>FinTime</h3>
               <p className="text-sm mb-4" style={{ color: '#7aa6c2' }}>AI Financial Time Machine</p>
