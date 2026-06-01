@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
-import { AlertTriangle, Plus, Pencil, Trash2, Calendar, CreditCard, Wallet, CheckCircle, ChevronDown, History } from 'lucide-react'
+import { AlertTriangle, Plus, Pencil, Trash2, Calendar, CreditCard, Wallet, CheckCircle, ChevronDown, History, Home, Car, Smartphone, Users, Package } from 'lucide-react'
 import { useToast } from '../../context/ToastContext'
 import api from '../../lib/api'
+import { useConfirm } from '../../context/ConfirmContext';
 
 const formatCurrency = (value) => {
   return new Intl.NumberFormat('id-ID', {
@@ -22,16 +23,17 @@ const formatDate = (date) => {
 }
 
 const DEBT_TYPES = [
-  { id: 'kpr', label: 'KPR (Rumah)', icon: '🏠' },
-  { id: 'vehicle', label: 'Kendaraan', icon: '🚗' },
-  { id: 'pinjol', label: 'Pinjaman Online', icon: '📱' },
-  { id: 'card', label: 'Kartu Kredit', icon: '💳' },
-  { id: 'personal', label: 'Pinjaman Pribadi', icon: '👤' },
-  { id: 'other', label: 'Lainnya', icon: '📋' },
+  { id: 'kpr', label: 'KPR (Rumah)', icon: <Home size={18} /> },
+  { id: 'vehicle', label: 'Kendaraan', icon: <Car size={18} /> },
+  { id: 'pinjol', label: 'Pinjaman Online', icon: <Smartphone size={18} /> },
+  { id: 'card', label: 'Kartu Kredit', icon: <CreditCard size={18} /> },
+  { id: 'personal', label: 'Pinjaman Pribadi', icon: <Users size={18} /> },
+  { id: 'other', label: 'Lainnya', icon: <Package size={18} /> },
 ]
 
-export default function DebtCard({ onRefresh }) {
+export default function DebtCard({ onRefresh, refreshTrigger }) {
   const { success, error: showError, warning } = useToast()
+  const { confirm } = useConfirm();
   const [debts, setDebts] = useState([])
   const [loading, setLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -82,7 +84,7 @@ export default function DebtCard({ onRefresh }) {
 
   useEffect(() => {
     loadDebts()
-  }, [])
+  }, [refreshTrigger])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -124,7 +126,7 @@ export default function DebtCard({ onRefresh }) {
       if (onRefresh) onRefresh()
     } catch (err) {
       console.error('Failed to save debt:', err)
-      showError('Gagal menyimpan hutang')
+      showError(err.response?.data?.message || 'Gagal menyimpan hutang')
     } finally {
       setIsSubmitting(false)
     }
@@ -149,13 +151,13 @@ export default function DebtCard({ onRefresh }) {
       if (onRefresh) onRefresh()
     } catch (err) {
       console.error('Failed to record payment:', err)
-      showError('Gagal mencatat pembayaran')
+      showError(err.response?.data?.message || 'Gagal mencatat pembayaran')
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  const handleEdit = (debt) => {
+  const handleEdit = async (debt) => {
     setFormData({
       name: debt.name || '',
       type: debt.type || 'personal',
@@ -173,7 +175,7 @@ export default function DebtCard({ onRefresh }) {
   }
 
   const handleDelete = async (debtId) => {
-    if (!confirm('Hapus hutang ini?')) return
+    if (!await confirm('Hapus hutang ini?')) return
     try {
       await api.delete(`/debts/${debtId}`)
       success('Hutang berhasil dihapus')
@@ -181,7 +183,7 @@ export default function DebtCard({ onRefresh }) {
       if (onRefresh) onRefresh()
     } catch (err) {
       console.error('Failed to delete debt:', err)
-      showError('Gagal menghapus hutang')
+      showError(err.response?.data?.message || 'Gagal menghapus hutang')
     }
   }
 
@@ -346,7 +348,7 @@ export default function DebtCard({ onRefresh }) {
                           {debt.name || 'Hutang'}
                         </h3>
                         <p className="text-[11px] sm:text-sm truncate" style={{ color: '#7aa6c2' }}>
-                          {typeInfo.label} {debt.lender ? `• ${debt.lender}` : ''}
+                          {typeInfo.label} {debt.lender ? `â€¢ ${debt.lender}` : ''}
                         </p>
                       </div>
                     </div>
@@ -949,3 +951,4 @@ export default function DebtCard({ onRefresh }) {
     </div>
   )
 }
+

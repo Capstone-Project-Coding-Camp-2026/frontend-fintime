@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Wallet, Loader2, CheckCircle, Building2 } from 'lucide-react'
 import api from '../../lib/api'
 import { PROVIDERS } from '../../constants/providers'
+import { useConfirm } from '../../context/ConfirmContext';
 
 export default function EditAccountModal({ isOpen, onClose, onSuccess, account }) {
+  const { confirm } = useConfirm();
   const [accountType, setAccountType] = useState('ewallet')
   const [selectedProvider, setSelectedProvider] = useState('')
   const [accountName, setAccountName] = useState('')
@@ -64,7 +66,7 @@ export default function EditAccountModal({ isOpen, onClose, onSuccess, account }
 
   const handleDelete = async () => {
     if (!account?.id) return
-    if (!confirm('Yakin ingin menghapus akun ini? Data transaksi tidak akan ikut dihapus.')) return
+    if (!await confirm('Yakin ingin menghapus akun ini? Data transaksi tidak akan ikut dihapus.')) return
 
     try {
       setIsSubmitting(true)

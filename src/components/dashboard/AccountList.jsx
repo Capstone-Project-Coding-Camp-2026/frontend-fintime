@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Wallet, ChevronDown, ChevronUp, Trash2, ArrowUpRight, ArrowDownRight, Building2 } from 'lucide-react'
 import { getProviderName, getProviderType } from '../../constants/providers'
+import { useConfirm } from '../../context/ConfirmContext';
 
 const CATEGORY_LABELS = {
   salary: 'Gaji', freelance: 'Freelance', investment: 'Investasi', gift: 'Hadiah', 'other-income': 'Lainnya',
@@ -10,6 +11,7 @@ const CATEGORY_LABELS = {
 }
 
 export default function AccountList({ onDelete }) {
+  const { confirm } = useConfirm();
   const [accounts, setAccounts] = useState([])
   const [transactions, setTransactions] = useState([])
   const [showAll, setShowAll] = useState(false)
@@ -19,15 +21,15 @@ export default function AccountList({ onDelete }) {
     loadData()
   }, [])
 
-  const loadData = () => {
+  const loadData = async () => {
     const savedAccounts = JSON.parse(localStorage.getItem('fintime_accounts') || '[]')
     const savedTransactions = JSON.parse(localStorage.getItem('fintime_transactions') || '[]')
     setAccounts(savedAccounts)
     setTransactions(savedTransactions)
   }
 
-  const handleDelete = (accountId) => {
-    if (!confirm('Yakin ingin menghapus akun ini?')) return
+  const handleDelete = async (accountId) => {
+    if (!await confirm('Yakin ingin menghapus akun ini?')) return
     const updated = accounts.filter(a => a.id !== accountId)
     localStorage.setItem('fintime_accounts', JSON.stringify(updated))
     setAccounts(updated)

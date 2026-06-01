@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
-import { Target, Plus, Pencil, Trash2, Calendar, Wallet, Award, CheckCircle, Clock, ChevronDown, History } from 'lucide-react'
+import { Target, Plus, Pencil, Trash2, Calendar, Wallet, Award, CheckCircle, Clock, ChevronDown, History, HeartPulse, Plane, Car, Smartphone, GraduationCap, Users, Home, TrendingUp, Package } from 'lucide-react'
 import { useToast } from '../../context/ToastContext'
 import api from '../../lib/api'
 
@@ -22,15 +22,15 @@ const formatDate = (date) => {
 }
 
 const GOAL_CATEGORIES = [
-  { id: 'emergency_fund', label: 'Dana Darurat', icon: '🛡️', color: '#22c55e' },
-  { id: 'vacation', label: 'Liburan', icon: '✈️', color: '#06b6d4' },
-  { id: 'vehicle', label: 'Kendaraan', icon: '🚗', color: '#a855f7' },
-  { id: 'gadget', label: 'Gadget', icon: '📱', color: '#ec4899' },
-  { id: 'education', label: 'Pendidikan', icon: '🎓', color: '#f97316' },
-  { id: 'wedding', label: 'Pernikahan', icon: '💒', color: '#fbbf24' },
-  { id: 'home', label: 'Rumah', icon: '🏠', color: '#14b8a6' },
-  { id: 'investment', label: 'Investasi', icon: '📈', color: '#00f5ff' },
-  { id: 'other', label: 'Lainnya', icon: '⭐', color: '#7aa6c2' },
+  { id: 'emergency_fund', label: 'Dana Darurat', icon: <HeartPulse size={18} />, color: '#22c55e' },
+  { id: 'vacation', label: 'Liburan', icon: <Plane size={18} />, color: '#06b6d4' },
+  { id: 'vehicle', label: 'Kendaraan', icon: <Car size={18} />, color: '#a855f7' },
+  { id: 'gadget', label: 'Gadget', icon: <Smartphone size={18} />, color: '#ec4899' },
+  { id: 'education', label: 'Pendidikan', icon: <GraduationCap size={18} />, color: '#f97316' },
+  { id: 'wedding', label: 'Pernikahan', icon: <Users size={18} />, color: '#fbbf24' },
+  { id: 'home', label: 'Rumah', icon: <Home size={18} />, color: '#14b8a6' },
+  { id: 'investment', label: 'Investasi', icon: <TrendingUp size={18} />, color: '#00f5ff' },
+  { id: 'other', label: 'Lainnya', icon: <Package size={18} />, color: '#7aa6c2' },
 ]
 
 const getDaysRemaining = (targetDate) => {
@@ -48,7 +48,7 @@ const getProgressColor = (percent) => {
   return '#f87171' // red
 }
 
-export default function GoalCard({ onRefresh }) {
+export default function GoalCard({ onRefresh, refreshTrigger }) {
   const { success, error: showError } = useToast()
   const [goals, setGoals] = useState([])
   const [loading, setLoading] = useState(true)
@@ -96,7 +96,7 @@ export default function GoalCard({ onRefresh }) {
 
   useEffect(() => {
     loadGoals()
-  }, [])
+  }, [refreshTrigger])
 
   const handleSubmit = async (e) => {
     e.preventDefault()

@@ -2,7 +2,9 @@ import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { TrendingUp, TrendingDown, Plus, Pencil, Trash2, AlertTriangle, Check, ChevronDown } from 'lucide-react'
 import { useToast } from '../../context/ToastContext'
+import { useConfirm } from '../../context/ConfirmContext'
 import api from '../../lib/api'
+import { CATEGORY_LABELS } from '../dashboard/dashboardConstants'
 
 const formatCurrency = (value) => {
   return new Intl.NumberFormat('id-ID', {
@@ -19,8 +21,9 @@ const getProgressColor = (percent) => {
   return '#22c55e' // green
 }
 
-export default function BudgetCard({ onRefresh }) {
-  const { success, error: showError, warning } = useToast()
+export default function BudgetCard({ onRefresh, refreshTrigger }) {
+  const { error: showError, success } = useToast()
+  const { confirm } = useConfirm()
   const [budgets, setBudgets] = useState([])
   const [loading, setLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -37,8 +40,8 @@ export default function BudgetCard({ onRefresh }) {
   })
 
   const categories = [
-    'makan', 'transportasi', 'belanja', 'hiburan', 'kesehatan',
-    'pendidikan', 'listrik', 'internet', 'langganan', 'lainnya'
+    'perumahan', 'makanan', 'transport', 'belanja', 'hiburan', 'kesehatan',
+    'pendidikan', 'tagihan', 'lainnya'
   ]
 
   const loadBudgets = async () => {
@@ -63,10 +66,10 @@ export default function BudgetCard({ onRefresh }) {
     }
   }
 
-  // Load on mount
+  // Load on mount and on refresh
   useEffect(() => {
     loadBudgets()
-  }, [])
+  }, [refreshTrigger])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -101,7 +104,7 @@ export default function BudgetCard({ onRefresh }) {
       if (onRefresh) onRefresh()
     } catch (err) {
       console.error('Failed to save budget:', err)
-      showError('Gagal menyimpan budget')
+      showError(err.response?.data?.message || 'Gagal menyimpan budget')
     } finally {
       setIsSubmitting(false)
     }
@@ -118,7 +121,7 @@ export default function BudgetCard({ onRefresh }) {
   }
 
   const handleDelete = async (budgetId) => {
-    if (!confirm('Hapus budget ini?')) return
+    if (!await confirm('Hapus budget ini?')) return
     try {
       setDeletingId(budgetId)
       await api.delete(`/budgets/${budgetId}`)
@@ -127,7 +130,7 @@ export default function BudgetCard({ onRefresh }) {
       if (onRefresh) onRefresh()
     } catch (err) {
       console.error('Failed to delete budget:', err)
-      showError('Gagal menghapus budget')
+      showError(err.response?.data?.message || 'Gagal menghapus budget')
     } finally {
       setDeletingId(null)
     }
@@ -223,7 +226,7 @@ export default function BudgetCard({ onRefresh }) {
                           color: '#00f5ff',
                         }}
                       >
-                        {budget.category || 'lainnya'}
+                        {CATEGORY_LABELS[budget.category] || budget.category || 'lainnya'}
                       </span>
                       {isOver && (
                         <span
@@ -339,12 +342,12 @@ export default function BudgetCard({ onRefresh }) {
                 >
                   <span className={!formData.category ? 'text-gray-500' : ''}>
                     {formData.category 
-                      ? formData.category.charAt(0).toUpperCase() + formData.category.slice(1)
+                      ? (CATEGORY_LABELS[formData.category] || formData.category.charAt(0).toUpperCase() + formData.category.slice(1))
                       : 'Pilih Kategori'}
                   </span>
                   <ChevronDown 
                     size={18} 
-                    className={`transition-transform duration-300 ${showCategoryDropdown ? 'rotate-180' : ''}`} 
+                    className={`flex-shrink-0 transition-transform duration-300 ${showCategoryDropdown ? 'rotate-180' : ''}`} 
                     style={{ color: '#00f5ff' }}
                   />
                 </button>
@@ -381,7 +384,7 @@ export default function BudgetCard({ onRefresh }) {
                             }}
                           >
                             <span className="font-medium">
-                              {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                              {CATEGORY_LABELS[cat] || (cat.charAt(0).toUpperCase() + cat.slice(1))}
                             </span>
                           </button>
                         ))}

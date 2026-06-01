@@ -30,7 +30,7 @@ export default function UserDropdown({ user, onLogout }) {
         <ChevronDown
           size={16}
           style={{ color: 'var(--text-dim)' }}
-          className={`transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`flex-shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
         />
       </motion.button>
 

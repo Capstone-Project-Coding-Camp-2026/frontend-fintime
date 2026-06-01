@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { TrendingUp, Plus, Pencil, Trash2, DollarSign, Percent, ArrowUpRight, ArrowDownRight } from 'lucide-react'
+import { TrendingUp, Plus, Pencil, Trash2, DollarSign, Percent, ArrowUpRight, ArrowDownRight, LineChart, PieChart, Coins, Landmark, FileText, Package } from 'lucide-react'
 import DashboardLayout from '../components/layout/DashboardLayout'
 import { useToast } from '../context/ToastContext'
 import api from '../lib/api'
+import { useConfirm } from '../context/ConfirmContext';
 
 const formatCurrency = (value) => {
   return new Intl.NumberFormat('id-ID', {
@@ -15,16 +16,17 @@ const formatCurrency = (value) => {
 }
 
 const INVESTMENT_TYPES = [
-  { id: 'stock', label: 'Saham', icon: '📈', color: '#22c55e' },
-  { id: 'mutual_fund', label: 'Reksadana', icon: '📊', color: '#06b6d4' },
-  { id: 'crypto', label: 'Kripto', icon: '₿', color: '#f97316' },
-  { id: 'deposito', label: 'Deposito', icon: '🏦', color: '#a855f7' },
-  { id: 'bonds', label: 'Obligasi', icon: '📜', color: '#ec4899' },
-  { id: 'other', label: 'Lainnya', icon: '💰', color: '#7aa6c2' },
+  { id: 'stock', label: 'Saham', icon: <LineChart size={18} />, color: '#22c55e' },
+  { id: 'mutual_fund', label: 'Reksadana', icon: <PieChart size={18} />, color: '#06b6d4' },
+  { id: 'crypto', label: 'Kripto', icon: <Coins size={18} />, color: '#f97316' },
+  { id: 'deposito', label: 'Deposito', icon: <Landmark size={18} />, color: '#a855f7' },
+  { id: 'bonds', label: 'Obligasi', icon: <FileText size={18} />, color: '#ec4899' },
+  { id: 'other', label: 'Lainnya', icon: <Package size={18} />, color: '#7aa6c2' },
 ]
 
 export default function InvestmentPage() {
   const { success, error: showError } = useToast()
+  const { confirm } = useConfirm();
   const [investments, setInvestments] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -92,11 +94,11 @@ export default function InvestmentPage() {
       loadInvestments()
     } catch (err) {
       console.error('Failed to save investment:', err)
-      showError('Gagal menyimpan investasi')
+      showError(err.response?.data?.message || 'Gagal menyimpan investasi')
     }
   }
 
-  const handleEdit = (inv) => {
+  const handleEdit = async (inv) => {
     setFormData({
       name: inv.name || '',
       type: inv.type || 'stock',
@@ -110,14 +112,14 @@ export default function InvestmentPage() {
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('Hapus investasi ini?')) return
+    if (!await confirm('Hapus investasi ini?')) return
     try {
       await api.delete(`/investments/${id}`)
       success('Investasi berhasil dihapus')
       loadInvestments()
     } catch (err) {
       console.error('Failed to delete investment:', err)
-      showError('Gagal menghapus investasi')
+      showError(err.response?.data?.message || 'Gagal menghapus investasi')
     }
   }
 
@@ -292,7 +294,7 @@ export default function InvestmentPage() {
                             {inv.name}
                           </h3>
                           <p className="text-sm" style={{ color: '#7aa6c2' }}>
-                            {typeInfo.label} • {inv.purchaseDate ? new Date(inv.purchaseDate).toLocaleDateString('id-ID', { month: 'short', year: 'numeric' }) : '-'}
+                            {typeInfo.label} â€¢ {inv.purchaseDate ? new Date(inv.purchaseDate).toLocaleDateString('id-ID', { month: 'short', year: 'numeric' }) : '-'}
                           </p>
                         </div>
                       </div>
@@ -487,3 +489,4 @@ export default function InvestmentPage() {
     </DashboardLayout>
   )
 }
+

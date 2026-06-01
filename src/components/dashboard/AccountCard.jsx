@@ -1,11 +1,15 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Wallet, ChevronDown, ChevronUp, Trash2, Building2, Pencil } from 'lucide-react'
 import api from '../../lib/api'
 import { getProviderName, getProviderType } from '../../constants/providers'
 import EditAccountModal from './EditAccountModal'
+import { useConfirm } from '../../context/ConfirmContext';
+import { useToast } from '../../context/ToastContext';
 
-export default function AccountCard({ userId, onDelete, onAddNew }) {
+export default function AccountCard({ userId, onDelete, onAddNew, refreshTrigger }) {
+  const { confirm } = useConfirm();
+  const { error: showError, success } = useToast();
   const [accounts, setAccounts] = useState([])
   const [totalBalance, setTotalBalance] = useState(0)
   const [showAll, setShowAll] = useState(false)
@@ -17,7 +21,7 @@ export default function AccountCard({ userId, onDelete, onAddNew }) {
     if (userId) {
       loadAccounts()
     }
-  }, [userId])
+  }, [userId, refreshTrigger])
 
   const loadAccounts = async () => {
     try {
@@ -154,7 +158,7 @@ export default function AccountCard({ userId, onDelete, onAddNew }) {
                           <p className="font-medium text-sm truncate" style={{ color: 'var(--text)' }}>{account.name}</p>
                           <p className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>
                             {getProviderName(account.provider)}
-                            {account.accountNumber && ` • ${account.accountNumber}`}
+                            {account.accountNumber && ` â€¢ ${account.accountNumber}`}
                           </p>
                         </div>
                       </div>
@@ -171,19 +175,21 @@ export default function AccountCard({ userId, onDelete, onAddNew }) {
                           <Pencil size={12} />
                         </button>
                         <button
-                          onClick={() => {
-                            if (!confirm('Yakin ingin menghapus akun ini?')) return
-                            api.delete(`/linked-accounts/${account.id}`).then(() => {
+                          onClick={async () => {
+                            if (!await confirm('Yakin ingin menghapus akun ini?')) return
+                            try {
+                              await api.delete(`/linked-accounts/${account.id}`)
                               setAccounts(prev => prev.filter(a => a.id !== account.id))
                               const newTotal = accounts
                                 .filter(a => a.id !== account.id)
                                 .reduce((sum, acc) => sum + (acc.balance || 0), 0)
                               setTotalBalance(newTotal)
                               onDelete?.()
-                            }).catch(err => {
+                              success('Akun berhasil dihapus')
+                            } catch (err) {
                               console.error('Error deleting account:', err)
-                              alert('Gagal menghapus akun')
-                            })
+                              showError(err.response?.data?.message || 'Gagal menghapus akun')
+                            }
                           }}
                           className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:bg-red-500/10"
                           style={{ color: '#f87171' }}
@@ -232,3 +238,4 @@ export default function AccountCard({ userId, onDelete, onAddNew }) {
     </>
   )
 }
+

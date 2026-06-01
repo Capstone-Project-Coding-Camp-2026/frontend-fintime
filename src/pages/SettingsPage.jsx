@@ -20,10 +20,11 @@ import {
 import DashboardLayout from '../components/layout/DashboardLayout'
 import { useToast } from '../context/ToastContext'
 import api from '../lib/api'
+import { useConfirm } from '../context/ConfirmContext';
 
 const LANGUAGES = [
-  { code: 'id', label: 'Indonesia', flag: '🇮🇩' },
-  { code: 'en', label: 'English', flag: '🇬🇧' },
+  { code: 'id', label: 'Indonesia' },
+  { code: 'en', label: 'English' },
 ]
 
 const CURRENCIES = [
@@ -34,6 +35,7 @@ const CURRENCIES = [
 
 export default function SettingsPage() {
   const { success, error: showError } = useToast()
+  const { confirm } = useConfirm();
   const [user, setUser] = useState(null)
 
   // Settings state
@@ -60,7 +62,7 @@ export default function SettingsPage() {
     }
   }, [])
 
-  const updateSetting = (key, value) => {
+  const updateSetting = async (key, value) => {
     setSettings((prev) => ({
       ...prev,
       [key]: value,
@@ -75,7 +77,7 @@ export default function SettingsPage() {
     }
   }
 
-  const updateNotification = (key, value) => {
+  const updateNotification = async (key, value) => {
     setSettings((prev) => ({
       ...prev,
       notifications: {
@@ -109,13 +111,13 @@ export default function SettingsPage() {
       success('Data berhasil di-export')
     } catch (err) {
       console.error('Export failed:', err)
-      showError('Gagal mengexport data')
+      showError(err.response?.data?.message || 'Gagal mengexport data')
     }
   }
 
-  const handleClearData = () => {
-    if (!confirm('Yakin ingin menghapus semua data lokal? Data di server tidak akan terpengaruh.')) return
-    if (!confirm('Ini akan menghapus semua preference dan cache lokal. Lanjutkan?')) return
+  const handleClearData = async () => {
+    if (!await confirm('Yakin ingin menghapus semua data lokal? Data di server tidak akan terpengaruh.')) return
+    if (!await confirm('Ini akan menghapus semua preference dan cache lokal. Lanjutkan?')) return
 
     localStorage.removeItem('fintime_onboarding_complete')
     // Keep user data, just clear settings
@@ -209,7 +211,7 @@ export default function SettingsPage() {
                     >
                       {LANGUAGES.map((lang) => (
                         <option key={lang.code} value={lang.code} style={{ background: '#02111f', color: 'white' }}>
-                          {lang.flag} {lang.label}
+                          {lang.label}
                         </option>
                       ))}
                     </select>
@@ -368,7 +370,7 @@ export default function SettingsPage() {
                   border: '1px solid rgba(0,245,255,0.2)',
                 }}
               >
-                ⏱
+                â±
               </div>
               <h3 className="text-xl font-bold mb-1" style={{ color: 'white' }}>FinTime</h3>
               <p className="text-sm mb-4" style={{ color: '#7aa6c2' }}>AI Financial Time Machine</p>
@@ -385,7 +387,7 @@ export default function SettingsPage() {
               <h4 className="font-semibold mb-3" style={{ color: 'white' }}>Credits</h4>
               <div className="space-y-2 text-sm" style={{ color: '#7aa6c2' }}>
                 <p>Coding Camp 2026</p>
-                <p>Dicoding × DBS Foundation</p>
+                <p>Dicoding Ã— DBS Foundation</p>
                 <p>Team: CC26-PSU411</p>
               </div>
             </div>

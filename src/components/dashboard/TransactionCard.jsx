@@ -19,7 +19,7 @@ import TransactionView from './TransactionView'
 import LedgerView from './LedgerView'
 import { saveLabelRule } from '../../lib/transactionApi'
 
-export default function TransactionCard({ userId, onAddNew, onRefresh }) {
+export default function TransactionCard({ userId, onAddNew, onRefresh, refreshTrigger }) {
   const [transactions, setTransactions] = useState([])
   const [showAll, setShowAll] = useState(false)
   const [transactionFilter, setTransactionFilter] = useState('all')
@@ -36,7 +36,7 @@ export default function TransactionCard({ userId, onAddNew, onRefresh }) {
       loadTransactions()
       loadUnlabelledCount()
     }
-  }, [userId])
+  }, [userId, refreshTrigger])
 
   const loadTransactions = async () => {
     try {

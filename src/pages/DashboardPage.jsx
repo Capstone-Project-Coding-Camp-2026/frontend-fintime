@@ -403,13 +403,13 @@ export default function DashboardPage() {
             <section className="mb-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <AccountCard
-                  key={`account-${refreshKey}`}
+                  refreshTrigger={refreshKey}
                   userId={user?.id}
                   onDelete={handleRefresh}
                   onAddNew={() => setShowAddAccount(true)}
                 />
                 <TransactionCard
-                  key={`transaction-${refreshKey}`}
+                  refreshTrigger={refreshKey}
                   userId={user?.id}
                   onAddNew={() => {
                     setDefaultTransactionType('expense')
@@ -454,17 +454,17 @@ export default function DashboardPage() {
 
             {/* Budget Section */}
             <section className="mt-8">
-              <BudgetCard onRefresh={handleRefresh} />
+              <BudgetCard onRefresh={handleRefresh} refreshTrigger={refreshKey} />
             </section>
 
             {/* Debt Section */}
             <section className="mt-8">
-              <DebtCard onRefresh={handleRefresh} />
+              <DebtCard onRefresh={handleRefresh} refreshTrigger={refreshKey} />
             </section>
 
             {/* Goal Section */}
             <section className="mt-8">
-              <GoalCard onRefresh={handleRefresh} />
+              <GoalCard onRefresh={handleRefresh} refreshTrigger={refreshKey} />
             </section>
 
             {/* Onboarding Wizard */}

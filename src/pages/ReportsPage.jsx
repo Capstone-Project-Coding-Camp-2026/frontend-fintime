@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   FileText,
@@ -218,7 +218,7 @@ export default function ReportsPage() {
       setMonthlyTrend(sortedTrend)
     } catch (err) {
       console.error('Failed to fetch reports:', err)
-      showError('Gagal memuat data laporan')
+      showError(err.response?.data?.message || 'Gagal memuat data laporan')
     } finally {
       setLoading(false)
     }
@@ -238,7 +238,7 @@ export default function ReportsPage() {
       }
     } catch (err) {
       console.error('Export failed:', err)
-      showError('Gagal mengexport laporan')
+      showError(err.response?.data?.message || 'Gagal mengexport laporan')
     } finally {
       setExporting(false)
     }

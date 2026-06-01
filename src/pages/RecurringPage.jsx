@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Repeat, Plus, Pencil, Trash2, Calendar, Clock, Check, X } from 'lucide-react'
 import DashboardLayout from '../components/layout/DashboardLayout'
 import { useToast } from '../context/ToastContext'
 import api from '../lib/api'
+import { useConfirm } from '../context/ConfirmContext';
 
 const formatCurrency = (value) => {
   return new Intl.NumberFormat('id-ID', {
@@ -23,6 +24,7 @@ const FREQUENCIES = [
 
 export default function RecurringPage() {
   const { success, error: showError } = useToast()
+  const { confirm } = useConfirm();
   const [recurring, setRecurring] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -95,11 +97,11 @@ export default function RecurringPage() {
       loadRecurring()
     } catch (err) {
       console.error('Failed to save recurring:', err)
-      showError('Gagal menyimpan transaksi berulang')
+      showError(err.response?.data?.message || 'Gagal menyimpan transaksi berulang')
     }
   }
 
-  const handleEdit = (item) => {
+  const handleEdit = async (item) => {
     setFormData({
       name: item.name || '',
       type: item.type || 'expense',
@@ -114,14 +116,14 @@ export default function RecurringPage() {
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('Hapus transaksi berulang ini?')) return
+    if (!await confirm('Hapus transaksi berulang ini?')) return
     try {
       await api.delete(`/recurring/${id}`)
       success('Transaksi berulang berhasil dihapus')
       loadRecurring()
     } catch (err) {
       console.error('Failed to delete recurring:', err)
-      showError('Gagal menghapus transaksi berulang')
+      showError(err.response?.data?.message || 'Gagal menghapus transaksi berulang')
     }
   }
 
@@ -132,7 +134,7 @@ export default function RecurringPage() {
       loadRecurring()
     } catch (err) {
       console.error('Failed to toggle recurring:', err)
-      showError('Gagal mengubah status')
+      showError(err.response?.data?.message || 'Gagal mengubah status')
     }
   }
 
@@ -293,7 +295,7 @@ export default function RecurringPage() {
                               </span>
                             </div>
                             <p className="text-sm" style={{ color: '#7aa6c2' }}>
-                              {freqInfo.label} • {item.category || 'lainnya'}
+                              {freqInfo.label} â€¢ {item.category || 'lainnya'}
                             </p>
                           </div>
                         </div>
@@ -549,3 +551,4 @@ export default function RecurringPage() {
     </DashboardLayout>
   )
 }
+

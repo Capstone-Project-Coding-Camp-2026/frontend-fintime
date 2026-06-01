@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+﻿import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import {
@@ -12,6 +12,7 @@ import {
 
 import ParticleField from '../components/Particlefield'
 import api from '../lib/api'
+import { useToast } from '../context/ToastContext'
 import {
   StepCheckpoint,
   StepPersonal,
@@ -26,7 +27,8 @@ import {
 } from '../components/register'
 
 export default function RegisterPage() {
-  // ─── State ───────────────────────────────────────────────
+  // â”€â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const { success, error: showError } = useToast()
   const [currentStep, setCurrentStep] = useState(0)
   const [isSuccess, setIsSuccess] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -35,7 +37,7 @@ export default function RegisterPage() {
   const [step2CanNext, setStep2CanNext] = useState(false) // Untuk StepContact
   const navigate = useNavigate()
 
-  // ─── OTP State ──────────────────────────────────────────
+  // â”€â”€â”€ OTP State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [showOtp, setShowOtp] = useState(false)
   const [otpValues, setOtpValues] = useState(['', '', '', '', '', ''])
   const [otpLoading, setOtpLoading] = useState(false)
@@ -51,7 +53,7 @@ export default function RegisterPage() {
     return () => clearTimeout(timer)
   }, [otpCountdown])
 
-  // ─── Validasi step ────────────────────────────────────────
+  // â”€â”€â”€ Validasi step â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const canNext = () => {
     if (currentStep === 0) {
       return (
@@ -112,10 +114,10 @@ export default function RegisterPage() {
     }
   }
 
-  // ─── Progress calculation ─────────────────────────────────
+  // â”€â”€â”€ Progress calculation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const progressPct = (currentStep / (STEPS.length - 1)) * 100
 
-  // ─── OTP Handlers ─────────────────────────────────────────
+  // â”€â”€â”€ OTP Handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const handleOtpChange = (index, value) => {
     if (!/^\d?$/.test(value)) return
     const newOtp = [...otpValues]
@@ -151,10 +153,10 @@ export default function RegisterPage() {
       setOtpCountdown(60)
       setOtpValues(['', '', '', '', '', ''])
       setOtpError('')
-      alert('Kode OTP baru telah berhasil dikirim ulang ke email Anda!')
+      success('Kode OTP baru telah berhasil dikirim ulang ke email Anda!')
     } catch (err) {
       console.error('Resend OTP failed:', err)
-      alert('Gagal mengirim ulang OTP.')
+      showError(err.response?.data?.message || 'Gagal mengirim ulang OTP.')
     }
   }
 
@@ -186,7 +188,7 @@ export default function RegisterPage() {
     }
   }
 
-  // ─── Render ───────────────────────────────────────────────
+  // â”€â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   return (
     <div
       className="relative min-h-screen min-h-[100dvh] flex overflow-hidden"
@@ -218,7 +220,7 @@ export default function RegisterPage() {
               className="w-8 h-8 rounded-full border border-cyan-DEFAULT/40 flex items-center justify-center text-sm"
               style={{ borderColor: 'rgba(0,245,255,0.4)' }}
             >
-              ⏱
+              â±
             </motion.div>
             <span
               className="text-xl font-bold tracking-tight"
@@ -507,3 +509,4 @@ export default function RegisterPage() {
     </div>
   )
 }
+
