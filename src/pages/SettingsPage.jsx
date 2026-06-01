@@ -15,6 +15,7 @@ import {
   Check,
   Languages,
   Palette,
+  ChevronDown,
 } from 'lucide-react'
 import DashboardLayout from '../components/layout/DashboardLayout'
 import { useToast } from '../context/ToastContext'
@@ -188,22 +189,27 @@ export default function SettingsPage() {
                     <p className="font-medium" style={{ color: 'white' }}>Bahasa</p>
                     <p className="text-sm" style={{ color: '#7aa6c2' }}>Pilih bahasa antarmuka</p>
                   </div>
-                  <select
-                    value={settings.language}
-                    onChange={(e) => updateSetting('language', e.target.value)}
-                    className="px-4 py-2 rounded-xl outline-none"
-                    style={{
-                      background: '#02111f',
-                      border: '1px solid rgba(0,245,255,0.15)',
-                      color: 'white',
-                    }}
-                  >
-                    {LANGUAGES.map((lang) => (
-                      <option key={lang.code} value={lang.code}>
-                        {lang.flag} {lang.label}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative min-w-[200px]">
+                    <select
+                      value={settings.language}
+                      onChange={(e) => updateSetting('language', e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl outline-none appearance-none cursor-pointer transition-all pr-10"
+                      style={{
+                        background: 'rgba(0,245,255,0.04)',
+                        border: '1px solid rgba(0,245,255,0.15)',
+                        color: 'white',
+                      }}
+                      onMouseOver={(e) => e.target.style.background = 'rgba(0,245,255,0.08)'}
+                      onMouseOut={(e) => e.target.style.background = 'rgba(0,245,255,0.04)'}
+                    >
+                      {LANGUAGES.map((lang) => (
+                        <option key={lang.code} value={lang.code} style={{ background: '#02111f', color: 'white' }}>
+                          {lang.flag} {lang.label}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: '#00f5ff' }} />
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-between py-3">
@@ -211,22 +217,27 @@ export default function SettingsPage() {
                     <p className="font-medium" style={{ color: 'white' }}>Mata Uang</p>
                     <p className="text-sm" style={{ color: '#7aa6c2' }}>Pilih mata uang utama</p>
                   </div>
-                  <select
-                    value={settings.currency}
-                    onChange={(e) => updateSetting('currency', e.target.value)}
-                    className="px-4 py-2 rounded-xl outline-none"
-                    style={{
-                      background: '#02111f',
-                      border: '1px solid rgba(0,245,255,0.15)',
-                      color: 'white',
-                    }}
-                  >
-                    {CURRENCIES.map((curr) => (
-                      <option key={curr.code} value={curr.code}>
-                        {curr.symbol} {curr.label}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative min-w-[200px]">
+                    <select
+                      value={settings.currency}
+                      onChange={(e) => updateSetting('currency', e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl outline-none appearance-none cursor-pointer transition-all pr-10"
+                      style={{
+                        background: 'rgba(0,245,255,0.04)',
+                        border: '1px solid rgba(0,245,255,0.15)',
+                        color: 'white',
+                      }}
+                      onMouseOver={(e) => e.target.style.background = 'rgba(0,245,255,0.08)'}
+                      onMouseOut={(e) => e.target.style.background = 'rgba(0,245,255,0.04)'}
+                    >
+                      {CURRENCIES.map((curr) => (
+                        <option key={curr.code} value={curr.code} style={{ background: '#02111f', color: 'white' }}>
+                          {curr.symbol} {curr.label}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: '#00f5ff' }} />
+                  </div>
                 </div>
               </div>
             </div>
