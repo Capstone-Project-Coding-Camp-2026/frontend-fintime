@@ -20,6 +20,7 @@ import BudgetCard from '../components/budget/BudgetCard'
 import DebtCard from '../components/debt/DebtCard'
 import GoalCard from '../components/goal/GoalCard'
 import OnboardingWizard from '../components/onboarding/OnboardingWizard'
+import FinancialLearning from '../components/dashboard/FinancialLearning'
 
 export default function DashboardPage() {
   const [showAddTransaction, setShowAddTransaction] = useState(false)
@@ -272,7 +273,7 @@ export default function DashboardPage() {
             {/* Quick Actions */}
             <section className="mb-8">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <motion.button
+                {/* <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => {
@@ -334,7 +335,7 @@ export default function DashboardPage() {
                       Tambah baru
                     </p>
                   </div>
-                </motion.button>
+                </motion.button> */}
 
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -468,10 +469,18 @@ export default function DashboardPage() {
             </section>
 
             {/* Onboarding Wizard */}
-            <OnboardingWizard
-              showOnboarding={showOnboardingManual}
-              onComplete={() => setShowOnboardingManual(false)}
-            />
+            <section className="mt-8">
+              <OnboardingWizard
+                showOnboarding={showOnboardingManual}
+                onComplete={() => setShowOnboardingManual(false)}
+              />
+            </section>
+
+            {/* Financial Learning Section */}
+            <section className="mt-8">
+              <FinancialLearning condition={avatarCondition} />
+            </section>
+
           </main>
 
           {/* Modals */}

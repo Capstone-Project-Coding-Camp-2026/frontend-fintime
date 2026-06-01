@@ -416,7 +416,7 @@ export default function AvatarConditionBanner({
               </p>
             </div>
 
-            <button
+            {/* <button
               className="w-full py-2.5 rounded-xl text-xs font-bold transition-all hover:bg-cyan-500/20"
               style={{
                 border: '1px solid var(--cyan)',
@@ -425,7 +425,7 @@ export default function AvatarConditionBanner({
               }}
             >
               Lihat Detail Strategi Investasi
-            </button>
+            </button> */}
           </div>
         </motion.div>
       </div>
