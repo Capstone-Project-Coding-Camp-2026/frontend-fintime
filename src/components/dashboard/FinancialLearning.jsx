@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, Sparkles, ChevronDown, ExternalLink } from 'lucide-react';
 import api from '../../lib/api';
-import { useLanguage } from '../../context/LanguageContext';
 
 export default function FinancialLearning({ condition = 'normal' }) {
-  const { language, t } = useLanguage();
   const [learnings, setLearnings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState(null);
@@ -82,7 +80,7 @@ export default function FinancialLearning({ condition = 'normal' }) {
               <h2 className="text-xl font-bold flex items-center gap-2 text-white">
                 Financial Learning <Sparkles className="w-4 h-4 text-cyan-400 animate-pulse" />
               </h2>
-              <p className="text-sm text-gray-400">{language === 'en' ? 'Personalized from your financial forecast' : 'Dipersonalisasi dari proyeksi keuangan Anda'}</p>
+              <p className="text-sm text-gray-400">Personalized from your financial forecast</p>
             </div>
           </div>
         </div>
@@ -90,13 +88,10 @@ export default function FinancialLearning({ condition = 'normal' }) {
         <div className="space-y-3">
           {learnings.map((item, idx) => {
             const isExpanded = expandedId === item.id;
-            const displayTitle = language === 'en' && item.titleEn ? item.titleEn : item.title;
-            const displayContent = language === 'en' && item.contentEn ? item.contentEn : item.content;
-            
             // Generate a short excerpt if content is long and not expanded
-            const excerpt = displayContent?.length > 100
-              ? displayContent.substring(0, 100) + '...'
-              : displayContent;
+            const excerpt = item.content?.length > 100
+              ? item.content.substring(0, 100) + '...'
+              : item.content;
 
             return (
               <motion.div
@@ -119,11 +114,11 @@ export default function FinancialLearning({ condition = 'normal' }) {
                       <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${getCategoryColor(item.category)}`}>
                         {item.category?.toUpperCase() || 'FINANCE'}
                       </span>
-                      <span className="text-xs text-gray-500">5 {language === 'en' ? 'min read' : 'mnt baca'}</span>
+                      <span className="text-xs text-gray-500">5 min read</span>
                     </div>
 
                     <h3 className={`text-base font-medium mb-1 transition-colors ${isExpanded ? 'text-cyan-100' : 'text-gray-200 group-hover:text-cyan-300'}`}>
-                      {displayTitle}
+                      {item.title}
                     </h3>
 
                     <AnimatePresence mode="wait">
@@ -148,14 +143,14 @@ export default function FinancialLearning({ condition = 'normal' }) {
                         >
                           <div className="pt-3 border-t border-gray-700/50 mt-3">
                             <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-line">
-                              {displayContent}
+                              {item.content}
                             </p>
                           </div>
 
                           <div className="mt-4 flex justify-end">
                             <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer">
                               <button className="text-xs font-medium text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors">
-                                {language === 'en' ? 'Read more' : 'Baca selengkapnya'} <ExternalLink className="w-3 h-3" />
+                                Baca selengkapnya <ExternalLink className="w-3 h-3" />
                               </button>
                             </a>
                           </div>
