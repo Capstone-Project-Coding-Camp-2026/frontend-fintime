@@ -1,32 +1,34 @@
 import { useNavigate } from 'react-router-dom'
 import { LayoutDashboard, User as UserIcon, FileText, LogOut } from 'lucide-react'
+import { useLanguage } from '../../context/LanguageContext'
 
 export default function BottomNav({ activePage = 'dashboard', onLogout }) {
   const navigate = useNavigate()
+  const { t } = useLanguage()
 
   const navItems = [
     {
       id: 'dashboard',
       icon: LayoutDashboard,
-      label: 'Dash',
+      label: t('nav_dash_short'),
       onClick: () => navigate('/dashboard'),
     },
     {
       id: 'reports',
       icon: FileText,
-      label: 'Laporan',
+      label: t('nav_reports'),
       onClick: () => navigate('/reports'),
     },
     {
       id: 'profile',
       icon: UserIcon,
-      label: 'Profil',
+      label: t('nav_profile'),
       onClick: () => navigate('/profile'),
     },
     {
       id: 'logout',
       icon: LogOut,
-      label: 'Keluar',
+      label: t('nav_logout'),
       onClick: onLogout,
       isDestructive: true,
     },

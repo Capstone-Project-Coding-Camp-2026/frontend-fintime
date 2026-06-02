@@ -3,12 +3,14 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { NAV_LINKS } from "../data/timeline";
 import Logo from "./common/Logo";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 50);
@@ -28,6 +30,15 @@ export default function Navbar() {
       navigate('/login');
     }
     setMobileOpen(false);
+  };
+
+  const getNavLinkLabel = (href) => {
+    switch (href) {
+      case "#timeline": return t('nav_landing_timeline');
+      case "#features": return t('nav_landing_features');
+      case "#how-it-works": return t('nav_landing_how');
+      default: return "";
+    }
   };
 
   return (
@@ -70,7 +81,7 @@ export default function Navbar() {
                   (e.target.style.color = "var(--text-muted)")
                 }
               >
-                {link.label}
+                {getNavLinkLabel(link.href)}
               </button>
             </li>
           ))}
@@ -86,7 +97,7 @@ export default function Navbar() {
               className="hidden md:flex items-center gap-2 btn-ghost text-sm font-bold px-4 py-2"
               style={{ fontFamily: "Sora, sans-serif" }}
             >
-              <span>Login</span>
+              <span>{t('nav_login')}</span>
               <span style={{ color: "var(--cyan)" }}>→</span>
             </motion.button>
           )}
@@ -96,7 +107,7 @@ export default function Navbar() {
             className="btn-primary text-sm font-bold px-5 py-2.5"
             onClick={handleLaunchApp}
           >
-            {isLoggedIn ? "Dashboard" : "Launch App"}
+            {isLoggedIn ? t('nav_dashboard') : t('nav_launch_app')}
           </motion.button>
 
           {/* Mobile Menu Toggle */}
@@ -163,7 +174,7 @@ export default function Navbar() {
               fontFamily: "Sora, sans-serif",
             }}
           >
-            {link.label}
+            {getNavLinkLabel(link.href)}
           </button>
         ))}
         {!isLoggedIn && (
@@ -171,7 +182,7 @@ export default function Navbar() {
             onClick={() => navigate('/login')}
             className="btn-ghost text-sm font-bold py-2.5 mt-2"
           >
-            Login
+            {t('nav_login')}
           </button>
         )}
       </motion.div>

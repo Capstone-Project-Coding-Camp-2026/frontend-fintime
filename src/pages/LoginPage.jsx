@@ -8,8 +8,10 @@ import {
 } from 'lucide-react'
 import ParticleField from '../components/Particlefield'
 import api from '../lib/api'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function LoginPage() {
+  const { t } = useLanguage()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -149,21 +151,21 @@ export default function LoginPage() {
 
           <div className="mt-4">
             <h2 className="text-3xl font-extrabold tracking-tight leading-tight">
-              <span style={{ color: 'var(--text)' }}>Selamat Datang</span>
+              <span style={{ color: 'var(--text)' }}>{t('login_sidebar_welcome')}</span>
               <br />
-              <span className="shimmer-text">Kembali</span>
+              <span className="shimmer-text">{t('login_sidebar_back')}</span>
             </h2>
             <p className="text-sm mt-4 max-w-xs" style={{ color: 'var(--text-muted)' }}>  
-              Lanjutkan perjalanan finansialmu dan lihat bagaimana AI kami memproyeksikan masa depanmu.
+              {t('login_sidebar_desc')}
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-3 w-full max-w-sm mt-2">
             {[
-              { icon: TrendingUp, value: '4.2M+', label: 'Proyeksi Dihasilkan' },
-              { icon: Bot, value: 'AI Powered', label: 'NLP Engine' },
-              { icon: Target, value: '98%', label: 'Akurasi Model' },
-              { icon: Shield, value: '256-bit', label: 'Enkripsi' },
+              { icon: TrendingUp, value: '4.2M+', label: t('login_stat_projections') },
+              { icon: Bot, value: 'AI Powered', label: t('login_stat_nlp') },
+              { icon: Target, value: '98%', label: t('login_stat_accuracy') },
+              { icon: Shield, value: '256-bit', label: t('login_stat_encryption') },
             ].map(stat => (
               <div
                 key={stat.label}
@@ -191,7 +193,7 @@ export default function LoginPage() {
           className="absolute top-6 right-6 flex items-center gap-1.5 text-sm font-semibold no-underline"
           style={{ color: 'var(--text-muted)', fontFamily: 'Sora, sans-serif' }}
         >
-          <ChevronLeft size={14} /> Kembali
+          <ChevronLeft size={14} /> {t('btn_back')}
         </Link>
 
         <div className="w-full max-w-md mx-auto">
@@ -222,21 +224,21 @@ export default function LoginPage() {
                 FinTime
               </span>
             </div>
-            <div className="section-label">Welcome Back</div>
+            <div className="section-label">{t('auth_login_title')}</div>
             <h2 className="text-4xl font-extrabold tracking-tight mb-2" style={{ fontFamily: 'Sora, sans-serif' }}>
-              Masuk ke <span className="grad-text">FinTime</span>
+              {t('auth_login_to')} <span className="grad-text">FinTime</span>
             </h2>
             <p className="text-sm mb-8" style={{ color: 'var(--text-muted)' }}>
-              Belum punya akun?{' '}
+              {t('auth_no_account')}{' '}
               <Link to="/register" className="font-bold no-underline" style={{ color: '#00f5ff' }}>
-                Daftar di sini
+                {t('auth_register_now')}
               </Link>
             </p>
 
             <form onSubmit={handleLogin} className="flex flex-col gap-5">
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-bold tracking-widest uppercase" style={{ color: 'var(--text-dim)' }}>
-                  Email <span style={{ color: '#00f5ff' }}>*</span>
+                  {t('auth_email_label')} <span style={{ color: '#00f5ff' }}>*</span>
                 </label>
                 <div className="relative">
                   <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-dim)' }} />
@@ -253,7 +255,7 @@ export default function LoginPage() {
 
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-bold tracking-widest uppercase" style={{ color: 'var(--text-dim)' }}>
-                  Password <span style={{ color: '#00f5ff' }}>*</span>
+                  {t('auth_password_label')} <span style={{ color: '#00f5ff' }}>*</span>
                 </label>
                 <div className="relative">
                   <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-dim)' }} />
@@ -284,14 +286,14 @@ export default function LoginPage() {
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
                   />
-                  <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Ingat saya</span>
+                  <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{t('auth_remember_me')}</span>
                 </label>
                 <Link
                   to="/forgot-password"
                   className="text-xs font-bold no-underline"
                   style={{ color: '#00f5ff' }}
                 >
-                  Lupa password?
+                  {t('auth_forgot_password')}
                 </Link>
               </div>
 
@@ -323,12 +325,12 @@ export default function LoginPage() {
                 {loading ? (
                   <>
                     <Loader2 size={18} className="animate-spin" />
-                    <span>Memuat...</span>
+                    <span>{t('btn_loading')}</span>
                   </>
                 ) : (
                   <>
                     <LogIn size={18} />
-                    <span>Masuk</span>
+                    <span>{t('auth_login_button')}</span>
                   </>
                 )}
               </motion.button>

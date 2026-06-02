@@ -75,6 +75,22 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
 
   const [paymentAmount, setPaymentAmount] = useState('')
 
+  // Auto calculate monthly payment
+  useEffect(() => {
+    const principal = parseFloat(formData.totalAmount)
+    const rate = parseFloat(formData.interestRate) || 0
+    const months = parseInt(formData.tenorMonths)
+
+    if (principal && months > 0) {
+      const totalInterest = principal * (rate / 100) * (months / 12)
+      const totalPayment = principal + totalInterest
+      const monthly = Math.round(totalPayment / months)
+      setFormData(prev => ({ ...prev, monthlyPayment: monthly.toString() }))
+    } else {
+      setFormData(prev => ({ ...prev, monthlyPayment: '' }))
+    }
+  }, [formData.totalAmount, formData.interestRate, formData.tenorMonths])
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
@@ -336,9 +352,9 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
                         <h3 className="font-bold text-sm sm:text-base truncate" style={{ color: 'white' }}>
                           {debt.name || 'Hutang'}
                         </h3>
-                        <p className="text-[11px] sm:text-sm truncate" style={{ color: '#7aa6c2' }}>
-                          {typeInfo.label} {debt.lender ? `â€¢ ${debt.lender}` : ''}
-                        </p>
+                          <p className="text-[11px] sm:text-sm truncate" style={{ color: '#7aa6c2' }}>
+                            {typeInfo.label} {debt.lender ? `• ${debt.lender}` : ''}
+                          </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
@@ -674,15 +690,16 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
                   </label>
                   <input
                     type="text"
+                    disabled={true}
                     value={formData.monthlyPayment ? new Intl.NumberFormat('id-ID').format(formData.monthlyPayment) : ''}
                     onChange={(e) => {
                       const val = e.target.value.replace(/\D/g, '')
                       setFormData({ ...formData, monthlyPayment: val })
                     }}
-                    placeholder="800.000"
-                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none text-sm sm:text-base"
+                    placeholder="Otomatis Dihitung"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none text-sm sm:text-base cursor-not-allowed opacity-70"
                     style={{
-                      background: '#02111f',
+                      background: 'rgba(0,245,255,0.05)',
                       border: '1px solid rgba(0,245,255,0.15)',
                       color: 'white',
                     }}
@@ -940,4 +957,6 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
     </div>
   )
 }
+
+
 

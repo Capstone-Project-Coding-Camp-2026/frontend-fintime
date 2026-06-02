@@ -18,8 +18,10 @@ import { BookOpen, Filter } from 'lucide-react'
 import api, { fetcher } from '../../lib/api'
 import TransactionView from './TransactionView'
 import LedgerView from './LedgerView'
+import { useLanguage } from '../../context/LanguageContext'
 
 export default function TransactionCard({ userId, onAddNew, onRefresh, refreshTrigger }) {
+  const { t } = useLanguage()
   const [showAll, setShowAll] = useState(false)
   const [transactionFilter, setTransactionFilter] = useState('all')
   const [ledgerFilter, setLedgerFilter] = useState('all')
@@ -155,9 +157,9 @@ export default function TransactionCard({ userId, onAddNew, onRefresh, refreshTr
     const now = new Date()
     const diff = Math.floor((now - date) / (1000 * 60 * 60 * 24))
 
-    if (diff === 0) return 'Hari ini'
-    if (diff === 1) return 'Kemarin'
-    if (diff < 7) return `${diff} hari lalu`
+    if (diff === 0) return t('time_today')
+    if (diff === 1) return t('time_yesterday')
+    if (diff < 7) return `${diff} ${t('time_days_ago')}`
     return date.toLocaleDateString('id-ID', {
       day: 'numeric',
       month: 'short',
@@ -200,13 +202,13 @@ export default function TransactionCard({ userId, onAddNew, onRefresh, refreshTr
           </div>
           <div>
             <h3 className="font-semibold" style={{ color: 'var(--text)' }}>
-              {viewMode === 'ledger' ? 'Smart Ledger' : 'Transaksi Terbaru'}
+              {viewMode === 'ledger' ? t('dash_ledger_title') : t('dash_transactions_title')}
             </h3>
             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
               {viewMode === 'ledger'
                 ? unlabelledTx.length
                 : transactions.length}{' '}
-              transaksi
+              {t('dash_unit_transactions')}
             </p>
           </div>
         </div>
@@ -219,7 +221,7 @@ export default function TransactionCard({ userId, onAddNew, onRefresh, refreshTr
               color: '#020b18',
             }}
           >
-            + Tambah
+            + {t('btn_add')}
           </button>
           <button
             onClick={handleToggleLedger}
@@ -239,7 +241,7 @@ export default function TransactionCard({ userId, onAddNew, onRefresh, refreshTr
           >
             <span className="flex items-center gap-1.5">
               <BookOpen size={13} />
-              Smart Ledger
+              {t('dash_ledger_title')}
             </span>
 
             {pendingCount > 0 && viewMode !== 'ledger' && (

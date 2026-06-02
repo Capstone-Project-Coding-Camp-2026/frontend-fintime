@@ -21,6 +21,7 @@ import DashboardLayout from '../components/layout/DashboardLayout'
 import { useToast } from '../context/ToastContext'
 import api from '../lib/api'
 import { useConfirm } from '../context/ConfirmContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const LANGUAGES = [
   { code: 'id', label: 'Indonesia' },
@@ -36,6 +37,7 @@ const CURRENCIES = [
 export default function SettingsPage() {
   const { success, error: showError } = useToast()
   const { confirm } = useConfirm();
+  const { t, changeLanguage } = useLanguage();
   const [user, setUser] = useState(null)
 
   // Settings state
@@ -69,11 +71,16 @@ export default function SettingsPage() {
     }))
 
     // Persist to localStorage
-    localStorage.setItem(`fintime_${key}`, value)
+    localStorage.setItem('fintime_' + key, value)
     
     // Apply theme immediately
     if (key === 'theme') {
       document.documentElement.setAttribute('data-theme', value)
+    }
+    
+    // Apply language context immediately
+    if (key === 'language' && typeof changeLanguage === 'function') {
+      changeLanguage(value)
     }
   }
 
@@ -86,7 +93,7 @@ export default function SettingsPage() {
       },
     }))
 
-    localStorage.setItem(`fintime_notify_${key.replace(/([A-Z])/g, '_$1').toLowerCase()}`, value.toString())
+    localStorage.setItem('fintime_notify_' + key.replace(/([A-Z])/g, '_$1').toLowerCase(), value.toString())
   }
 
   const handleExportData = async () => {
@@ -138,12 +145,12 @@ export default function SettingsPage() {
             >
               <h4 className="font-semibold mb-4 flex items-center gap-2" style={{ color: 'white' }}>
                 <Palette size={18} style={{ color: '#00f5ff' }} />
-                Tampilan
+                {t('theme_title')}
               </h4>
               <div className="flex items-center justify-between py-3 border-b" style={{ borderColor: 'rgba(0,245,255,0.06)' }}>
                 <div>
-                  <p className="font-medium" style={{ color: 'white' }}>Tema</p>
-                  <p className="text-sm" style={{ color: '#7aa6c2' }}>Pilih tampilan aplikasi</p>
+                  <p className="font-medium" style={{ color: 'white' }}>{t('theme_label')}</p>
+                  <p className="text-sm" style={{ color: '#7aa6c2' }}>{t('theme_desc')}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -158,7 +165,7 @@ export default function SettingsPage() {
                     }}
                   >
                     <Moon size={16} />
-                    Dark
+                    {t('theme_dark')}
                   </button>
                   <button
                     onClick={() => updateSetting('theme', 'light')}
@@ -172,7 +179,7 @@ export default function SettingsPage() {
                     }}
                   >
                     <Sun size={16} />
-                    Light
+                    {t('theme_light')}
                   </button>
                 </div>
               </div>
@@ -187,14 +194,14 @@ export default function SettingsPage() {
             >
               <h4 className="font-semibold mb-4 flex items-center gap-2" style={{ color: 'white' }}>
                 <Globe size={18} style={{ color: '#00f5ff' }} />
-                Regional
+                {t('regional_title')}
               </h4>
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between py-3 border-b" style={{ borderColor: 'rgba(0,245,255,0.06)' }}>
                   <div>
-                    <p className="font-medium" style={{ color: 'white' }}>Bahasa</p>
-                    <p className="text-sm" style={{ color: '#7aa6c2' }}>Pilih bahasa antarmuka</p>
+                    <p className="font-medium" style={{ color: 'white' }}>{t('language_label')}</p>
+                    <p className="text-sm" style={{ color: '#7aa6c2' }}>{t('language_desc')}</p>
                   </div>
                   <div className="relative min-w-[200px]">
                     <select
@@ -221,8 +228,8 @@ export default function SettingsPage() {
 
                 <div className="flex items-center justify-between py-3">
                   <div>
-                    <p className="font-medium" style={{ color: 'white' }}>Mata Uang</p>
-                    <p className="text-sm" style={{ color: '#7aa6c2' }}>Pilih mata uang utama</p>
+                    <p className="font-medium" style={{ color: 'white' }}>{t('currency_label')}</p>
+                    <p className="text-sm" style={{ color: '#7aa6c2' }}>{t('currency_desc')}</p>
                   </div>
                   <div className="relative min-w-[200px]">
                     <select
@@ -255,11 +262,11 @@ export default function SettingsPage() {
         return (
           <div className="space-y-4">
             {[
-              { key: 'budgetAlerts', label: 'Peringatan Budget', desc: 'Notifikasi saat budget hampir habis' },
-              { key: 'debtReminders', label: 'Pengingat Hutang', desc: 'Notifikasi jatuh tempo cicilan' },
-              { key: 'goalUpdates', label: 'Update Target', desc: 'Notifikasi progress target tabungan' },
-              { key: 'weeklyReport', label: 'Laporan Mingguan', desc: 'Kirim ringkasan keuangan tiap minggu' },
-              { key: 'marketing', label: 'Promo & Update', desc: 'Informasi fitur baru dan promo' },
+              { key: 'budgetAlerts', label: t('notif_budget'), desc: t('notif_budget_desc') },
+              { key: 'debtReminders', label: t('notif_debt'), desc: t('notif_debt_desc') },
+              { key: 'goalUpdates', label: t('notif_goals'), desc: t('notif_goals_desc') },
+              { key: 'weeklyReport', label: t('notif_weekly'), desc: t('notif_weekly_desc') },
+              { key: 'marketing', label: t('notif_promo'), desc: t('notif_promo_desc') },
             ].map((item) => (
               <div
                 key={item.key}
@@ -309,10 +316,10 @@ export default function SettingsPage() {
             >
               <h4 className="font-semibold mb-4 flex items-center gap-2" style={{ color: 'white' }}>
                 <Database size={18} style={{ color: '#00f5ff' }} />
-                Backup Data
+                {t('data_backup_title')}
               </h4>
               <p className="text-sm mb-4" style={{ color: '#7aa6c2' }}>
-                Export semua data Anda dalam format JSON untuk backup.
+                {t('data_backup_desc')}
               </p>
               <button
                 onClick={handleExportData}
@@ -324,7 +331,7 @@ export default function SettingsPage() {
                 }}
               >
                 <Download size={16} />
-                Export Data
+                {t('btn_backup')}
               </button>
             </div>
 
@@ -337,17 +344,17 @@ export default function SettingsPage() {
             >
               <h4 className="font-semibold mb-4 flex items-center gap-2" style={{ color: '#f87171' }}>
                 <Trash2 size={18} />
-                Zona Berbahaya
+                {t('danger_title')}
               </h4>
               <p className="text-sm mb-4" style={{ color: '#7aa6c2' }}>
-                Hapus semua data lokal dan cache. Data di server tidak akan terpengaruh.
+                {t('danger_clear_data_desc')}
               </p>
               <button
                 onClick={handleClearData}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold transition-all bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20"
               >
                 <Trash2 size={16} />
-                Bersihkan Data Lokal
+                {t('btn_clear')}
               </button>
             </div>
           </div>
@@ -373,8 +380,8 @@ export default function SettingsPage() {
                 â±
               </div>
               <h3 className="text-xl font-bold mb-1" style={{ color: 'white' }}>FinTime</h3>
-              <p className="text-sm mb-4" style={{ color: '#7aa6c2' }}>AI Financial Time Machine</p>
-              <p className="text-xs" style={{ color: '#5a8aab' }}>Version 1.0.0</p>
+              <p className="text-sm mb-4" style={{ color: '#7aa6c2' }}>{t('about_subtitle')}</p>
+              <p className="text-xs" style={{ color: '#5a8aab' }}>{t('about_version')} 1.0.0</p>
             </div>
 
             <div
@@ -384,10 +391,10 @@ export default function SettingsPage() {
                 border: '1px solid rgba(0,245,255,0.08)',
               }}
             >
-              <h4 className="font-semibold mb-3" style={{ color: 'white' }}>Credits</h4>
+              <h4 className="font-semibold mb-3" style={{ color: 'white' }}>{t('about_credits')}</h4>
               <div className="space-y-2 text-sm" style={{ color: '#7aa6c2' }}>
                 <p>Coding Camp 2026</p>
-                <p>Dicoding Ã— DBS Foundation</p>
+                <p>Dicoding × DBS Foundation</p>
                 <p>Team: CC26-PSU411</p>
               </div>
             </div>
@@ -399,7 +406,7 @@ export default function SettingsPage() {
                 border: '1px solid rgba(0,245,255,0.08)',
               }}
             >
-              <h4 className="font-semibold mb-3" style={{ color: 'white' }}>Tech Stack</h4>
+              <h4 className="font-semibold mb-3" style={{ color: 'white' }}>{t('about_tech_stack')}</h4>
               <div className="flex flex-wrap gap-2">
                 {['React 19', 'Vite', 'TailwindCSS', 'Framer Motion', 'Node.js', 'Express'].map((tech) => (
                   <span
@@ -424,10 +431,10 @@ export default function SettingsPage() {
   }
 
   const sections = [
-    { id: 'general', label: 'Umum', icon: SettingsIcon },
-    { id: 'notifications', label: 'Notifikasi', icon: Bell },
-    { id: 'data', label: 'Data', icon: Database },
-    { id: 'about', label: 'Tentang', icon: Shield },
+    { id: 'general', label: t('menu_general'), icon: SettingsIcon },
+    { id: 'notifications', label: t('menu_notifications'), icon: Bell },
+    { id: 'data', label: t('menu_data'), icon: Database },
+    { id: 'about', label: t('menu_about'), icon: Shield },
   ]
 
   return (
@@ -437,10 +444,10 @@ export default function SettingsPage() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-2xl sm:text-4xl font-bold tracking-tight mb-2 grad-text">
-              Pengaturan
+              {t('settings_title')}
             </h1>
             <p className="text-gray-400">
-              Kelola preferensi dan konfigurasi aplikasi
+              {t('settings_subtitle')}
             </p>
           </div>
 
@@ -457,7 +464,7 @@ export default function SettingsPage() {
                 className="px-4 py-4 border-b"
                 style={{ borderColor: 'rgba(0,245,255,0.08)' }}
               >
-                <h3 className="font-bold" style={{ color: 'white' }}>Menu</h3>
+                <h3 className="font-bold" style={{ color: 'white' }}>{t('menu_title')}</h3>
               </div>
               <div className="p-2">
                 {sections.map((section) => (

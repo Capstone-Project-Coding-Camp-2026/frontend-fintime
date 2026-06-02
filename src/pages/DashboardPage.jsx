@@ -21,8 +21,10 @@ import DebtCard from '../components/debt/DebtCard'
 import GoalCard from '../components/goal/GoalCard'
 import OnboardingWizard from '../components/onboarding/OnboardingWizard'
 import FinancialLearning from '../components/dashboard/FinancialLearning'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function DashboardPage() {
+  const { t } = useLanguage()
   const [showAddTransaction, setShowAddTransaction] = useState(false)
   const [showAddAccount, setShowAddAccount] = useState(false)
   const [showOnboardingManual, setShowOnboardingManual] = useState(false)
@@ -100,104 +102,32 @@ export default function DashboardPage() {
       .get(`/linked-accounts/${u.id}/summary`)
       .then((res) => {
         if (res.data?.success) {
-          setTotalBalance(res.data.data.totalBalance || 0)
+          setTotalBalance(res.data.data?.totalBalance || 0)
         }
       })
       .catch((err) => console.error('Failed to get account summary:', err))
-
-    // 3. Run Background dynamic Forecast to update analytics
-    api
-      .post('/ai/forecast', { userId: u.id })
-      .then((res) => {
-        if (res.data && res.data.success) {
-          const aiData = res.data.data || {}
-          setProjectedWealth(aiData.projectedWealth || 0)
-          setPensionSurvivalYears(aiData.pensionSurvivalYears || 0)
-          setAvatarCondition(aiData.condition || 'normal')
-
-          if (aiData.predictedExpenses && aiData.predictedExpenses.length > 0) {
-            const avgExpense =
-              aiData.predictedExpenses.reduce((sum, val) => sum + val, 0) /
-              aiData.predictedExpenses.length
-            setMonthlyExpense(Math.round(avgExpense))
-          }
-        }
-      })
-      .catch((err) => console.error('Failed to run forecast:', err))
   }, [refreshKey])
 
-  const handleAnalyze = async () => {
+  const handleAnalyze = async (e) => {
+    e.preventDefault()
+    if (!price || isAnalyzing) return
+
     setIsAnalyzing(true)
+    setErrorMsg('')
     setHasResult(false)
 
     try {
-      const storedUser = localStorage.getItem('fintime_user')
-      const u = storedUser ? JSON.parse(storedUser) : null
-
-      const itemPriceVal = parseFloat(price) || 0
-
       const payload = {
-        itemPrice: itemPriceVal,
-        selectedOption: selectedOption,
-        installmentMonths: parseInt(installmentMonths) || 1,
-        interestRate: parseFloat(interestRate) || 0,
+        price: parseFloat(price),
+        option: selectedOption,
+        installmentMonths: parseInt(installmentMonths),
+        interestRate: parseFloat(interestRate),
       }
-      const response = await api.post('/ai/whatif', payload)
 
-      if (response.data && response.data.success) {
-        const data = response.data.data || {}
-        const conf = data.confidence || 0.8
-
-        // Map backend decision results back to graphical percentages
-        let good = 40,
-          neutral = 40,
-          bad = 20
-        let verdict = 'neutral' // default
-
-        if (data.recommendation === 'just_buy') {
-          verdict = 'good'
-          good = Math.round(conf * 100)
-          neutral = Math.round((1 - conf) * 60)
-          bad = Math.round((1 - conf) * 40)
-        } else if (data.recommendation === 'dont_buy') {
-          verdict = 'bad'
-          bad = Math.round(conf * 100)
-          neutral = Math.round((1 - conf) * 60)
-          good = Math.round((1 - conf) * 40)
-        } else {
-          verdict = 'neutral'
-          neutral = Math.round(conf * 100)
-          good = Math.round((1 - conf) * 50)
-          bad = Math.round((1 - conf) * 50)
-        }
-
-        // Calculate payment metrics
-        const interestPerMonth = parseFloat(interestRate) / 100;
-        const months = parseInt(installmentMonths) || 1;
-        const monthlyPay =
-          selectedOption === 'paylater'
-            ? (itemPriceVal / months) + (itemPriceVal * interestPerMonth)
-            : itemPriceVal
-
-        const totalPay =
-          selectedOption === 'paylater'
-            ? monthlyPay * months
-            : itemPriceVal
-
-        setAnalysisData({
-          goodPercent: good,
-          neutralPercent: neutral,
-          badPercent: bad,
-          verdict: verdict,
-          monthlyPayment: Math.round(monthlyPay),
-          remainingBudget: Math.round(
-            data.financial_impact?.post_purchase_cashflow || data.financial_impact?.monthly_cashflow_after || data.cashflow_after || data.cashflow_after_purchase || 0,
-          ),
-          totalPayment: Math.round(totalPay),
-        })
-
+      const res = await api.post('/ai/simulate-purchase', payload)
+      if (res.data?.success) {
+        setAnalysisData(res.data.data)
         setHasResult(true)
-        setErrorMsg('')
       }
     } catch (err) {
       console.error('Failed to run what-if simulation:', err)
@@ -232,7 +162,7 @@ export default function DashboardPage() {
                   Overview Dashboard
                 </h1>
                 <p className="text-gray-400">
-                  Selamat datang kembali,{' '}
+                  {t('dash_welcome')},{' '}
                   <span className="text-cyan-400 font-semibold">
                     {user?.fullName}
                   </span>
@@ -240,12 +170,12 @@ export default function DashboardPage() {
               </div>
               <div className="hidden sm:block text-right">
                 <p className="text-xs text-gray-500 uppercase tracking-widest font-medium mb-1">
-                  Status Akun
+                  {t('dash_status_account')}
                 </p>
                 <div className="flex items-center gap-2 justify-end">
                   <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                   <span className="text-sm font-bold text-gray-300">
-                    Terverifikasi
+                    {t('dash_status_verified')}
                   </span>
                 </div>
               </div>
@@ -294,13 +224,13 @@ export default function DashboardPage() {
                       className="text-sm font-semibold"
                       style={{ color: 'var(--text)' }}
                     >
-                      Pengeluaran
+                      {t('dash_action_expense')}
                     </p>
                     <p
                       className="text-xs"
                       style={{ color: 'var(--text-muted)' }}
                     >
-                      Tambah baru
+                      {t('dash_action_add_new')}
                     </p>
                   </div>
                 </motion.button>
@@ -326,13 +256,13 @@ export default function DashboardPage() {
                       className="text-sm font-semibold"
                       style={{ color: 'var(--text)' }}
                     >
-                      Pendapatan
+                      {t('dash_action_income')}
                     </p>
                     <p
                       className="text-xs"
                       style={{ color: 'var(--text-muted)' }}
                     >
-                      Tambah baru
+                      {t('dash_action_add_new')}
                     </p>
                   </div>
                 </motion.button> */}
@@ -355,13 +285,13 @@ export default function DashboardPage() {
                       className="text-sm font-semibold"
                       style={{ color: 'var(--text)' }}
                     >
-                      Tambah Akun
+                      {t('dash_action_add_account')}
                     </p>
                     <p
                       className="text-xs"
                       style={{ color: 'var(--text-muted)' }}
                     >
-                      Hubungkan baru
+                      {t('dash_action_connect_new')}
                     </p>
                   </div>
                 </motion.button>
@@ -387,13 +317,13 @@ export default function DashboardPage() {
                       className="text-sm font-semibold"
                       style={{ color: 'var(--text)' }}
                     >
-                      Quick Transaksi
+                      {t('dash_action_quick_tx')}
                     </p>
                     <p
                       className="text-xs"
                       style={{ color: 'var(--text-muted)' }}
                     >
-                      Catat cepat
+                      {t('dash_action_record_fast')}
                     </p>
                   </div>
                 </motion.button>

@@ -4,6 +4,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react'
+import { useLanguage } from '../../context/LanguageContext'
 
 export default function TransactionView({
   loading,
@@ -22,6 +23,17 @@ export default function TransactionView({
   CATEGORY_LABELS,
   TRANSACTION_FILTERS,
 }) {
+  const { t } = useLanguage()
+
+  const getFilterLabel = (key, defaultLabel) => {
+    switch (key) {
+      case 'all': return t('dash_filter_all');
+      case 'income': return t('dash_filter_income');
+      case 'expense': return t('dash_filter_expense');
+      default: return defaultLabel;
+    }
+  }
+
   return (
     <motion.div
       key="transactions-view"
@@ -41,7 +53,7 @@ export default function TransactionView({
       >
         <div className="p-3 text-center">
           <p className="text-[10px] mb-1 text-gray-400">
-            Pemasukan
+            {t('dash_income_label')}
           </p>
 
           <p className="font-semibold text-[11px] sm:text-sm text-green-400 truncate px-1">
@@ -51,7 +63,7 @@ export default function TransactionView({
 
         <div className="p-3 text-center">
           <p className="text-[10px] mb-1 text-gray-400">
-            Pengeluaran
+            {t('dash_expense_label')}
           </p>
 
           <p className="font-semibold text-[11px] sm:text-sm text-red-400 truncate px-1">
@@ -61,7 +73,7 @@ export default function TransactionView({
 
         <div className="p-3 text-center">
           <p className="text-[10px] mb-1 text-gray-400">
-            Saldo
+            {t('dash_balance_label')}
           </p>
 
           <p className="font-semibold text-[11px] sm:text-sm text-cyan-400 truncate px-1">
@@ -93,7 +105,7 @@ export default function TransactionView({
                     }
               }
             >
-              {label}
+              {getFilterLabel(key, label)}
             </button>
           )
         })}
@@ -102,7 +114,7 @@ export default function TransactionView({
       <div className="p-5 pt-3 space-y-3 flex-1 overflow-y-auto custom-scrollbar">
         {loading ? (
           <div className="text-center py-8 text-gray-400">
-            Memuat...
+            {t('dash_loading')}
           </div>
         ) : filteredTransactions.length === 0 ? (
           <div className="text-center py-8">
@@ -115,7 +127,7 @@ export default function TransactionView({
               onClick={onAddNew}
               className="px-4 py-2 rounded-lg text-sm bg-cyan-500 text-black"
             >
-              Catat Transaksi
+              {t('dash_action_record')}
             </button>
           </div>
         ) : (
@@ -169,12 +181,12 @@ export default function TransactionView({
                 {showAll ? (
                   <>
                     <ChevronUp size={14} />
-                    Lebih Sedikit
+                    {t('btn_show_less')}
                   </>
                 ) : (
                   <>
                     <ChevronDown size={14} />
-                    Lihat Semua
+                    {t('btn_see_all')}
                   </>
                 )}
               </button>

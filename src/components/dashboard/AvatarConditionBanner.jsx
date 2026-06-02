@@ -1,38 +1,6 @@
 import { motion } from 'framer-motion'
 import ImageAvatar from '../ui/ImageAvatar'
-
-const conditionConfig = {
-  good: {
-    label: 'Kondisi Keuangan Prima',
-    color: '#4ade80',
-    colorDim: 'rgba(74, 222, 128, 0.12)',
-    score: 85,
-    scoreLabel: 'Sangat Baik',
-    message: 'Finansialmu dalam kondisi sangat baik! Terus pertahankan.',
-    recommendation:
-      'Alokasikan 10% pendapatan tambahanmu ke instrumen investasi agresif.',
-  },
-  normal: {
-    label: 'On Track',
-    color: '#fbbf24',
-    colorDim: 'rgba(251, 191, 36, 0.12)',
-    score: 62,
-    scoreLabel: 'Cukup Baik',
-    message: 'Finansialmu cukup baik. Masih ada ruang untuk perbaikan.',
-    recommendation:
-      'Coba kurangi pengeluaran hiburan sebesar 5% untuk dana darurat.',
-  },
-  bad: {
-    label: 'Perlu Perbaikan',
-    color: '#f87171',
-    colorDim: 'rgba(248, 113, 113, 0.12)',
-    score: 35,
-    scoreLabel: 'Perlu Perhatian',
-    message: 'Finansialmu membutuhkan perhatian lebih. Buat rencana perbaikan.',
-    recommendation:
-      'Fokus lunasi hutang berbunga tinggi dan tunda pengeluaran besar.',
-  },
-}
+import { useLanguage } from '../../context/LanguageContext'
 
 export default function AvatarConditionBanner({
   balance = 0,
@@ -46,12 +14,43 @@ export default function AvatarConditionBanner({
   monthlyIncome = 5000000,
   monthlyExpense = 3500000,
 }) {
+  const { t } = useLanguage()
+
+  const conditionConfig = {
+    good: {
+      label: t('cond_good_label'),
+      color: '#4ade80',
+      colorDim: 'rgba(74, 222, 128, 0.12)',
+      score: 85,
+      scoreLabel: t('cond_good_score'),
+      message: t('cond_good_msg'),
+      recommendation: t('cond_good_rec'),
+    },
+    normal: {
+      label: t('cond_normal_label'),
+      color: '#fbbf24',
+      colorDim: 'rgba(251, 191, 36, 0.12)',
+      score: 62,
+      scoreLabel: t('cond_normal_score'),
+      message: t('cond_normal_msg'),
+      recommendation: t('cond_normal_rec'),
+    },
+    bad: {
+      label: t('cond_bad_label'),
+      color: '#f87171',
+      colorDim: 'rgba(248, 113, 113, 0.12)',
+      score: 35,
+      scoreLabel: t('cond_bad_score'),
+      message: t('cond_bad_msg'),
+      recommendation: t('cond_bad_rec'),
+    },
+  }
+
   // Use propCondition if passed, otherwise default to normal
   const condition = propCondition || 'normal'
   const config = conditionConfig[condition] || conditionConfig.normal
 
   // Menghitung progress menuju target pension
-  // jika memiliki wealth yang diproyeksikan dari backend, gunakan untuk menghitung kemajuan menuju dana pensiun target
   const wealthForProgress = projectedWealth > 0 ? projectedWealth : balance
   const progressPercent = Math.min(
     100,
@@ -71,10 +70,10 @@ export default function AvatarConditionBanner({
   // Format currency helpers
   const formatIDR = (val) => {
     if (val >= 1000000000) {
-      return `Rp ${(val / 1000000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })} Miliar`
+      return `Rp ${(val / 1000000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })} ${t('cond_unit_miliar')}`
     }
     if (val >= 1000000) {
-      return `Rp ${(val / 1000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })} Juta`
+      return `Rp ${(val / 1000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })} ${t('cond_unit_juta')}`
     }
     return `Rp ${val.toLocaleString('id-ID')}`
   }
@@ -196,149 +195,191 @@ export default function AvatarConditionBanner({
               </div>
             </div>
 
-            <div className="relative">
-              <div
-                className="w-full h-3.5 rounded-full overflow-hidden"
-                style={{
-                  backgroundColor: 'var(--dark-3)',
-                  border: '1px solid var(--glass-border)',
-                  boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.2)',
-                }}
-              >
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${healthScore}%` }}
-                  transition={{ duration: 1.2, delay: 0.3, ease: 'easeOut' }}
-                  className="h-full rounded-full relative"
-                  style={{
-                    background: `linear-gradient(90deg, ${config.color} 0%, ${config.color}dd 100%)`,
-                    boxShadow: `0 0 10px ${config.color}80`,
-                  }}
-                >
-                  <div className="absolute inset-0 shimmer-text" />
-                </motion.div>
-              </div>
-              <div className="flex items-center justify-between mt-2">
-                <span
-                  className="text-[10px]"
-                  style={{ color: 'var(--text-dim)' }}
-                >
-                  {config.scoreLabel}
-                </span>
-                <span
-                  className="text-[10px]"
-                  style={{ color: 'var(--text-muted)' }}
-                >
-                  Survival: {pensionSurvivalYears.toFixed(1)} tahun
-                </span>
-              </div>
+            <div className="relative h-2 w-full bg-white/5 rounded-full overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${healthScore}%` }}
+                className="h-full rounded-full"
+                style={{ backgroundColor: config.color }}
+              />
             </div>
+            <p
+              className="text-[10px] mt-2 text-left font-medium"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              {config.scoreLabel}
+            </p>
           </div>
         </div>
       </motion.div>
 
-      {/* Right Side - Quick Stats & Message */}
-      <div className="space-y-4">
-        {/* Financial Stats */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="glass-card rounded-2xl p-5 border"
-          style={{ borderColor: 'var(--glass-border)' }}
+      {/* Stats and Message Card */}
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="flex flex-col gap-5"
+      >
+        {/* Real-time Stats Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div
+            className="p-4 rounded-2xl border"
+            style={{
+              background: 'rgba(6, 21, 40, 0.4)',
+              borderColor: 'rgba(255, 255, 255, 0.05)',
+            }}
+          >
+            <p className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">
+              {t('dash_total_balance')}
+            </p>
+            <p className="text-sm sm:text-base font-bold text-white">
+              {formatIDR(balance)}
+            </p>
+          </div>
+          <div
+            className="p-4 rounded-2xl border"
+            style={{
+              background: 'rgba(6, 21, 40, 0.4)',
+              borderColor: 'rgba(255, 255, 255, 0.05)',
+            }}
+          >
+            <p className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">
+              {t('dash_projected_wealth')}
+            </p>
+            <p className="text-sm sm:text-base font-bold text-cyan-400">
+              {formatIDR(projectedWealth)}
+            </p>
+          </div>
+          <div
+            className="p-4 rounded-2xl border"
+            style={{
+              background: 'rgba(6, 21, 40, 0.4)',
+              borderColor: 'rgba(255, 255, 255, 0.05)',
+            }}
+          >
+            <p className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">
+              Income / Mo
+            </p>
+            <p className="text-sm sm:text-base font-bold text-green-400">
+              {formatIDR(monthlyIncome)}
+            </p>
+          </div>
+          <div
+            className="p-4 rounded-2xl border"
+            style={{
+              background: 'rgba(6, 21, 40, 0.4)',
+              borderColor: 'rgba(255, 255, 255, 0.05)',
+            }}
+          >
+            <p className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">
+              Avg. Expense
+            </p>
+            <p className="text-sm sm:text-base font-bold text-red-400">
+              {formatIDR(monthlyExpense)}
+            </p>
+          </div>
+        </div>
+
+        {/* AI Insight Card */}
+        <div
+          className="flex-1 p-6 sm:p-8 rounded-2xl border relative overflow-hidden flex flex-col justify-center"
+          style={{
+            background: 'rgba(6, 21, 40, 0.6)',
+            borderColor: 'rgba(0, 245, 255, 0.1)',
+          }}
         >
-          <h3 className="font-semibold mb-4" style={{ color: 'var(--text)' }}>
-            Statistik Keuangan
-          </h3>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-4">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center"
+                style={{ background: 'rgba(0, 245, 255, 0.1)' }}
+              >
+                <span className="text-xl">💡</span>
+              </div>
+              <h3 className="font-bold text-lg text-white">AI Insight</h3>
+            </div>
+
+            <p className="text-gray-300 leading-relaxed mb-6 text-sm sm:text-base">
+              "{config.message}"
+            </p>
+
             <div
-              className="p-4 rounded-xl text-center"
+              className="p-4 rounded-xl border border-dashed flex items-start gap-4"
               style={{
-                background: 'rgba(74, 222, 128, 0.08)',
-                border: '1px solid rgba(74, 222, 128, 0.2)',
+                background: 'rgba(0, 245, 255, 0.03)',
+                borderColor: 'rgba(0, 245, 255, 0.2)',
               }}
             >
-              <p
-                className="text-xs uppercase tracking-wider mb-1"
-                style={{ color: 'var(--text-muted)' }}
+              <div
+                className="mt-1 w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
+                style={{ background: 'rgba(0, 245, 255, 0.1)' }}
               >
-                Pendapatan
+                <span className="text-sm">🎯</span>
+              </div>
+              <div>
+                <p className="text-xs font-bold text-cyan-400 uppercase tracking-widest mb-1">
+                  Recommendation
+                </p>
+                <p className="text-sm text-gray-400 leading-snug">
+                  {config.recommendation}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Retirement Progress */}
+        <div
+          className="p-5 rounded-2xl border flex flex-col sm:flex-row items-center gap-6"
+          style={{
+            background: 'rgba(6, 21, 40, 0.4)',
+            borderColor: 'rgba(255, 255, 255, 0.05)',
+          }}
+        >
+          <div className="flex-1 w-full">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+                Retirement Readiness
               </p>
-              <p className="text-lg font-bold" style={{ color: '#4ade80' }}>
-                +{formatIDR(monthlyIncome)}
-              </p>
-              <p className="text-xs" style={{ color: 'var(--text-dim)' }}>
-                Per bulan
+              <p className="text-xs font-bold text-cyan-400">
+                {progressPercent.toFixed(1)}%
               </p>
             </div>
-            <div
-              className="p-4 rounded-xl text-center"
-              style={{
-                background: 'rgba(248, 113, 113, 0.08)',
-                border: '1px solid rgba(248, 113, 113, 0.2)',
-              }}
-            >
-              <p
-                className="text-xs uppercase tracking-wider mb-1"
-                style={{ color: 'var(--text-muted)' }}
-              >
-                Pengeluaran
+            <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${progressPercent}%` }}
+                className="h-full bg-cyan-400 shadow-[0_0_10px_rgba(0,245,255,0.5)]"
+              />
+            </div>
+            <div className="flex justify-between mt-2">
+              <p className="text-[10px] text-gray-600">
+                Target: {formatIDR(targetPension)}
               </p>
-              <p className="text-lg font-bold" style={{ color: '#f87171' }}>
-                -{formatIDR(monthlyExpense)}
-              </p>
-              <p className="text-xs" style={{ color: 'var(--text-dim)' }}>
-                Per bulan
+              <p className="text-[10px] text-gray-400">
+                Longevity: {pensionSurvivalYears} {t('dash_pension_years')}
               </p>
             </div>
           </div>
 
-          {/* Progress Pension */}
           <div
-            className="mt-4 pt-4 border-t"
-            style={{ borderColor: 'var(--glass-border)' }}
+            className="px-6 py-3 rounded-xl border flex flex-col items-center justify-center shrink-0 min-w-[140px]"
+            style={{
+              background: 'rgba(0, 245, 255, 0.05)',
+              borderColor: 'rgba(0, 245, 255, 0.1)',
+            }}
           >
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <span
-                  className="text-xs font-medium"
-                  style={{ color: 'var(--text-muted)' }}
-                >
-                  Proyeksi Dana Pensiun
-                </span>
-                <span className="font-bold text-lg grad-text">
-                  {progressPercent.toFixed(1)}%
-                </span>
-              </div>
-            </div>
-            <div
-              className="w-full h-3 rounded-full overflow-hidden"
-              style={{
-                backgroundColor: 'var(--dark-3)',
-                border: '1px solid var(--glass-border)',
-              }}
-            >
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${progressPercent}%` }}
-                transition={{ duration: 1.2, delay: 0.4, ease: 'easeOut' }}
-                className="h-full rounded-full relative"
-                style={{
-                  background: 'var(--grad)',
-                  boxShadow: '0 0 10px var(--cyan-glow)',
-                }}
-              />
-            </div>
-            <div className="flex items-center justify-between mt-2">
-              <span className="text-xs" style={{ color: 'var(--text-dim)' }}>
-                Terproyeksi: {formatIDR(wealthForProgress)}
+            <p className="text-[10px] font-bold text-gray-500 uppercase mb-1">
+              Survival Projection
+            </p>
+            <p className="text-2xl font-black text-white">
+              {pensionSurvivalYears}
+              <span className="text-xs font-bold text-cyan-400 ml-1">
+                {t('dash_pension_years').toUpperCase()}
               </span>
-              <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                Target: {formatIDR(targetPension)}
-              </span>
-            </div>
+            </p>
           </div>
-        </motion.div>
+        </div>
 
         {/* AI Message */}
         <motion.div
@@ -415,20 +456,9 @@ export default function AvatarConditionBanner({
                       : 'Dana darurat, kurangi pengeluaran, reksadana pasar uang')}
               </p>
             </div>
-
-            {/* <button
-              className="w-full py-2.5 rounded-xl text-xs font-bold transition-all hover:bg-cyan-500/20"
-              style={{
-                border: '1px solid var(--cyan)',
-                color: 'var(--cyan)',
-                background: 'rgba(0, 245, 255, 0.05)',
-              }}
-            >
-              Lihat Detail Strategi Investasi
-            </button> */}
           </div>
         </motion.div>
-      </div>
+      </motion.div>
     </div>
   )
 }

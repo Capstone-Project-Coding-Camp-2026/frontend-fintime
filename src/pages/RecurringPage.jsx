@@ -295,7 +295,7 @@ export default function RecurringPage() {
                               </span>
                             </div>
                             <p className="text-sm" style={{ color: '#7aa6c2' }}>
-                              {freqInfo.label} â€¢ {item.category || 'lainnya'}
+                              {freqInfo.label} • {item.category || 'lainnya'}
                             </p>
                           </div>
                         </div>

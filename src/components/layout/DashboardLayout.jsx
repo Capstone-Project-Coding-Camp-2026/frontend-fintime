@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -14,14 +14,16 @@ import BottomNav from './BottomNav'
 import NotificationCenter from '../notification/NotificationCenter'
 import { useToast } from '../../context/ToastContext'
 import api from '../../lib/api'
+import { useLanguage } from '../../context/LanguageContext'
 
 export default function DashboardLayout({ children, activePage = 'dashboard', particleCount = 30, onShowHelp }) {
   const navigate = useNavigate()
+  const { t } = useLanguage()
   const [user, setUser] = useState(null)
   const [isMobile, setIsMobile] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
-  const { unreadCount } = useToast()
+  const { unreadCount, info } = useToast()
 
   useEffect(() => {
     const checkMobile = () => {
@@ -108,10 +110,10 @@ export default function DashboardLayout({ children, activePage = 'dashboard', pa
                       ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
                       : 'text-gray-400 hover:text-cyan-400 hover:bg-white/5'
                   }`}
-                  title="Dashboard"
+                  title={t('nav_dashboard')}
                 >
                   <LayoutDashboard size={18} />
-                  <span className="hidden xl:inline font-medium">Dashboard</span>
+                  <span className="hidden xl:inline font-medium">{t('nav_dashboard')}</span>
                 </button>
 
                 <button
@@ -121,10 +123,10 @@ export default function DashboardLayout({ children, activePage = 'dashboard', pa
                       ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
                       : 'text-gray-400 hover:text-cyan-400 hover:bg-white/5'
                   }`}
-                  title="Laporan"
+                  title={t('nav_reports')}
                 >
                   <FileText size={18} />
-                  <span className="hidden xl:inline font-medium">Laporan</span>
+                  <span className="hidden xl:inline font-medium">{t('nav_reports')}</span>
                 </button>
 
                 <button
@@ -134,10 +136,10 @@ export default function DashboardLayout({ children, activePage = 'dashboard', pa
                       ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
                       : 'text-gray-400 hover:text-cyan-400 hover:bg-white/5'
                   }`}
-                  title="Settings"
+                  title={t('nav_settings')}
                 >
                   <Settings size={18} />
-                  <span className="hidden xl:inline font-medium">Settings</span>
+                  <span className="hidden xl:inline font-medium">{t('nav_settings')}</span>
                 </button>
 
                 <div className="w-px h-6 mx-1 sm:mx-2" style={{ background: 'rgba(255,255,255,0.1)' }} />
@@ -147,9 +149,9 @@ export default function DashboardLayout({ children, activePage = 'dashboard', pa
             {/* Utility Icons (Visible on Mobile & Desktop) */}
             <div className="flex items-center gap-1.5">
               <button
-                onClick={onShowHelp}
+                onClick={() => { if (onShowHelp) onShowHelp(); else info('Panduan tur interaktif saat ini hanya tersedia di halaman Dashboard.'); }}
                 className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all text-gray-300 hover:text-cyan-400"
-                title="Bantuan & Panduan"
+                title={t('nav_help_tooltip')}
               >
                 <HelpCircle size={18} />
               </button>
@@ -157,7 +159,7 @@ export default function DashboardLayout({ children, activePage = 'dashboard', pa
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
                 className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center relative hover:bg-white/10 transition-all"
-                title="Notifikasi"
+                title={t('nav_notif_tooltip')}
               >
                 <Bell size={18} className="text-gray-300" />
                 {unreadCount > 0 && (
@@ -192,3 +194,4 @@ export default function DashboardLayout({ children, activePage = 'dashboard', pa
     </div>
   )
 }
+

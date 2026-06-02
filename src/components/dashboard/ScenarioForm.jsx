@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { Calculator, DollarSign, CreditCard } from 'lucide-react'
+import { useLanguage } from '../../context/LanguageContext'
 
 const inputBaseStyle = {
   width: '100%',
@@ -20,6 +21,7 @@ export default function ScenarioForm({
   interestRate, setInterestRate,
   onAnalyze, isAnalyzing
 }) {
+  const { t } = useLanguage()
   const isDisabled = isAnalyzing || !price || !selectedOption
 
   const formatInputCurrency = (value) => {
@@ -40,8 +42,8 @@ export default function ScenarioForm({
           <Calculator size={18} style={{ color: 'var(--cyan)' }} />
         </div>
         <div>
-          <h3 className="font-semibold" style={{ color: 'var(--text)' }}>Input Scenario</h3>
-          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Masukkan detail pembelian Anda</p>
+          <h3 className="font-semibold" style={{ color: 'var(--text)' }}>{t('dash_scenario_input')}</h3>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{t('dash_scenario_input_desc')}</p>
         </div>
       </div>
 
@@ -49,7 +51,7 @@ export default function ScenarioForm({
         {/* Harga Barang */}
         <div>
           <label className="text-xs mb-2 block uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-            Harga Barang
+            {t('dash_scenario_price')}
           </label>
           <div className="relative">
             <span
@@ -79,7 +81,7 @@ export default function ScenarioForm({
         {/* Metode Pembayaran */}
         <div>
           <label className="text-xs mb-2 block uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-            Metode Pembayaran
+            {t('dash_scenario_method')}
           </label>
           <div className="grid grid-cols-2 gap-3">
             <button
@@ -93,7 +95,7 @@ export default function ScenarioForm({
               }
             >
               <DollarSign size={16} />
-              Tunai
+              {t('dash_scenario_cash')}
             </button>
             <button
               type="button"
@@ -106,7 +108,7 @@ export default function ScenarioForm({
               }
             >
               <CreditCard size={16} />
-              PayLater
+              {t('dash_scenario_paylater')}
             </button>
           </div>
         </div>
@@ -122,7 +124,7 @@ export default function ScenarioForm({
           >
             <div>
               <label className="text-xs mb-2 block" style={{ color: 'var(--text-muted)' }}>
-                Tenor Cicilan (bulan)
+                {t('dash_scenario_tenor')}
               </label>
               <input
                 type="number"
@@ -144,7 +146,7 @@ export default function ScenarioForm({
             </div>
             <div>
               <label className="text-xs mb-2 block" style={{ color: 'var(--text-muted)' }}>
-                Bunga (% / bulan)
+                {t('dash_scenario_interest')}
               </label>
               <input
                 type="number"
@@ -183,12 +185,12 @@ export default function ScenarioForm({
               >
                 <Calculator size={16} />
               </motion.div>
-              Menganalisis...
+              {t('dash_scenario_analyzing')}
             </>
           ) : (
             <>
               <Calculator size={16} />
-              Analisis Sekarang
+              {t('dash_scenario_btn')}
             </>
           )}
         </button>

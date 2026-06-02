@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Wallet, ChevronDown, ChevronUp, Trash2, Building2, Pencil } from 'lucide-react'
 import api from '../../lib/api'
@@ -6,8 +6,10 @@ import { getProviderName, getProviderType } from '../../constants/providers'
 import EditAccountModal from './EditAccountModal'
 import { useConfirm } from '../../context/ConfirmContext';
 import { useToast } from '../../context/ToastContext';
+import { useLanguage } from '../../context/LanguageContext'
 
 export default function AccountCard({ userId, onDelete, onAddNew, refreshTrigger }) {
+  const { t } = useLanguage()
   const { confirm } = useConfirm();
   const { error: showError, success } = useToast();
   const [accounts, setAccounts] = useState([])
@@ -88,8 +90,8 @@ export default function AccountCard({ userId, onDelete, onAddNew, refreshTrigger
                 <Wallet size={20} style={{ color: '#00f5ff' }} />
               </div>
               <div>
-                <h3 className="font-semibold text-lg" style={{ color: 'var(--text)' }}>Akun Terhubung</h3>
-                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{accounts.length} akun terdaftar</p>
+                <h3 className="font-semibold text-lg" style={{ color: 'var(--text)' }}>{t('dash_accounts_title')}</h3>
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{accounts.length} {t('dash_accounts_subtitle')}</p>
               </div>
             </div>
             <button
@@ -97,13 +99,13 @@ export default function AccountCard({ userId, onDelete, onAddNew, refreshTrigger
               className="w-full py-2.5 rounded-xl text-sm font-semibold transition-all hover:bg-cyan-500/10 flex items-center justify-center gap-2"
               style={{ background: 'rgba(0, 245, 255, 0.05)', border: '1px solid rgba(0, 245, 255, 0.15)', color: '#00f5ff' }}
             >
-              + Tambah
+              + {t('btn_add')}
             </button>
           </div>
 
           {accounts.length > 0 && (
             <div className="px-5 py-3" style={{ background: 'rgba(0, 245, 255, 0.03)' }}>
-              <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Total Saldo</p>
+              <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>{t('dash_total_balance')}</p>
               <p className="text-xl font-bold grad-text">Rp {formatCurrency(totalBalance)}</p>
             </div>
           )}
@@ -111,18 +113,18 @@ export default function AccountCard({ userId, onDelete, onAddNew, refreshTrigger
           <div className="p-5 pt-3 space-y-3 flex-1 overflow-y-auto custom-scrollbar">
             {loading ? (
               <div className="text-center py-8">
-                <p className="text-sm" style={{ color: 'var(--text-dim)' }}>Memuat...</p>
+                <p className="text-sm" style={{ color: 'var(--text-dim)' }}>{t('dash_loading')}</p>
               </div>
             ) : accounts.length === 0 ? (
               <div className="text-center py-8">
                 <Wallet size={32} className="mx-auto mb-3" style={{ color: 'var(--text-dim)', opacity: 0.5 }} />
-                <p className="text-sm mb-3" style={{ color: 'var(--text-dim)' }}>Belum ada akun terhubung</p>
+                <p className="text-sm mb-3" style={{ color: 'var(--text-dim)' }}>{t('dash_no_accounts')}</p>
                 <button
                   onClick={onAddNew}
                   className="px-4 py-2 rounded-lg text-sm font-medium transition-all"
                   style={{ background: 'rgba(0, 245, 255, 0.1)', color: '#00f5ff', border: '1px solid rgba(0, 245, 255, 0.2)' }}
                 >
-                  Hubungkan Akun
+                  {t('dash_connect_account')}
                 </button>
               </div>
             ) : (
@@ -158,7 +160,7 @@ export default function AccountCard({ userId, onDelete, onAddNew, refreshTrigger
                           <p className="font-medium text-sm truncate" style={{ color: 'var(--text)' }}>{account.name}</p>
                           <p className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>
                             {getProviderName(account.provider)}
-                            {account.accountNumber && ` â€¢ ${account.accountNumber}`}
+                            {account.accountNumber && ` • ${account.accountNumber}`}
                           </p>
                         </div>
                       </div>
@@ -176,7 +178,7 @@ export default function AccountCard({ userId, onDelete, onAddNew, refreshTrigger
                         </button>
                         <button
                           onClick={async () => {
-                            if (!await confirm('Yakin ingin menghapus akun ini?')) return
+                            if (!await confirm(t('conf_delete_account'))) return
                             try {
                               await api.delete(`/linked-accounts/${account.id}`)
                               setAccounts(prev => prev.filter(a => a.id !== account.id))
@@ -185,7 +187,7 @@ export default function AccountCard({ userId, onDelete, onAddNew, refreshTrigger
                                 .reduce((sum, acc) => sum + (acc.balance || 0), 0)
                               setTotalBalance(newTotal)
                               onDelete?.()
-                              success('Akun berhasil dihapus')
+                              success(t('msg_account_deleted'))
                             } catch (err) {
                               console.error('Error deleting account:', err)
                               showError(err.response?.data?.message || 'Gagal menghapus akun')
@@ -213,9 +215,9 @@ export default function AccountCard({ userId, onDelete, onAddNew, refreshTrigger
                     }}
                   >
                     {showAll ? (
-                      <><ChevronUp size={14} /> Tampilkan Lebih Sedikit</>
+                      <><ChevronUp size={14} /> {t('btn_show_less')}</>
                     ) : (
-                      <><ChevronDown size={14} /> Lihat Semua ({accounts.length})</>
+                      <><ChevronDown size={14} /> {t('btn_see_all')} ({accounts.length})</>
                     )}
                   </button>
                 )}
@@ -238,4 +240,3 @@ export default function AccountCard({ userId, onDelete, onAddNew, refreshTrigger
     </>
   )
 }
-
