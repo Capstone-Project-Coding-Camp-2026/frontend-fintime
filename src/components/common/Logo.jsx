@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
+import { Timer } from 'lucide-react'
 
+// Force Vite HMR reload
 const Logo = ({ size = 'md', showText = true, rotateDuration = 10 }) => {
   const sizes = {
     sm: 'w-8 h-8 text-sm',
@@ -17,17 +19,17 @@ const Logo = ({ size = 'md', showText = true, rotateDuration = 10 }) => {
           border: '1px solid rgba(0,245,255,0.3)',
         }}
       >
-        <motion.span
+        <motion.div
           animate={{ rotate: 360 }}
           transition={{
             duration: rotateDuration,
             repeat: Infinity,
             ease: 'linear',
           }}
-          className="inline-block"
+          className="flex items-center justify-center"
         >
-          ⏱
-        </motion.span>
+          <Timer size={size === 'sm' ? 16 : size === 'md' ? 20 : 24} color="#00f5ff" />
+        </motion.div>
       </div>
 
         <span className="text-xl font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-[#00f5ff] to-[#0096c7]">

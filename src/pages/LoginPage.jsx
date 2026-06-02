@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import {
   Eye, EyeOff, Loader2, LogIn,
   TrendingUp, Bot, Target, Shield,
-  ChevronLeft, Mail, Lock, AlertCircle
+  ChevronLeft, Mail, Lock, AlertCircle, Timer
 } from 'lucide-react'
 import ParticleField from '../components/Particlefield'
 import api from '../lib/api'
@@ -122,7 +122,7 @@ export default function LoginPage() {
                 background: 'rgba(0,245,255,0.05)'
               }}
             >
-              <span className="text-3xl">⏱</span>
+              <Timer size={32} color="#00f5ff" />
             </motion.div>
             <div className="flex flex-col items-center">
               <span
@@ -209,7 +209,7 @@ export default function LoginPage() {
                 className="w-8 h-8 rounded-full border border-cyan-DEFAULT/40 flex items-center justify-center text-sm"
                 style={{ borderColor: 'rgba(0,245,255,0.4)' }}
               >
-                ⏱
+                <Timer size={16} color="#00f5ff" />
               </motion.div>
               <span
                 className="text-xl font-bold tracking-tight"

@@ -1,72 +1,73 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { X, ChevronRight, ChevronLeft, Check, Rocket, Target, PieChart, Zap, TrendingUp, Shield } from 'lucide-react'
+import { useLanguage } from '../../context/LanguageContext'
 
-const ONBOARDING_STEPS = [
+const getOnboardingSteps = (t) => [
   {
     id: 'welcome',
-    title: 'Selamat Datang di FinTime!',
-    description: 'Aplikasi AI Financial Time Machine yang membantu Anda mencapai kebebasan finansial.',
+    title: t('onboard_1_title'),
+    description: t('onboard_1_desc'),
     icon: Rocket,
     color: '#00f5ff',
     features: [
-      'Analisis kesehatan keuangan dengan avatar AI',
-      'Simulasi "What-If" untuk keputusan pembelian',
-      'Proyeksi kekayaan dan dana pensiun',
+      t('onboard_1_f1'),
+      t('onboard_1_f2'),
+      t('onboard_1_f3'),
     ],
   },
   {
     id: 'dashboard',
-    title: 'Dashboard Interaktif',
-    description: 'Pantau semua aktivitas keuangan Anda dalam satu tampilan.',
+    title: t('onboard_2_title'),
+    description: t('onboard_2_desc'),
     icon: PieChart,
     color: '#a855f7',
     features: [
-      'Overview saldo dan proyeksi kekayaan',
-      'Quick actions untuk tambah transaksi',
-      'Smart Ledger untuk labeling otomatis',
+      t('onboard_2_f1'),
+      t('onboard_2_f2'),
+      t('onboard_2_f3'),
     ],
   },
   {
     id: 'budget',
-    title: 'Budgeting Cerdas',
-    description: 'Atur limit pengeluaran per kategori dan tetap dalam kendali.',
+    title: t('onboard_3_title'),
+    description: t('onboard_3_desc'),
     icon: Target,
     color: '#fbbf24',
     features: [
-      'Buat budget bulanan per kategori',
-      'Peringatan saat mendekati limit',
-      'Tracking progress secara real-time',
+      t('onboard_3_f1'),
+      t('onboard_3_f2'),
+      t('onboard_3_f3'),
     ],
   },
   {
     id: 'goals',
-    title: 'Target Tabungan',
-    description: 'Tetapkan dan capai tujuan keuangan Anda.',
+    title: t('onboard_4_title'),
+    description: t('onboard_4_desc'),
     icon: TrendingUp,
     color: '#22c55e',
     features: [
-      'Multiple goals dengan deadline',
-      'Progress tracking visual',
-      'Notifikasi jatuh tempo',
+      t('onboard_4_f1'),
+      t('onboard_4_f2'),
+      t('onboard_4_f3'),
     ],
   },
   {
     id: 'ai',
-    title: 'AI Assistance',
-    description: 'Dapatkan rekomendasi keuangan berdasarkan data Anda.',
+    title: t('onboard_5_title'),
+    description: t('onboard_5_desc'),
     icon: Zap,
     color: '#ec4899',
     features: [
-      'Forecast kekayaan masa depan',
-      'Analisis keputusan pembelian',
-      'Relabeling transaksi otomatis',
+      t('onboard_5_f1'),
+      t('onboard_5_f2'),
+      t('onboard_5_f3'),
     ],
   },
   {
     id: 'complete',
-    title: 'Semua Siap!',
-    description: 'Anda siap memulai perjalanan keuangan yang lebih baik.',
+    title: t('onboard_6_title'),
+    description: t('onboard_6_desc'),
     icon: Shield,
     color: '#06b6d4',
     features: [],
@@ -74,6 +75,8 @@ const ONBOARDING_STEPS = [
 ]
 
 export default function OnboardingWizard({ onComplete, showOnboarding = false }) {
+  const { t } = useLanguage()
+  const ONBOARDING_STEPS = getOnboardingSteps(t)
   const [currentStep, setCurrentStep] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
 
@@ -249,15 +252,24 @@ export default function OnboardingWizard({ onComplete, showOnboarding = false })
             {/* Navigation */}
             <div className="flex items-center justify-between mt-auto pt-4 sm:pt-6 border-t border-white/5">
               <div className="flex-1">
-                <button
-                  onClick={handlePrev}
-                  disabled={currentStep === 0}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl font-medium transition-all disabled:opacity-0 hover:bg-white/5"
-                  style={{ color: '#7aa6c2' }}
-                >
-                  <ChevronLeft size={18} />
-                  <span className="hidden sm:inline">Sebelumnya</span>
-                </button>
+                {currentStep > 0 ? (
+                  <button
+                    onClick={handlePrev}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl font-medium transition-all hover:bg-white/5"
+                    style={{ color: '#7aa6c2' }}
+                  >
+                    <ChevronLeft size={18} />
+                    <span className="hidden sm:inline">{t('onboard_prev')}</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleSkip}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl font-medium transition-all hover:bg-white/5"
+                    style={{ color: '#7aa6c2' }}
+                  >
+                    <span className="font-semibold text-sm">{t('onboard_skip')}</span>
+                  </button>
+                )}
               </div>
 
               <div className="flex items-center gap-2 px-4">
@@ -289,11 +301,11 @@ export default function OnboardingWizard({ onComplete, showOnboarding = false })
                   {isLastStep ? (
                     <>
                       <Check size={18} strokeWidth={3} />
-                      <span>Mulai</span>
+                      <span>{t('onboard_start')}</span>
                     </>
                   ) : (
                     <>
-                      <span>Lanjut</span>
+                      <span>{t('onboard_next')}</span>
                       <ChevronRight size={18} />
                     </>
                   )}

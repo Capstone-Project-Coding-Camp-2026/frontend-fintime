@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import useSWR from 'swr'
 import { AlertTriangle, Plus, Pencil, Trash2, Calendar, CreditCard, Wallet, CheckCircle, ChevronDown, History, Home, Car, Smartphone, Users, Package } from 'lucide-react'
 import { useToast } from '../../context/ToastContext'
+import { useLanguage } from '../../context/LanguageContext'
 import api, { fetcher } from '../../lib/api'
 import { useConfirm } from '../../context/ConfirmContext';
 
@@ -33,6 +34,7 @@ const DEBT_TYPES = [
 ]
 
 export default function DebtCard({ onRefresh, refreshTrigger }) {
+  const { t } = useLanguage()
   const { success, error: showError, warning } = useToast()
   const { confirm } = useConfirm();
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -247,10 +249,10 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
           </div>
           <div>
             <h2 className="text-lg font-bold" style={{ color: 'white' }}>
-              Pelacakan Hutang
+              {t('dash_debt_title')}
             </h2>
             <p className="text-sm" style={{ color: '#7aa6c2' }}>
-              Kelola dan bayar hutang Anda
+              {t('dash_debt_desc')}
             </p>
           </div>
         </div>
@@ -265,7 +267,7 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
               }}
             >
               <AlertTriangle size={12} />
-              {dueSoonCount} Jatuh Tempo
+              {dueSoonCount} {t('dash_debt_due_soon')}
             </span>
           )}
           <button
@@ -282,7 +284,7 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
             }}
           >
             <Plus size={16} />
-            Tambah
+            {t('dash_action_add')}
           </button>
         </div>
       </div>
@@ -293,19 +295,19 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
         style={{ borderBottom: '1px solid rgba(0,245,255,0.08)' }}
       >
         <div>
-          <span className="text-xs" style={{ color: '#7aa6c2' }}>Total Hutang</span>
+          <span className="text-xs" style={{ color: '#7aa6c2' }}>{t('dash_debt_total')}</span>
           <p className="text-base sm:text-lg font-bold truncate" style={{ color: '#f87171' }}>
             {formatCurrency(totalDebt)}
           </p>
         </div>
         <div>
-          <span className="text-xs" style={{ color: '#7aa6c2' }}>Cicilan/Bulan</span>
+          <span className="text-xs" style={{ color: '#7aa6c2' }}>{t('dash_debt_monthly')}</span>
           <p className="text-base sm:text-lg font-bold truncate" style={{ color: '#fbbf24' }}>
             {formatCurrency(totalMonthly)}
           </p>
         </div>
         <div>
-          <span className="text-xs" style={{ color: '#7aa6c2' }}>Jumlah Hutang</span>
+          <span className="text-xs" style={{ color: '#7aa6c2' }}>{t('dash_debt_count')}</span>
           <p className="text-base sm:text-lg font-bold" style={{ color: '#00f5ff' }}>
             {debts.length}
           </p>
@@ -319,10 +321,10 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
         ) : debts.length === 0 ? (
           <div className="text-center py-8">
             <p className="font-semibold" style={{ color: '#7aa6c2' }}>
-              Tidak ada hutang
+              {t('dash_debt_empty')}
             </p>
             <p className="text-sm mt-1" style={{ color: '#5a8aab' }}>
-              Tambahkan hutang untuk mulai melacak
+              {t('dash_debt_empty_desc')}
             </p>
           </div>
         ) : (
@@ -402,10 +404,10 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
                   <div className="mb-3">
                     <div className="flex items-center justify-between text-[11px] sm:text-sm mb-2">
                       <span style={{ color: '#7aa6c2' }}>
-                        Terbayar: {percent.toFixed(0)}%
+                        {t('dash_debt_paid')}: {percent.toFixed(0)}%
                       </span>
                       <span style={{ color: '#7aa6c2' }}>
-                        Sisa: {formatCurrency(remaining)}
+                        {t('dash_debt_remaining')}: {formatCurrency(remaining)}
                       </span>
                     </div>
                     <div
@@ -424,14 +426,14 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
                       {debt.monthlyPayment > 0 && (
                         <span style={{ color: '#7aa6c2' }}>
-                          Cicilan: <span className="font-semibold" style={{ color: '#fbbf24' }}>
-                            {formatCurrency(debt.monthlyPayment)}/bln
+                          {t('dash_debt_installment')}: <span className="font-semibold" style={{ color: '#fbbf24' }}>
+                            {formatCurrency(debt.monthlyPayment)}/{t('dash_debt_per_month')}
                           </span>
                         </span>
                       )}
                       {debt.interestRate > 0 && (
                         <span style={{ color: '#7aa6c2' }}>
-                          Bunga: <span className="font-semibold" style={{ color: '#a855f7' }}>
+                          {t('dash_debt_interest')}: <span className="font-semibold" style={{ color: '#a855f7' }}>
                             {debt.interestRate}%
                           </span>
                         </span>
@@ -447,10 +449,10 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
                       >
                         <Calendar size={12} />
                         {daysUntil < 0
-                          ? `Terlambat ${Math.abs(daysUntil)} hari`
+                          ? `${t('dash_debt_late')} ${Math.abs(daysUntil)} ${t('dash_debt_days')}`
                           : daysUntil === 0
-                            ? 'Jatuh tempo hari ini'
-                            : `Jatuh tempo ${daysUntil} hari lagi`
+                            ? t('dash_debt_due_today')
+                            : `${t('dash_debt_due_in')} ${daysUntil} ${t('dash_debt_days')}`
                         }
                       </span>
                     )}
@@ -491,20 +493,20 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
               </svg>
             </button>
             <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 pr-8">
-              {editingId ? 'Edit Hutang' : 'Tambah Hutang Baru'}
+              {editingId ? t('dash_debt_edit_btn') : t('dash_debt_add_btn')}
             </h3>
 
             <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
               <div>
                 <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: '#7aa6c2' }}>
-                  Nama Hutang
+                  {t('dash_debt_label_name')}
                 </label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
-                  placeholder="Contoh: Cicilan Motor"
+                  placeholder={t('dash_debt_placeholder_name')}
                   className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none text-sm sm:text-base"
                   style={{
                     background: '#02111f',
@@ -517,7 +519,7 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="relative">
                   <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: '#7aa6c2' }}>
-                    Jenis
+                    {t('dash_debt_label_type')}
                   </label>
                   <button
                     type="button"
@@ -583,13 +585,13 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
 
                 <div>
                   <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: '#7aa6c2' }}>
-                    Lender / Pemberi Pinjaman
+                    {t('dash_debt_label_lender')}
                   </label>
                   <input
                     type="text"
                     value={formData.lender}
                     onChange={(e) => setFormData({ ...formData, lender: e.target.value })}
-                    placeholder="Contoh: BCA Finance"
+                    placeholder={t('dash_debt_placeholder_lender')}
                     className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none text-sm sm:text-base"
                     style={{
                       background: '#02111f',
@@ -603,7 +605,7 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: '#7aa6c2' }}>
-                    Total Pinjaman (Rp)
+                    {t('dash_debt_label_total')}
                   </label>
                   <input
                     type="text"
@@ -613,7 +615,6 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
                       setFormData({ ...formData, totalAmount: val })
                     }}
                     required
-                    placeholder="25.000.000"
                     className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none text-sm sm:text-base"
                     style={{
                       background: '#02111f',
@@ -625,7 +626,7 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
 
                 <div>
                   <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: '#7aa6c2' }}>
-                    Sisa Hutang (Rp)
+                    {t('dash_debt_label_remaining')}
                   </label>
                   <input
                     type="text"
@@ -634,7 +635,6 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
                       const val = e.target.value.replace(/\D/g, '')
                       setFormData({ ...formData, remainingAmount: val })
                     }}
-                    placeholder="15.000.000"
                     className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none text-sm sm:text-base"
                     style={{
                       background: '#02111f',
@@ -646,7 +646,7 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
 
                 <div>
                   <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: '#7aa6c2' }}>
-                    Bunga (%/tahun)
+                    {t('dash_debt_label_interest')}
                   </label>
                   <input
                     type="number"
@@ -655,7 +655,6 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
                     min="0"
                     max="100"
                     step="0.1"
-                    placeholder="12"
                     className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none text-sm sm:text-base"
                     style={{
                       background: '#02111f',
@@ -667,14 +666,13 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
 
                 <div>
                   <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: '#7aa6c2' }}>
-                    Tenor (bulan)
+                    {t('dash_debt_label_tenor')}
                   </label>
                   <input
                     type="number"
                     value={formData.tenorMonths}
                     onChange={(e) => setFormData({ ...formData, tenorMonths: e.target.value })}
                     min="1"
-                    placeholder="36"
                     className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none text-sm sm:text-base"
                     style={{
                       background: '#02111f',
@@ -686,7 +684,7 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
 
                 <div>
                   <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: '#7aa6c2' }}>
-                    Cicilan/Bulan (Rp)
+                    {t('dash_debt_label_monthly')}
                   </label>
                   <input
                     type="text"
@@ -696,7 +694,7 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
                       const val = e.target.value.replace(/\D/g, '')
                       setFormData({ ...formData, monthlyPayment: val })
                     }}
-                    placeholder="Otomatis Dihitung"
+                    placeholder={t('dash_debt_placeholder_auto')}
                     className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none text-sm sm:text-base cursor-not-allowed opacity-70"
                     style={{
                       background: 'rgba(0,245,255,0.05)',
@@ -708,7 +706,7 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
 
                 <div>
                   <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: '#7aa6c2' }}>
-                    Tanggal Mulai
+                    {t('dash_debt_label_start')}
                   </label>
                   <input
                     type="date"
@@ -725,7 +723,7 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
 
                 <div>
                   <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: '#7aa6c2' }}>
-                    Tanggal Jatuh Tempo
+                    {t('dash_debt_label_due')}
                   </label>
                   <input
                     type="date"
@@ -752,7 +750,7 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
                     color: '#f87171',
                   }}
                 >
-                  Batal
+                  {t('dash_action_cancel')}
                 </button>
                 <button
                   type="submit"
@@ -770,10 +768,10 @@ export default function DebtCard({ onRefresh, refreshTrigger }) {
                       <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>
                         <span className="block w-4 h-4 border-2 border-[#020b18] border-t-transparent rounded-full" />
                       </motion.div>
-                      Menyimpan...
+                      {t('dash_action_saving')}
                     </>
                   ) : (
-                    editingId ? 'Update' : 'Simpan'
+                    editingId ? t('dash_action_update') : t('dash_action_save')
                   )}
                 </button>
               </div>

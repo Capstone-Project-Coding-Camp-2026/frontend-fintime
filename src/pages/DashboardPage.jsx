@@ -19,7 +19,6 @@ import TransactionCard from '../components/dashboard/TransactionCard'
 import BudgetCard from '../components/budget/BudgetCard'
 import DebtCard from '../components/debt/DebtCard'
 import GoalCard from '../components/goal/GoalCard'
-import OnboardingWizard from '../components/onboarding/OnboardingWizard'
 import FinancialLearning from '../components/dashboard/FinancialLearning'
 import { useLanguage } from '../context/LanguageContext'
 
@@ -27,7 +26,6 @@ export default function DashboardPage() {
   const { t } = useLanguage()
   const [showAddTransaction, setShowAddTransaction] = useState(false)
   const [showAddAccount, setShowAddAccount] = useState(false)
-  const [showOnboardingManual, setShowOnboardingManual] = useState(false)
   const [defaultTransactionType, setDefaultTransactionType] =
     useState('expense')
   const [refreshKey, setRefreshKey] = useState(0)
@@ -43,8 +41,8 @@ export default function DashboardPage() {
   // What-If Form States
   const [price, setPrice] = useState('')
   const [selectedOption, setSelectedOption] = useState('cash')
-  const [installmentMonths, setInstallmentMonths] = useState('12')
-  const [interestRate, setInterestRate] = useState('2')
+  const [installmentMonths, setInstallmentMonths] = useState('')
+  const [interestRate, setInterestRate] = useState('')
 
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [hasResult, setHasResult] = useState(false)
@@ -118,13 +116,13 @@ export default function DashboardPage() {
 
     try {
       const payload = {
-        price: parseFloat(price),
-        option: selectedOption,
-        installmentMonths: parseInt(installmentMonths),
-        interestRate: parseFloat(interestRate),
+        itemPrice: parseFloat(price) || 0,
+        selectedOption,
+        installmentMonths: parseInt(installmentMonths) || 1,
+        interestRate: parseFloat(interestRate) || 0,
       }
 
-      const res = await api.post('/ai/simulate-purchase', payload)
+      const res = await api.post('/ai/whatif', payload)
       if (res.data?.success) {
         setAnalysisData(res.data.data)
         setHasResult(true)
@@ -149,7 +147,6 @@ export default function DashboardPage() {
     <DashboardLayout
       activePage="dashboard"
       particleCount={30}
-      onShowHelp={() => setShowOnboardingManual(true)}
     >
       {({ user }) => (
         <>
@@ -366,22 +363,57 @@ export default function DashboardPage() {
                   onAnalyze={handleAnalyze}
                   isAnalyzing={isAnalyzing}
                 />
-                {errorMsg && (
-                  <p
-                    className="text-sm text-red-500 mt-2"
-                    style={{ color: 'var(--error-red)' }}
-                  >
-                    {errorMsg}
-                  </p>
-                )}
-                <AnalysisResult
-                  {...analysisData}
-                  price={parseFloat(price) || 0}
-                  selectedOption={selectedOption}
-                  hasResult={hasResult}
-                />
-              </div>
-            </section>
+                  {errorMsg && (
+                    <p
+                      className="text-sm mt-4 text-center"
+                      style={{ color: 'var(--error-red)' }}
+                    >
+                      {errorMsg}
+                    </p>
+                  )}
+                  {(() => {
+                    const rec = analysisData?.recommendation;
+                    const verdict = rec === 'buy' ? 'good' : (rec === 'buy_careful' ? 'neutral' : (rec === 'dont_buy' ? 'bad' : 'neutral'));
+                    const confidence = (analysisData?.confidence || 0) * 100;
+                    
+                    let goodPercent = analysisData?.good_percent ?? analysisData?.goodPercent ?? 0;
+                    let neutralPercent = analysisData?.neutral_percent ?? analysisData?.neutralPercent ?? 0;
+                    let badPercent = analysisData?.bad_percent ?? analysisData?.badPercent ?? 0;
+
+                    // Fallback using confidence if backend doesn't provide explicit percentages
+                    if (goodPercent === 0 && neutralPercent === 0 && badPercent === 0 && confidence > 0) {
+                      if (verdict === 'good') {
+                        goodPercent = confidence;
+                        neutralPercent = (100 - confidence) / 2;
+                        badPercent = (100 - confidence) / 2;
+                      } else if (verdict === 'neutral') {
+                        neutralPercent = confidence;
+                        goodPercent = (100 - confidence) / 2;
+                        badPercent = (100 - confidence) / 2;
+                      } else {
+                        badPercent = confidence;
+                        goodPercent = (100 - confidence) / 2;
+                        neutralPercent = (100 - confidence) / 2;
+                      }
+                    }
+
+                    return (
+                      <AnalysisResult
+                        goodPercent={goodPercent}
+                        neutralPercent={neutralPercent}
+                        badPercent={badPercent}
+                        verdict={verdict}
+                        monthlyPayment={analysisData?.monthly_payment ?? analysisData?.monthlyPayment ?? 0}
+                        totalPayment={analysisData?.total_payment ?? analysisData?.totalPayment ?? 0}
+                        alternatives={analysisData?.alternatives ?? []}
+                        price={parseFloat(price) || 0}
+                        selectedOption={selectedOption}
+                        hasResult={hasResult}
+                      />
+                    );
+                  })()}
+                </div>
+              </section>
 
             {/* Budget Section */}
             <section className="mt-8">
@@ -396,14 +428,6 @@ export default function DashboardPage() {
             {/* Goal Section */}
             <section className="mt-8">
               <GoalCard onRefresh={handleRefresh} refreshTrigger={refreshKey} />
-            </section>
-
-            {/* Onboarding Wizard */}
-            <section className="mt-8">
-              <OnboardingWizard
-                showOnboarding={showOnboardingManual}
-                onComplete={() => setShowOnboardingManual(false)}
-              />
             </section>
 
             {/* Financial Learning Section */}

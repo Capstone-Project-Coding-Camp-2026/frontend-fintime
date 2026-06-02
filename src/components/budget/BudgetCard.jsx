@@ -4,6 +4,7 @@ import useSWR from 'swr'
 import { TrendingUp, TrendingDown, Plus, Pencil, Trash2, AlertTriangle, Check, ChevronDown } from 'lucide-react'
 import { useToast } from '../../context/ToastContext'
 import { useConfirm } from '../../context/ConfirmContext'
+import { useLanguage } from '../../context/LanguageContext'
 import api, { fetcher } from '../../lib/api'
 import { CATEGORY_LABELS } from '../dashboard/dashboardConstants'
 
@@ -23,6 +24,7 @@ const getProgressColor = (percent) => {
 }
 
 export default function BudgetCard({ onRefresh, refreshTrigger }) {
+  const { t } = useLanguage()
   const { error: showError, success } = useToast()
   const { confirm } = useConfirm()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -143,10 +145,10 @@ export default function BudgetCard({ onRefresh, refreshTrigger }) {
           </div>
           <div>
             <h2 className="text-lg font-bold" style={{ color: 'white' }}>
-              Budget Bulanan
+              {t('dash_budget_title')}
             </h2>
             <p className="text-sm" style={{ color: '#7aa6c2' }}>
-              Atur limit pengeluaran per kategori
+              {t('dash_budget_desc')}
             </p>
           </div>
         </div>
@@ -164,7 +166,7 @@ export default function BudgetCard({ onRefresh, refreshTrigger }) {
           }}
         >
           <Plus size={16} />
-          Tambah
+          {t('dash_action_add')}
         </button>
       </div>
 
@@ -177,10 +179,10 @@ export default function BudgetCard({ onRefresh, refreshTrigger }) {
         ) : budgets.length === 0 ? (
           <div className="text-center py-8">
             <p className="font-semibold" style={{ color: '#7aa6c2' }}>
-              Belum ada budget
+              {t('dash_budget_empty')}
             </p>
             <p className="text-sm mt-1" style={{ color: '#5a8aab' }}>
-              Tambahkan budget untuk mulai melacak pengeluaran
+              {t('dash_budget_empty_desc')}
             </p>
           </div>
         ) : (
@@ -274,7 +276,7 @@ export default function BudgetCard({ onRefresh, refreshTrigger }) {
                     </div>
                     <div>
                       <span style={{ color: '#7aa6c2' }}>
-                        {isOver ? 'Melebihi: ' : 'Sisa: '}
+                        {isOver ? `${t('dash_budget_over')}: ` : `${t('dash_budget_remaining')}: `}
                       </span>
                       <span
                         className="font-bold"
@@ -309,13 +311,13 @@ export default function BudgetCard({ onRefresh, refreshTrigger }) {
             }}
           >
             <h3 className="text-xl font-bold mb-6">
-              {editingId ? 'Edit Budget' : 'Tambah Budget'}
+              {editingId ? t('dash_budget_edit_btn') : t('dash_budget_add_btn')}
             </h3>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="relative">
                 <label className="block text-sm font-medium mb-2" style={{ color: '#7aa6c2' }}>
-                  Kategori
+                  {t('dash_budget_label_category')}
                 </label>
                 <button
                   type="button"
@@ -330,7 +332,7 @@ export default function BudgetCard({ onRefresh, refreshTrigger }) {
                   <span className={!formData.category ? 'text-gray-500' : ''}>
                     {formData.category 
                       ? (CATEGORY_LABELS[formData.category] || formData.category.charAt(0).toUpperCase() + formData.category.slice(1))
-                      : 'Pilih Kategori'}
+                      : t('dash_budget_placeholder_category')}
                   </span>
                   <ChevronDown 
                     size={18} 
@@ -383,7 +385,7 @@ export default function BudgetCard({ onRefresh, refreshTrigger }) {
 
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: '#7aa6c2' }}>
-                  Limit Budget (Rp)
+                  {t('dash_budget_label_limit')}
                 </label>
                 <input
                   type="text"
@@ -435,7 +437,7 @@ export default function BudgetCard({ onRefresh, refreshTrigger }) {
                       Menyimpan...
                     </>
                   ) : (
-                    editingId ? 'Update' : 'Simpan'
+                    editingId ? t('dash_action_update') : t('dash_action_save')
                   )}
                 </button>
               </div>

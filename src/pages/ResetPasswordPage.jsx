@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useSearchParams } from 'react-router-dom'
 import {
-  ChevronLeft, Lock, Eye, EyeOff, Loader2, CheckCircle, AlertCircle, KeyRound, ArrowRight
+  ChevronLeft, Lock, Eye, EyeOff, Loader2, CheckCircle, AlertCircle, KeyRound, ArrowRight, Timer
 } from 'lucide-react'
 import ParticleField from '../components/Particlefield'
 import api from '../lib/api'
@@ -120,7 +120,7 @@ export default function ResetPasswordPage() {
                 backdropFilter: 'blur(10px)',
               }}
             >
-              <span className="text-4xl">⏱</span>
+              <Timer size={40} color="#00f5ff" />
             </motion.div>
             <div className="flex flex-col items-center">
               <span

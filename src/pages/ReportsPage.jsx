@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   FileText,
@@ -31,6 +31,7 @@ import {
 } from 'recharts'
 import DashboardLayout from '../components/layout/DashboardLayout'
 import { useToast } from '../context/ToastContext'
+import { useLanguage } from '../context/LanguageContext'
 import api from '../lib/api'
 import { TRANSACTION_CATEGORIES } from '../components/dashboard/dashboardConstants'
 
@@ -61,6 +62,7 @@ const DATE_PRESETS = [
 ]
 
 export default function ReportsPage() {
+  const { t } = useLanguage()
   const { success, error: showError } = useToast()
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -290,10 +292,10 @@ export default function ReportsPage() {
           <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
               <h1 className="text-2xl sm:text-4xl font-bold tracking-tight mb-2 grad-text print:text-black print:!bg-none print:!-webkit-text-fill-color-initial">
-                Laporan Keuangan
+                {t('rep_title')}
               </h1>
               <p className="text-gray-400 print:text-gray-700">
-                Analisis dan laporan transaksi keuangan Anda
+                {t('rep_subtitle')}
               </p>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto print:hidden">
@@ -373,12 +375,17 @@ export default function ReportsPage() {
           >
             {/* Quick Date Presets */}
             <div className="mb-4">
-              <span className="text-[10px] uppercase tracking-wider block mb-2" style={{ color: '#7aa6c2' }}>Quick Select</span>
+              <span className="text-[10px] uppercase tracking-wider block mb-2" style={{ color: '#7aa6c2' }}>{t('rep_quick_select')}</span>
               <div className="flex flex-wrap gap-2">
-                {DATE_PRESETS.map((preset) => (
+                {[
+                  { id: 7, label: t('rep_preset_7d') },
+                  { id: 30, label: t('rep_preset_30d') },
+                  { id: 90, label: t('rep_preset_3m') },
+                  { id: 180, label: t('rep_preset_6m') },
+                ].map((preset) => (
                   <button
-                    key={preset.days}
-                    onClick={() => handleDatePreset(preset.days)}
+                    key={preset.id}
+                    onClick={() => handleDatePreset(preset.id)}
                     className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
                     style={{
                       background: 'rgba(0,245,255,0.05)',
@@ -402,7 +409,7 @@ export default function ReportsPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 items-end">
               <div className="space-y-1.5 sm:space-y-2">
-                <label className="text-[10px] uppercase tracking-wider block" style={{ color: '#7aa6c2' }}>Mulai Tanggal</label>
+                <label className="text-[10px] uppercase tracking-wider block" style={{ color: '#7aa6c2' }}>{t('rep_start_date')}</label>
                 <div className="relative">
                   <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400" />
                   <input
@@ -420,7 +427,7 @@ export default function ReportsPage() {
               </div>
 
               <div className="space-y-1.5 sm:space-y-2">
-                <label className="text-[10px] uppercase tracking-wider block" style={{ color: '#7aa6c2' }}>Sampai Tanggal</label>
+                <label className="text-[10px] uppercase tracking-wider block" style={{ color: '#7aa6c2' }}>{t('rep_end_date')}</label>
                 <div className="relative">
                   <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400" />
                   <input
@@ -438,7 +445,7 @@ export default function ReportsPage() {
               </div>
 
               <div className="space-y-1.5 sm:space-y-2">
-                <label className="text-[10px] uppercase tracking-wider block" style={{ color: '#7aa6c2' }}>Kategori</label>
+                <label className="text-[10px] uppercase tracking-wider block" style={{ color: '#7aa6c2' }}>{t('rep_category')}</label>
                 <div className="relative">
                   <select
                     value={selectedCategory}
@@ -450,9 +457,9 @@ export default function ReportsPage() {
                       color: 'white',
                     }}
                   >
-                    <option value="all" className="bg-[#02111f]">Semua Kategori</option>
+                    <option value="all" className="bg-[#02111f]">{t('rep_all_categories')}</option>
                     {TRANSACTION_CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat} className="bg-[#02111f]">{cat}</option>
+                      <option key={cat} value={cat} className="bg-[#02111f]">{t(`cat_${cat}`) || cat}</option>
                     ))}
                   </select>
                   <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400 pointer-events-none" />
@@ -460,7 +467,7 @@ export default function ReportsPage() {
               </div>
 
               <div className="space-y-1.5 sm:space-y-2">
-                <label className="text-[10px] uppercase tracking-wider block" style={{ color: '#7aa6c2' }}>Tipe</label>
+                <label className="text-[10px] uppercase tracking-wider block" style={{ color: '#7aa6c2' }}>{t('rep_type')}</label>
                 <div className="relative">
                   <select
                     value={selectedType}
@@ -472,9 +479,9 @@ export default function ReportsPage() {
                       color: 'white',
                     }}
                   >
-                    <option value="all" className="bg-[#02111f]">Semua Tipe</option>
-                    <option value="income" className="bg-[#02111f]">Pendapatan</option>
-                    <option value="expense" className="bg-[#02111f]">Pengeluaran</option>
+                    <option value="all" className="bg-[#02111f]">{t('rep_all_types')}</option>
+                    <option value="income" className="bg-[#02111f]">{t('rep_income')}</option>
+                    <option value="expense" className="bg-[#02111f]">{t('rep_expense')}</option>
                   </select>
                   <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400 pointer-events-none" />
                 </div>
@@ -484,10 +491,10 @@ export default function ReportsPage() {
             {/* Active filter summary */}
             {hasAnyFilter && (
               <div className="mt-4 pt-4 flex flex-wrap items-center gap-2" style={{ borderTop: '1px solid rgba(0,245,255,0.08)' }}>
-                <span className="text-[10px] uppercase tracking-wider" style={{ color: '#7aa6c2' }}>Filter aktif:</span>
+                <span className="text-[10px] uppercase tracking-wider" style={{ color: '#7aa6c2' }}>{t('rep_active_filters')}:</span>
                 {isDateFiltered && (
                   <span className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">
-                    Tanggal
+                    {t('rep_date')}
                     <button onClick={() => { setStartDate(DEFAULT_START); setEndDate(DEFAULT_END) }} className="ml-1 hover:text-white">
                       <X size={10} />
                     </button>
@@ -495,7 +502,7 @@ export default function ReportsPage() {
                 )}
                 {isCategoryFiltered && (
                   <span className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                    {selectedCategory}
+                    {t(`cat_${selectedCategory}`) || selectedCategory}
                     <button onClick={() => setSelectedCategory('all')} className="ml-1 hover:text-white">
                       <X size={10} />
                     </button>
@@ -503,7 +510,7 @@ export default function ReportsPage() {
                 )}
                 {isTypeFiltered && (
                   <span className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                    {selectedType === 'income' ? 'Pendapatan' : 'Pengeluaran'}
+                    {selectedType === 'income' ? t('rep_income') : t('rep_expense')}
                     <button onClick={() => setSelectedType('all')} className="ml-1 hover:text-white">
                       <X size={10} />
                     </button>
@@ -533,7 +540,7 @@ export default function ReportsPage() {
                   <TrendingUp size={18} style={{ color: '#22c55e' }} />
                 </div>
                 <span className="text-xs font-medium" style={{ color: '#7aa6c2' }}>
-                  Total Pendapatan
+                  {t('rep_total_income')}
                 </span>
               </div>
               <p className="text-lg sm:text-xl font-bold text-green-400">
@@ -559,7 +566,7 @@ export default function ReportsPage() {
                   <TrendingDown size={18} style={{ color: '#f87171' }} />
                 </div>
                 <span className="text-xs font-medium" style={{ color: '#7aa6c2' }}>
-                  Total Pengeluaran
+                  {t('rep_total_expense')}
                 </span>
               </div>
               <p className="text-lg sm:text-xl font-bold text-red-400">
@@ -589,7 +596,7 @@ export default function ReportsPage() {
                   <Wallet size={18} style={{ color: '#00f5ff' }} />
                 </div>
                 <span className="text-xs font-medium" style={{ color: '#7aa6c2' }}>
-                  Saldo Bersih
+                  {t('rep_net_balance')}
                 </span>
               </div>
               <p
@@ -620,7 +627,7 @@ export default function ReportsPage() {
                   <FileText size={18} style={{ color: '#a855f7' }} />
                 </div>
                 <span className="text-xs font-medium" style={{ color: '#7aa6c2' }}>
-                  Total Transaksi
+                  {t('rep_tx_count')}
                 </span>
               </div>
               <p className="text-lg sm:text-xl font-bold text-purple-400">
@@ -644,10 +651,10 @@ export default function ReportsPage() {
             >
               <h3 className="text-base sm:text-lg font-bold mb-6 flex items-center gap-3">
                 <TrendingUp size={20} style={{ color: '#00f5ff' }} />
-                Tren Bulanan
+                {t('rep_trend')}
               </h3>
               <div className="h-64 sm:h-80 w-full">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                   <AreaChart data={monthlyTrend}>
                     <defs>
                       <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
@@ -704,11 +711,11 @@ export default function ReportsPage() {
               <div className="flex items-center justify-center gap-6 mt-4">
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
-                  <span className="text-[10px] sm:text-xs" style={{ color: '#7aa6c2' }}>Pendapatan</span>
+                  <span className="text-[10px] sm:text-xs" style={{ color: '#7aa6c2' }}>{t('rep_income')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                  <span className="text-[10px] sm:text-xs" style={{ color: '#7aa6c2' }}>Pengeluaran</span>
+                  <span className="text-[10px] sm:text-xs" style={{ color: '#7aa6c2' }}>{t('rep_expense')}</span>
                 </div>
               </div>
             </motion.div>
@@ -726,10 +733,10 @@ export default function ReportsPage() {
             >
               <h3 className="text-base sm:text-lg font-bold mb-6 flex items-center gap-3">
                 <PieChart size={20} style={{ color: '#00f5ff' }} />
-                Breakdown Kategori
+                {t('rep_breakdown')}
               </h3>
               <div className="h-64 sm:h-80 w-full">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                   <RechartsPie>
                     <Pie
                       data={categoryBreakdown}
@@ -759,7 +766,7 @@ export default function ReportsPage() {
                       verticalAlign="bottom"
                       height={36}
                       formatter={(value) => (
-                        <span className="text-[10px] sm:text-xs font-medium" style={{ color: '#7aa6c2' }}>{value}</span>
+                        <span className="text-[10px] sm:text-xs font-medium" style={{ color: '#7aa6c2' }}>{t(`cat_${value}`) || value}</span>
                       )}
                     />
                   </RechartsPie>

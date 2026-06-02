@@ -357,7 +357,7 @@ export default function AvatarConditionBanner({
                 Target: {formatIDR(targetPension)}
               </p>
               <p className="text-[10px] text-gray-400">
-                Longevity: {pensionSurvivalYears} {t('dash_pension_years')}
+                Longevity: {Number(pensionSurvivalYears).toLocaleString('id-ID', { maximumFractionDigits: 1 })} {t('dash_pension_years')}
               </p>
             </div>
           </div>
@@ -373,7 +373,7 @@ export default function AvatarConditionBanner({
               Survival Projection
             </p>
             <p className="text-2xl font-black text-white">
-              {pensionSurvivalYears}
+              {Number(pensionSurvivalYears).toLocaleString('id-ID', { maximumFractionDigits: 1 })}
               <span className="text-xs font-bold text-cyan-400 ml-1">
                 {t('dash_pension_years').toUpperCase()}
               </span>
@@ -432,7 +432,7 @@ export default function AvatarConditionBanner({
               className="font-semibold text-sm"
               style={{ color: 'var(--text)' }}
             >
-              Rekomendasi Alokasi Aset
+              {t('avat_asset_recommendation')}
             </h3>
           </div>
 
@@ -442,7 +442,7 @@ export default function AvatarConditionBanner({
                 className="text-xs font-medium mb-1"
                 style={{ color: 'var(--cyan)' }}
               >
-                Instrumen Disarankan
+                {t('avat_suggested_instruments')}
               </p>
               <p
                 className="text-xs leading-relaxed"

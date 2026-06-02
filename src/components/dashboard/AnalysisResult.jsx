@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 import { CheckCircle, AlertTriangle, XCircle, TrendingUp } from 'lucide-react'
+import { useLanguage } from '../../context/LanguageContext'
 
 const verdictConfig = {
   good: {
@@ -9,7 +10,7 @@ const verdictConfig = {
     color: '#4ade80',
     colorDim: 'rgba(74, 222, 128, 0.1)',
     border: 'rgba(74, 222, 128, 0.2)',
-    message: 'Kondisi keuanganmu mendukung untuk pembelian ini. Cash atau PayLater sama-sama aman.',
+    msgKey: 'dash_verdict_good_msg',
   },
   neutral: {
     label: 'BUY BUT BE CAREFUL',
@@ -17,7 +18,7 @@ const verdictConfig = {
     color: '#fbbf24',
     colorDim: 'rgba(251, 191, 36, 0.1)',
     border: 'rgba(251, 191, 36, 0.2)',
-    message: 'Pembelian ini masih dalam batas aman, tapi pertimbangkan dengan hati-hati.',
+    msgKey: 'dash_verdict_neutral_msg',
   },
   bad: {
     label: 'DONT BUY',
@@ -25,7 +26,7 @@ const verdictConfig = {
     color: '#f87171',
     colorDim: 'rgba(248, 113, 113, 0.1)',
     border: 'rgba(248, 113, 113, 0.2)',
-    message: 'Pembelian ini tidak disarankan untuk kondisi keuanganmu saat ini.',
+    msgKey: 'dash_verdict_bad_msg',
   },
 }
 
@@ -42,10 +43,12 @@ export default function AnalysisResult({
   hasResult,
   alternatives = []
 }) {
+  const { t } = useLanguage()
+
   const data = [
-    { name: 'Aman', value: goodPercent, color: '#4ade80' },
-    { name: 'Waspada', value: neutralPercent, color: '#fbbf24' },
-    { name: 'Bahaya', value: badPercent, color: '#f87171' },
+    { name: t('dash_verdict_good'), value: goodPercent, color: '#4ade80' },
+    { name: t('dash_verdict_neutral'), value: neutralPercent, color: '#fbbf24' },
+    { name: t('dash_verdict_bad'), value: badPercent, color: '#f87171' },
   ]
 
   const config = verdictConfig[verdict] || verdictConfig.neutral
@@ -56,14 +59,11 @@ export default function AnalysisResult({
         className="glass-card rounded-2xl border p-6 flex flex-col items-center justify-center min-h-[400px]"
         style={{ borderColor: 'var(--glass-border)' }}
       >
-        <div
-          className="w-20 h-20 rounded-2xl flex items-center justify-center mb-4"
-          style={{ background: 'var(--cyan-glow)' }}
-        >
-          <TrendingUp size={32} style={{ color: 'var(--cyan)' }} />
+        <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 flex items-center justify-center mb-4">
+          <TrendingUp size={32} className="text-cyan-400" />
         </div>
-        <p className="text-sm text-center max-w-[200px]" style={{ color: 'var(--text-muted)' }}>
-          Masukkan scenario dan tekan "Analisis Sekarang" untuk melihat hasil
+        <p className="text-gray-400 text-sm text-center max-w-[200px]">
+          {t('dash_scenario_empty_state')}
         </p>
       </div>
     )
@@ -92,7 +92,7 @@ export default function AnalysisResult({
 
       {/* Pie Chart */}
       <div className="h-48 mb-5 relative min-w-0 min-h-[192px]">
-        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+        <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
           <PieChart>
             <Pie
               data={data}
@@ -109,16 +109,10 @@ export default function AnalysisResult({
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
-            <Tooltip
-              contentStyle={{
-                background: 'var(--dark-2)',
-                border: '1px solid var(--glass-border)',
-                borderRadius: '10px',
-                color: 'var(--text)',
-                fontSize: '12px',
-                fontFamily: 'Sora, sans-serif',
-              }}
-              formatter={(value) => [`${value}%`, 'Probabilitas']}
+            <Tooltip 
+              contentStyle={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px' }}
+              itemStyle={{ color: '#e2e8f0' }}
+              formatter={(value) => [`${Number(value).toLocaleString('id-ID', { maximumFractionDigits: 1 })}%`, t('dash_probability')]}
             />
           </PieChart>
         </ResponsiveContainer>
@@ -132,9 +126,10 @@ export default function AnalysisResult({
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: item.color }}
             />
-            <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-              {item.name} {item.value}%
-            </span>
+              <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                {item.name}<br />
+                {Number(item.value).toLocaleString('id-ID', { maximumFractionDigits: 1 })}%
+              </span>
           </div>
         ))}
       </div>
@@ -154,16 +149,16 @@ export default function AnalysisResult({
           </p>
         </div>
         <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-          {config.message}
+          {t(config.msgKey)}
         </p>
       </div>
 
       {/* Detail */}
       <div className="space-y-3">
         {[
-          { label: 'Harga', value: `Rp ${price.toLocaleString('id-ID')}` },
-          { label: 'Total Pembayaran', value: `Rp ${totalPayment.toLocaleString('id-ID')}` },
-          ...(selectedOption === 'paylater' ? [{ label: 'Cicilan/bulan', value: `Rp ${monthlyPayment.toLocaleString('id-ID')}` }] : []),
+          { label: t('dash_detail_price'), value: `Rp ${price.toLocaleString('id-ID')}` },
+          { label: t('dash_detail_total'), value: `Rp ${totalPayment.toLocaleString('id-ID')}` },
+          ...(selectedOption === 'paylater' ? [{ label: t('dash_detail_monthly'), value: `Rp ${monthlyPayment.toLocaleString('id-ID')}` }] : []),
           // {
           //   label: 'Sisa Budget',
           //   value: `Rp ${remainingBudget.toLocaleString('id-ID')}`,

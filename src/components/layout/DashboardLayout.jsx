@@ -12,17 +12,19 @@ import ParticleField from '../Particlefield'
 import UserDropdown from './UserDropdown'
 import BottomNav from './BottomNav'
 import NotificationCenter from '../notification/NotificationCenter'
+import OnboardingWizard from '../onboarding/OnboardingWizard'
 import { useToast } from '../../context/ToastContext'
 import api from '../../lib/api'
 import { useLanguage } from '../../context/LanguageContext'
 
-export default function DashboardLayout({ children, activePage = 'dashboard', particleCount = 30, onShowHelp }) {
+export default function DashboardLayout({ children, activePage = 'dashboard', particleCount = 30 }) {
   const navigate = useNavigate()
   const { t } = useLanguage()
   const [user, setUser] = useState(null)
   const [isMobile, setIsMobile] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
+  const [showOnboarding, setShowOnboarding] = useState(false)
   const { unreadCount, info } = useToast()
 
   useEffect(() => {
@@ -149,7 +151,7 @@ export default function DashboardLayout({ children, activePage = 'dashboard', pa
             {/* Utility Icons (Visible on Mobile & Desktop) */}
             <div className="flex items-center gap-1.5">
               <button
-                onClick={() => { if (onShowHelp) onShowHelp(); else info('Panduan tur interaktif saat ini hanya tersedia di halaman Dashboard.'); }}
+                onClick={() => setShowOnboarding(true)}
                 className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all text-gray-300 hover:text-cyan-400"
                 title={t('nav_help_tooltip')}
               >
@@ -169,7 +171,6 @@ export default function DashboardLayout({ children, activePage = 'dashboard', pa
                 )}
               </button>
             </div>
-
             {/* User Profile (Desktop only, mobile has it in BottomNav) */}
             {!isMobile && (
               <div className="ml-1">
@@ -189,9 +190,10 @@ export default function DashboardLayout({ children, activePage = 'dashboard', pa
         onClose={() => setShowNotifications(false)}
       />
 
+      <OnboardingWizard showOnboarding={showOnboarding} onComplete={() => setShowOnboarding(false)} />
+
       {/* Mobile Bottom Nav */}
       <BottomNav activePage={activePage} onLogout={handleLogout} />
     </div>
   )
 }
-

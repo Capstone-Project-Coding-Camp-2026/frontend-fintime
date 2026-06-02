@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import {
   ChevronLeft, Mail, Loader2, CheckCircle, AlertCircle,
-  KeyRound, Shield, Clock, ArrowRight
+  KeyRound, Shield, Clock, ArrowRight, Timer
 } from 'lucide-react'
 import ParticleField from '../components/Particlefield'
 import api from '../lib/api'
@@ -86,7 +86,7 @@ export default function ForgotPasswordPage() {
                 backdropFilter: 'blur(10px)',
               }}
             >
-              <span className="text-4xl">⏱</span>
+              <Timer size={40} color="#00f5ff" />
             </motion.div>
             <div className="flex flex-col items-center">
               <span

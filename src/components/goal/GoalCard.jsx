@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import useSWR from 'swr'
 import { Target, Plus, Pencil, Trash2, Calendar, Wallet, Award, CheckCircle, Clock, ChevronDown, History, HeartPulse, Plane, Car, Smartphone, GraduationCap, Users, Home, TrendingUp, Package } from 'lucide-react'
 import { useToast } from '../../context/ToastContext'
+import { useLanguage } from '../../context/LanguageContext'
 import api, { fetcher } from '../../lib/api'
 
 const formatCurrency = (value) => {
@@ -50,6 +51,7 @@ const getProgressColor = (percent) => {
 }
 
 export default function GoalCard({ onRefresh, refreshTrigger }) {
+  const { t } = useLanguage()
   const { success, error: showError } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showForm, setShowForm] = useState(false)
@@ -225,10 +227,10 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
           </div>
           <div>
             <h2 className="text-lg font-bold" style={{ color: 'white' }}>
-              Target Tabungan
+              {t('dash_goal_title')}
             </h2>
             <p className="text-sm" style={{ color: '#7aa6c2' }}>
-              Raih tujuan keuangan Anda
+              {t('dash_goal_desc')}
             </p>
           </div>
         </div>
@@ -246,7 +248,7 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
           }}
         >
           <Plus size={16} />
-          Tambah
+          {t('dash_action_add')}
         </button>
       </div>
 
@@ -256,25 +258,25 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
         style={{ borderBottom: '1px solid rgba(0,245,255,0.08)' }}
       >
         <div>
-          <span className="text-xs" style={{ color: '#7aa6c2' }}>Total Ditabung</span>
+          <span className="text-xs" style={{ color: '#7aa6c2' }}>{t('dash_goal_saved')}</span>
           <p className="text-base sm:text-lg font-bold truncate" style={{ color: '#a855f7' }}>
             {formatCurrency(totalSaved)}
           </p>
         </div>
         <div>
-          <span className="text-xs" style={{ color: '#7aa6c2' }}>Target Keseluruhan</span>
+          <span className="text-xs" style={{ color: '#7aa6c2' }}>{t('dash_goal_target')}</span>
           <p className="text-base sm:text-lg font-bold truncate" style={{ color: '#00f5ff' }}>
             {formatCurrency(totalTarget)}
           </p>
         </div>
         <div>
-          <span className="text-xs" style={{ color: '#7aa6c2' }}>Aktif</span>
+          <span className="text-xs" style={{ color: '#7aa6c2' }}>{t('dash_goal_active')}</span>
           <p className="text-base sm:text-lg font-bold" style={{ color: '#fbbf24' }}>
             {activeGoals.length}
           </p>
         </div>
         <div>
-          <span className="text-xs" style={{ color: '#7aa6c2' }}>Selesai</span>
+          <span className="text-xs" style={{ color: '#7aa6c2' }}>{t('dash_goal_done')}</span>
           <p className="text-base sm:text-lg font-bold" style={{ color: '#22c55e' }}>
             {completedGoals.length}
           </p>
@@ -290,10 +292,10 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
         ) : goals.length === 0 ? (
           <div className="text-center py-8">
             <p className="font-semibold" style={{ color: '#7aa6c2' }}>
-              Belum ada target
+              {t('dash_goal_empty')}
             </p>
             <p className="text-sm mt-1" style={{ color: '#5a8aab' }}>
-              Tambahkan target untuk mulai menabung
+              {t('dash_goal_empty_desc')}
             </p>
           </div>
         ) : (
@@ -369,7 +371,7 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
                             }}
                             className="w-8 h-8 rounded-lg flex items-center justify-center bg-green-500/5 hover:bg-green-500/10 transition-all"
                             style={{ color: '#22c55e', border: '1px solid rgba(34,197,94,0.1)' }}
-                            title="Tambah Tabungan"
+                            title={t('dash_goal_add_saving')}
                           >
                             <Wallet size={14} />
                           </button>
@@ -430,10 +432,10 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
                       >
                         <Clock size={12} />
                         {daysRemaining < 0
-                          ? `Terlambat ${Math.abs(daysRemaining)} hari`
+                          ? `${t('dash_debt_late')} ${Math.abs(daysRemaining)} ${t('dash_debt_days')}`
                           : daysRemaining === 0
-                            ? 'Jatuh tempo hari ini'
-                            : `${daysRemaining} hari tersisa`
+                            ? t('dash_debt_due_today')
+                            : `${daysRemaining} ${t('dash_debt_days')} ${t('dash_budget_remaining')}`
                         }
                       </span>
                     )}
@@ -492,20 +494,20 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
               </svg>
             </button>
             <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 pr-8">
-              {editingId ? 'Edit Target' : 'Tambah Target Baru'}
+              {editingId ? t('dash_goal_edit_btn') : t('dash_goal_add_btn')}
             </h3>
 
             <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
               <div>
                 <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: '#7aa6c2' }}>
-                  Nama Target
+                  {t('dash_goal_label_name')}
                 </label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
-                  placeholder="Contoh: Dana Liburan Jepang"
+                  placeholder={t('dash_goal_placeholder_name')}
                   className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none text-sm sm:text-base"
                   style={{
                     background: '#02111f',
@@ -517,7 +519,7 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
 
               <div className="relative">
                <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: '#7aa6c2' }}>
-                 Kategori
+                 {t('dash_goal_label_category')}
                </label>
                <button
                  type="button"
@@ -583,7 +585,7 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: '#7aa6c2' }}>
-                    Target Amount (Rp)
+                    {t('dash_goal_label_target')}
                   </label>
                   <input
                     type="text"
@@ -605,7 +607,7 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
 
                 <div>
                   <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: '#7aa6c2' }}>
-                    Sudah Tersimpan (Rp)
+                    {t('dash_goal_label_collected')}
                   </label>
                   <input
                     type="text"
@@ -627,7 +629,7 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
 
               <div>
                 <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: '#7aa6c2' }}>
-                  Target Tanggal
+                  {t('dash_goal_label_deadline')}
                 </label>
                 <input
                   type="date"
@@ -651,7 +653,7 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows="2"
-                  placeholder="Catatan tambahan..."
+                  placeholder={t('dash_goal_placeholder_note')}
                   className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl outline-none resize-none text-sm sm:text-base"
                   style={{
                     background: '#02111f',
@@ -672,7 +674,7 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
                     color: '#f87171',
                   }}
                 >
-                  Batal
+                  {t('dash_action_cancel')}
                 </button>
                 <button
                   type="submit"
@@ -690,10 +692,10 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
                       <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>
                         <span className="block w-4 h-4 border-2 border-[#020b18] border-t-transparent rounded-full" />
                       </motion.div>
-                      Menyimpan...
+                      {t('dash_action_saving')}
                     </>
                   ) : (
-                    editingId ? 'Update' : 'Simpan'
+                    editingId ? t('dash_action_update') : t('dash_action_save')
                   )}
                 </button>
               </div>
@@ -730,7 +732,7 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
             </button>
-            <h3 className="text-lg sm:text-xl font-bold mb-2 pr-8">Tambah Tabungan</h3>
+            <h3 className="text-lg sm:text-xl font-bold mb-2 pr-8">{t('dash_goal_add_saving')}</h3>
             <p className="text-sm mb-3 sm:mb-4" style={{ color: '#7aa6c2' }}>
               {selectedGoal.name}
             </p>
@@ -772,7 +774,7 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
                     color: '#f87171',
                   }}
                 >
-                  Batal
+                  {t('dash_action_cancel')}
                 </button>
                 <button
                   type="submit"
@@ -790,12 +792,12 @@ export default function GoalCard({ onRefresh, refreshTrigger }) {
                       <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>
                         <span className="block w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
                       </motion.div>
-                      Menyimpan...
+                      {t('dash_action_saving')}
                     </>
                   ) : (
                     <>
                       <Wallet size={16} />
-                      Simpan
+                      {t('dash_action_save')}
                     </>
                   )}
                 </button>

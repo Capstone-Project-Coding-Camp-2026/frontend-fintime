@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { LogOut, User as UserIcon, ChevronDown } from 'lucide-react'
+import { useLanguage } from '../../context/LanguageContext'
 
 export default function UserDropdown({ user, onLogout }) {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
 
@@ -56,7 +58,7 @@ export default function UserDropdown({ user, onLogout }) {
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-white/5 hover:text-cyan-400 transition-all"
               >
                 <UserIcon size={18} />
-                <span className="font-medium">Profil Saya</span>
+                <span className="font-medium">{t('nav_profile')}</span>
               </button>
             </div>
             <div className="border-t border-white/5 p-2">
@@ -65,7 +67,7 @@ export default function UserDropdown({ user, onLogout }) {
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10 transition-all"
               >
                 <LogOut size={18} />
-                <span className="font-medium">Keluar</span>
+                <span className="font-medium">{t('nav_logout')}</span>
               </button>
             </div>
           </motion.div>
